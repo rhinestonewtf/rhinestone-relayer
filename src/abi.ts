@@ -1,0 +1,328 @@
+export const accountLockerAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: '_accountOwner',
+        type: 'address',
+        internalType: 'address payable',
+      },
+      {
+        name: '_lockerOwner',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: '_orchestrator',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'receive', stateMutability: 'payable' },
+  {
+    type: 'function',
+    name: 'EMERGENCY_WITHDRAWAL_LOCK',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'accountOwner',
+    inputs: [],
+    outputs: [{ name: '', type: 'address', internalType: 'address payable' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'addOrchestrator',
+    inputs: [
+      {
+        name: '_orchestrator',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'claimFunds',
+    inputs: [
+      {
+        name: '_claimRequest',
+        type: 'tuple',
+        internalType: 'struct ClaimRequest',
+        components: [
+          { name: 'fee', type: 'uint256', internalType: 'uint256' },
+          {
+            name: 'claimRecipient',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'intent',
+            type: 'tuple',
+            internalType: 'struct BridgeIntent',
+            components: [
+              {
+                name: 'targetChainId',
+                type: 'uint64',
+                internalType: 'uint64',
+              },
+              {
+                name: 'expiryTimestamp',
+                type: 'uint32',
+                internalType: 'uint32',
+              },
+              {
+                name: 'orchestrator',
+                type: 'address',
+                internalType: 'address',
+              },
+              {
+                name: 'sourceTokenAddress',
+                type: 'address',
+                internalType: 'address',
+              },
+              {
+                name: 'targetTokenAddress',
+                type: 'address',
+                internalType: 'address',
+              },
+              {
+                name: 'amount',
+                type: 'uint256',
+                internalType: 'uint256',
+              },
+              {
+                name: 'maxFee',
+                type: 'uint256',
+                internalType: 'uint256',
+              },
+              {
+                name: 'nonce',
+                type: 'bytes32',
+                internalType: 'bytes32',
+              },
+              { name: 'userData', type: 'bytes', internalType: 'bytes' },
+            ],
+          },
+        ],
+      },
+      { name: '_userSignature', type: 'bytes', internalType: 'bytes' },
+      {
+        name: '_orchestratorSignature',
+        type: 'bytes',
+        internalType: 'bytes',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'eip712Domain',
+    inputs: [],
+    outputs: [
+      { name: 'fields', type: 'bytes1', internalType: 'bytes1' },
+      { name: 'name', type: 'string', internalType: 'string' },
+      { name: 'version', type: 'string', internalType: 'string' },
+      { name: 'chainId', type: 'uint256', internalType: 'uint256' },
+      {
+        name: 'verifyingContract',
+        type: 'address',
+        internalType: 'address',
+      },
+      { name: 'salt', type: 'bytes32', internalType: 'bytes32' },
+      {
+        name: 'extensions',
+        type: 'uint256[]',
+        internalType: 'uint256[]',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'emergencyTimestamp',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint32', internalType: 'uint32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'escapeHatchWithdrawClaim',
+    inputs: [
+      { name: '_token', type: 'address', internalType: 'address' },
+      { name: '_amount', type: 'uint256', internalType: 'uint256' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'escapeHatchWithdrawRequest',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'isEmergencyMode',
+    inputs: [],
+    outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'lockerOwner',
+    inputs: [],
+    outputs: [{ name: '', type: 'address', internalType: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'removeOrchestrator',
+    inputs: [
+      {
+        name: '_orchestrator',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'usedClaimNonces',
+    inputs: [{ name: 'nonce', type: 'bytes32', internalType: 'bytes32' }],
+    outputs: [{ name: 'isUsed', type: 'bool', internalType: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'usedWithdrawalNonces',
+    inputs: [{ name: 'nonce', type: 'bytes32', internalType: 'bytes32' }],
+    outputs: [{ name: 'isUsed', type: 'bool', internalType: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'validOrchestrators',
+    inputs: [
+      { name: 'orchestrator', type: 'address', internalType: 'address' },
+    ],
+    outputs: [{ name: 'isValid', type: 'bool', internalType: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'validateCoSignedHash',
+    inputs: [
+      { name: 'msgHash', type: 'bytes32', internalType: 'bytes32' },
+      {
+        name: 'orchestrator',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'accountOwnerSignature',
+        type: 'bytes',
+        internalType: 'bytes',
+      },
+      {
+        name: 'orchestratorSignature',
+        type: 'bytes',
+        internalType: 'bytes',
+      },
+    ],
+    outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'withdraw',
+    inputs: [
+      {
+        name: '_request',
+        type: 'tuple',
+        internalType: 'struct WithdrawRequest',
+        components: [
+          { name: 'timestamp', type: 'uint32', internalType: 'uint32' },
+          {
+            name: 'tokenAddress',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'orchestrator',
+            type: 'address',
+            internalType: 'address',
+          },
+          { name: 'amount', type: 'uint256', internalType: 'uint256' },
+          { name: 'nonce', type: 'bytes32', internalType: 'bytes32' },
+        ],
+      },
+      {
+        name: '_accountOwnerSignature',
+        type: 'bytes',
+        internalType: 'bytes',
+      },
+      {
+        name: '_orchestratorSignature',
+        type: 'bytes',
+        internalType: 'bytes',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    name: 'EIP712DomainChanged',
+    inputs: [],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'EscapeHatchWithdrawRequest',
+    inputs: [],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'AddressEmptyCode',
+    inputs: [{ name: 'target', type: 'address', internalType: 'address' }],
+  },
+  {
+    type: 'error',
+    name: 'AddressInsufficientBalance',
+    inputs: [{ name: 'account', type: 'address', internalType: 'address' }],
+  },
+  { type: 'error', name: 'EmergencyWithdrawalDisabled', inputs: [] },
+  { type: 'error', name: 'FailedInnerCall', inputs: [] },
+  { type: 'error', name: 'IntentExpired', inputs: [] },
+  { type: 'error', name: 'InvalidFee', inputs: [] },
+  { type: 'error', name: 'InvalidNonce', inputs: [] },
+  { type: 'error', name: 'InvalidOrchestrator', inputs: [] },
+  { type: 'error', name: 'InvalidShortString', inputs: [] },
+  { type: 'error', name: 'InvalidSignature', inputs: [] },
+  { type: 'error', name: 'OnlyAccountOwner', inputs: [] },
+  { type: 'error', name: 'OnlyOrchestrator', inputs: [] },
+  {
+    type: 'error',
+    name: 'SafeERC20FailedOperation',
+    inputs: [{ name: 'token', type: 'address', internalType: 'address' }],
+  },
+  { type: 'error', name: 'StandardWithdrawalDisabled', inputs: [] },
+  {
+    type: 'error',
+    name: 'StringTooLong',
+    inputs: [{ name: 'str', type: 'string', internalType: 'string' }],
+  },
+] as const
