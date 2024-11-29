@@ -1,0 +1,12 @@
+FROM node:20-slim 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+RUN apt-get update && apt-get install -y python3 make gcc g++
+COPY . /app
+WORKDIR /app
+
+RUN pnpm install
+
+# will listen on whatever port is passed through ENV or 3000
+CMD [ "pnpm","run", "start" ]
