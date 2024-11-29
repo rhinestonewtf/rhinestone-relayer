@@ -1,10 +1,12 @@
 FROM node:20-slim 
+RUN apt-get update && apt-get install -y python3 make gcc g++
+RUN corepack enable
+
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-RUN apt-get update && apt-get install -y python3 make gcc g++
-COPY . /app
+
 WORKDIR /app
+COPY . .
 
 RUN pnpm install
 
