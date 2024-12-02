@@ -14,13 +14,15 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^22.1.0",
+    "@types/ws": "^8.5.13",
     "amqplib": "^0.10.4",
     "axios": "^1.7.4",
     "dotenv": "^16.4.5",
     "permissionless": "^0.2.15",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
-    "viem": "^2.19.1"
+    "viem": "^2.19.1",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.5",
