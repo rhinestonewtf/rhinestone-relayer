@@ -37,7 +37,8 @@ ws.on('error', (error) => {
   console.error('WebSocket error:', error)
 })
 
-// Call the generateBundle function on repeat every 30 seconds
+// Generate a bundle with a very small amount every 30 seconds, so that fillers can test integration
+// NOTE: This should not be added for production fillers.
 try {
   setInterval(async () => {
     try {
