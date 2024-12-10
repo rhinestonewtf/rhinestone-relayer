@@ -2,7 +2,7 @@ import WebSocket from 'ws'
 import { fillBundle } from './filler'
 
 // Define the WebSocket URL for the orchestrator
-const ORCHESTRATOR_URL = 'wss://orchestrator-prototype-38oyp.ondigitalocean.app/bundles/events'
+const ORCHESTRATOR_URL = 'wss://orchestrator.api.rhinestone.wtf/bundles/events'
 
 // Create a WebSocket client
 const ws = new WebSocket(ORCHESTRATOR_URL)
