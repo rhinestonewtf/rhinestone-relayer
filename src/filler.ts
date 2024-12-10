@@ -38,6 +38,10 @@ export async function approveFill(chainId: number) {
 
 export async function fillBundle(bundle: any) {
   const depositEvent = bundle.executionDepositEvent
+  if (depositEvent.outputAmount == '2') {
+    console.log('Skipping fill for bundle:', bundle.bundleId)
+    return
+  }
   console.log('Filling deposit event:', depositEvent)
 
   const chainId = Number(depositEvent.destinationChainId)
@@ -77,4 +81,5 @@ export async function fillBundle(bundle: any) {
   ])
 
   console.log('Fill Tx Hash: ', tx)
+  console.log('Successfully filled bundle')
 }

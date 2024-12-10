@@ -13,6 +13,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@rhinestone/module-sdk": "^0.1.31",
+    "@rhinestone/orchestrator-sdk": "^0.0.1",
     "@types/node": "^22.1.0",
     "@types/ws": "^8.5.13",
     "amqplib": "^0.10.4",
@@ -21,7 +23,7 @@
     "permissionless": "^0.2.15",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
-    "viem": "^2.19.1",
+    "viem": "^2.21.52",
     "ws": "^8.18.0"
   },
   "devDependencies": {

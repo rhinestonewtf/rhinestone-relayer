@@ -1,5 +1,6 @@
 import WebSocket from 'ws'
 import { fillBundle } from './filler'
+import { generateBundle } from './bundleGenerator'
 
 // Define the WebSocket URL for the orchestrator
 const ORCHESTRATOR_URL = 'wss://orchestrator.api.rhinestone.wtf/bundles/events'
@@ -19,7 +20,7 @@ ws.on('message', async (data) => {
   try {
     if (bundle.type !== 'Ping') {
       await fillBundle(bundle)
-      console.log('Successfully filled bundle')
+      console.log('Successfully received bundle')
     }
   } catch (error) {
     console.error('Error filling bundle:', error)
@@ -35,3 +36,16 @@ ws.on('close', () => {
 ws.on('error', (error) => {
   console.error('WebSocket error:', error)
 })
+
+// Call the generateBundle function on repeat every 30 seconds
+try {
+  setInterval(async () => {
+    try {
+      await generateBundle()
+    } catch (error) {
+      console.error('Error generating bundle:', error)
+    }
+  }, 30000)
+} catch (error) {
+  console.error('Error setting up interval:', error)
+}

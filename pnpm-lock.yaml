@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@rhinestone/module-sdk':
+        specifier: ^0.1.31
+        version: 0.1.31(viem@2.21.52(typescript@5.7.2))
+      '@rhinestone/orchestrator-sdk':
+        specifier: ^0.0.1
+        version: 0.0.1(@rhinestone/module-sdk@0.1.31(viem@2.21.52(typescript@5.7.2)))(viem@2.21.52(typescript@5.7.2))
       '@types/node':
         specifier: ^22.1.0
         version: 22.10.1
@@ -33,7 +39,7 @@ importers:
         specifier: ^5.5.4
         version: 5.7.2
       viem:
-        specifier: ^2.19.1
+        specifier: ^2.21.52
         version: 2.21.52(typescript@5.7.2)
       ws:
         specifier: ^8.18.0
@@ -420,6 +426,17 @@ packages:
 
   '@prisma/get-platform@5.22.0':
     resolution: {integrity: sha512-pHhpQdr1UPFpt+zFfnPazhulaZYCUqeIcPpJViYoq9R+D/yw4fjE+CtnsnKzPYm0ddUbeXUzjGVGIRVgPDCk4Q==}
+
+  '@rhinestone/module-sdk@0.1.31':
+    resolution: {integrity: sha512-TO6xS68OxsZz1RDJLeqoWKyQYGH0h6TgSN76KmnK/I7GLxbedVJWQmoJVxZ8nD3yxbyu9wM+SwxNVMRD0fta3A==}
+    peerDependencies:
+      viem: ^2.0.0
+
+  '@rhinestone/orchestrator-sdk@0.0.1':
+    resolution: {integrity: sha512-BDkp0hRym2tgNBLDcnzxr/V7IFEDyF7iaSlctnp+L/u57uRKFVXy/5PHlEh+tO97bSjaJxPKjF6FWxGd9iK8ag==}
+    peerDependencies:
+      '@rhinestone/module-sdk': ^0.1.29
+      viem: ^2.17.8
 
   '@scure/base@1.1.9':
     resolution: {integrity: sha512-8YKhl8GHiNI/pU2VMaofa2Tor7PJRAjwQLBBuilkJ9L5+13yVbC7JO/wS7piioAvPSwR3JKM1IJ/u4xQzbcXKg==}
@@ -1534,6 +1551,9 @@ packages:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
 
+  solady@0.0.235:
+    resolution: {integrity: sha512-JUEXLDG7ag3HmqUnrDG7ilhafH6R9bFPpwV63O2kH4UbnS2+gRGEOqqy4k01O7tHjo3MWkDD0cpG+UY9pjy/fQ==}
+
   source-map-support@0.5.13:
     resolution: {integrity: sha512-SHSKFHadjVA5oR4PPqhtAVdcBWwRYVd6g6cAXnIbRiIwc2EhPrTuKUBdSLvlEKyIP3GCf89fltvcZiP9MMFA1w==}
 
@@ -2241,6 +2261,17 @@ snapshots:
   '@prisma/get-platform@5.22.0':
     dependencies:
       '@prisma/debug': 5.22.0
+
+  '@rhinestone/module-sdk@0.1.31(viem@2.21.52(typescript@5.7.2))':
+    dependencies:
+      solady: 0.0.235
+      tslib: 2.8.1
+      viem: 2.21.52(typescript@5.7.2)
+
+  '@rhinestone/orchestrator-sdk@0.0.1(@rhinestone/module-sdk@0.1.31(viem@2.21.52(typescript@5.7.2)))(viem@2.21.52(typescript@5.7.2))':
+    dependencies:
+      '@rhinestone/module-sdk': 0.1.31(viem@2.21.52(typescript@5.7.2))
+      viem: 2.21.52(typescript@5.7.2)
 
   '@scure/base@1.1.9': {}
 
@@ -3506,6 +3537,8 @@ snapshots:
   sisteransi@1.0.5: {}
 
   slash@3.0.0: {}
+
+  solady@0.0.235: {}
 
   source-map-support@0.5.13:
     dependencies:
