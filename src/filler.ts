@@ -38,11 +38,11 @@ export async function fillBundle(bundle: any) {
 
   // NOTE: This should not be added for production fillers.
   // The rhinestone relayer skips feeling test bundles, so that integrating fillers can test using these.
-  // if (depositEvent.outputAmount == '2') {
-  //   console.log('Skipping fill for bundle:', bundle.bundleId)
-  //   return
-  // }
-  // console.log('Filling deposit event:', depositEvent)
+  if (depositEvent.outputAmount == '2') {
+    console.log('Skipping fill for bundle:', bundle.bundleId)
+    return
+  }
+  console.log('Filling deposit event:', depositEvent)
 
   const chainId = Number(depositEvent.destinationChainId)
 
