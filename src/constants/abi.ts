@@ -17,16 +17,6 @@ export const spokepoolAbi = [
         type: 'uint32',
         internalType: 'uint32',
       },
-      {
-        name: '_l2Usdc',
-        type: 'address',
-        internalType: 'contract IERC20',
-      },
-      {
-        name: '_cctpTokenMessenger',
-        type: 'address',
-        internalType: 'contract ITokenMessenger',
-      },
     ],
     stateMutability: 'nonpayable',
   },
@@ -98,16 +88,14 @@ export const spokepoolAbi = [
   },
   {
     type: 'function',
-    name: 'cctpTokenMessenger',
-    inputs: [],
-    outputs: [
-      {
-        name: '',
-        type: 'address',
-        internalType: 'contract ITokenMessenger',
-      },
+    name: 'adminRemoveFunds',
+    inputs: [
+      { name: 'amount', type: 'uint256', internalType: 'uint256' },
+      { name: 'token', type: 'address', internalType: 'address' },
+      { name: 'recipient', type: 'address', internalType: 'address' },
     ],
-    stateMutability: 'view',
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -663,16 +651,6 @@ export const spokepoolAbi = [
         internalType: 'uint32',
       },
       {
-        name: '_l2GatewayRouter',
-        type: 'address',
-        internalType: 'address',
-      },
-      {
-        name: '_crossDomainAdmin',
-        type: 'address',
-        internalType: 'address',
-      },
-      {
         name: '_withdrawalRecipient',
         type: 'address',
         internalType: 'address',
@@ -680,13 +658,6 @@ export const spokepoolAbi = [
     ],
     outputs: [],
     stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'l2GatewayRouter',
-    inputs: [],
-    outputs: [{ name: '', type: 'address', internalType: 'address' }],
-    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -700,6 +671,13 @@ export const spokepoolAbi = [
     name: 'numberOfDeposits',
     inputs: [],
     outputs: [{ name: '', type: 'uint32', internalType: 'uint32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'owner',
+    inputs: [],
+    outputs: [{ name: '', type: 'address', internalType: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -739,13 +717,6 @@ export const spokepoolAbi = [
   },
   {
     type: 'function',
-    name: 'recipientCircleDomainId',
-    inputs: [],
-    outputs: [{ name: '', type: 'uint32', internalType: 'uint32' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
     name: 'relayRootBundle',
     inputs: [
       {
@@ -759,6 +730,13 @@ export const spokepoolAbi = [
         internalType: 'bytes32',
       },
     ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'renounceOwnership',
+    inputs: [],
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -881,19 +859,6 @@ export const spokepoolAbi = [
   },
   {
     type: 'function',
-    name: 'setL2GatewayRouter',
-    inputs: [
-      {
-        name: 'newL2GatewayRouter',
-        type: 'address',
-        internalType: 'address',
-      },
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
     name: 'setWithdrawalRecipient',
     inputs: [
       {
@@ -928,6 +893,13 @@ export const spokepoolAbi = [
         internalType: 'bytes',
       },
     ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'transferOwnership',
+    inputs: [{ name: 'newOwner', type: 'address', internalType: 'address' }],
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -1019,30 +991,6 @@ export const spokepoolAbi = [
     ],
     outputs: [],
     stateMutability: 'payable',
-  },
-  {
-    type: 'function',
-    name: 'usdcToken',
-    inputs: [],
-    outputs: [{ name: '', type: 'address', internalType: 'contract IERC20' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    name: 'whitelistToken',
-    inputs: [
-      { name: 'l2Token', type: 'address', internalType: 'address' },
-      { name: 'l1Token', type: 'address', internalType: 'address' },
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'whitelistedTokens',
-    inputs: [{ name: '', type: 'address', internalType: 'address' }],
-    outputs: [{ name: '', type: 'address', internalType: 'address' }],
-    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -1506,6 +1454,25 @@ export const spokepoolAbi = [
   },
   {
     type: 'event',
+    name: 'OwnershipTransferred',
+    inputs: [
+      {
+        name: 'previousOwner',
+        type: 'address',
+        indexed: true,
+        internalType: 'address',
+      },
+      {
+        name: 'newOwner',
+        type: 'address',
+        indexed: true,
+        internalType: 'address',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
     name: 'PausedDeposits',
     inputs: [
       {
@@ -1722,19 +1689,6 @@ export const spokepoolAbi = [
   },
   {
     type: 'event',
-    name: 'SetL2GatewayRouter',
-    inputs: [
-      {
-        name: 'newL2GatewayRouter',
-        type: 'address',
-        indexed: true,
-        internalType: 'address',
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: 'event',
     name: 'SetWithdrawalRecipient',
     inputs: [
       {
@@ -1890,25 +1844,6 @@ export const spokepoolAbi = [
         type: 'bytes',
         indexed: false,
         internalType: 'bytes',
-      },
-    ],
-    anonymous: false,
-  },
-  {
-    type: 'event',
-    name: 'WhitelistedTokens',
-    inputs: [
-      {
-        name: 'l2Token',
-        type: 'address',
-        indexed: true,
-        internalType: 'address',
-      },
-      {
-        name: 'l1Token',
-        type: 'address',
-        indexed: true,
-        internalType: 'address',
       },
     ],
     anonymous: false,

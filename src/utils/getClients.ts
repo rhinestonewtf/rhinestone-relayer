@@ -1,3 +1,4 @@
+import { getChainConfig } from '@rhinestone/orchestrator-sdk'
 import {
   createPublicClient,
   createWalletClient,
@@ -5,11 +6,11 @@ import {
   http,
   publicActions,
 } from 'viem'
-import { getNetworkDetails } from '../constants/registry'
+
 import { privateKeyToAccount } from 'viem/accounts'
 
 export const getPublicClient = (chainId: number) => {
-  const chainConfig = getNetworkDetails(chainId)
+  const chainConfig = getChainConfig(chainId)
 
   return createPublicClient({
     transport: http(chainConfig.rpcUrl),
@@ -18,7 +19,7 @@ export const getPublicClient = (chainId: number) => {
 }
 
 export const getWalletClient = (chainId: number, privateKey: Hex) => {
-  const chainConfig = getNetworkDetails(chainId)
+  const chainConfig = getChainConfig(chainId)
 
   return createWalletClient({
     account: privateKeyToAccount(privateKey),

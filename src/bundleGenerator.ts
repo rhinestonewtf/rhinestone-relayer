@@ -1,37 +1,22 @@
 import {
   Execution,
+  getEmptyUserOp,
   getOrchestrator,
+  getTokenAddress,
   MetaIntent,
-  PackedUserOperation,
 } from '@rhinestone/orchestrator-sdk'
 import { encodeFunctionData, erc20Abi, Hex } from 'viem'
-import { baseUSDC } from './constants/registry'
-import { zeroAddress, zeroHash } from 'viem'
 
 require('dotenv').config()
 
 const orchestrator = getOrchestrator(process.env.ORCHESTRATOR_API_KEY!)
 
-export function getEmptyUserOp(): PackedUserOperation {
-  return {
-    sender: zeroAddress,
-    nonce: 0n,
-    initCode: '0x',
-    callData: '0x',
-    accountGasLimits: zeroHash,
-    preVerificationGas: 0n,
-    gasFees: zeroHash,
-    paymasterAndData: '0x',
-    signature: '0x',
-  }
-}
-
 export const generateBundle = async () => {
-  const userId = '157757fa-6952-4576-8858-49d9145987ee'
-  const accountAddress = '0xFfF799094Ede20f26d06A6Ff9bFDca13AD260018'
+  const userId = '581379d0-2fdd-4ea3-9aab-b900f7ed3e30'
+  const accountAddress = '0x7F1eA505b099BA673937a61A4c9B161c115c6E01'
 
   const execution: Execution = {
-    target: baseUSDC,
+    target: getTokenAddress('USDC', 8453),
     value: 0n,
     callData: encodeFunctionData({
       abi: erc20Abi,
@@ -44,22 +29,20 @@ export const generateBundle = async () => {
     targetChainId: 8453, // Base
     tokenTransfers: [
       {
-        tokenAddress: baseUSDC,
+        tokenAddress: getTokenAddress('USDC', 8453),
         amount: 2n,
       },
     ],
     targetAccount: accountAddress,
-    targetExecutions: [execution],
+    targetExecutions: [],
     userOp: getEmptyUserOp(),
   }
 
-  const bundleId = (
-    await orchestrator.postMetaIntentWithOwnableValidator(
-      metaIntent,
-      userId,
-      process.env.BUNDLE_GENERATOR_PRIVATE_KEY! as Hex,
-    )
-  ).bundleId
+  const bundleId = await orchestrator.postMetaIntentWithOwnableValidator(
+    metaIntent,
+    userId,
+    process.env.BUNDLE_GENERATOR_PRIVATE_KEY! as Hex,
+  )
 
   console.log(bundleId)
 
