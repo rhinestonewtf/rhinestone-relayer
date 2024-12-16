@@ -6,14 +6,15 @@ import {
   MetaIntent,
 } from '@rhinestone/orchestrator-sdk'
 import { encodeFunctionData, erc20Abi, Hex } from 'viem'
+import { postMetaIntentWithOwnableValidator } from '../test/safe7579Signature'
 
 require('dotenv').config()
 
 const orchestrator = getOrchestrator(process.env.ORCHESTRATOR_API_KEY!)
 
 export const generateBundle = async () => {
-  const userId = '581379d0-2fdd-4ea3-9aab-b900f7ed3e30'
-  const accountAddress = '0x7F1eA505b099BA673937a61A4c9B161c115c6E01'
+  const userId = 'd6f64241-a62c-4542-bb23-e78d7e1e0cd6'
+  const accountAddress = '0x9EB7504B7546b1B66e177B364A3566eC10132A40'
 
   const execution: Execution = {
     target: getTokenAddress('USDC', 8453),
@@ -34,14 +35,15 @@ export const generateBundle = async () => {
       },
     ],
     targetAccount: accountAddress,
-    targetExecutions: [],
+    targetExecutions: [execution],
     userOp: getEmptyUserOp(),
   }
 
-  const bundleId = await orchestrator.postMetaIntentWithOwnableValidator(
+  const bundleId = await postMetaIntentWithOwnableValidator(
     metaIntent,
     userId,
     process.env.BUNDLE_GENERATOR_PRIVATE_KEY! as Hex,
+    orchestrator,
   )
 
   console.log(bundleId)
