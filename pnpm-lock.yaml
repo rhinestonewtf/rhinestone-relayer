@@ -8,12 +8,9 @@ importers:
 
   .:
     dependencies:
-      '@rhinestone/module-sdk':
-        specifier: ^0.1.31
-        version: 0.1.31(viem@2.21.55(typescript@5.7.2))
       '@rhinestone/orchestrator-sdk':
-        specifier: ^0.1.1
-        version: 0.1.1(viem@2.21.55(typescript@5.7.2))
+        specifier: ^0.1.3
+        version: 0.1.3(viem@2.21.55(typescript@5.7.2))
       '@types/node':
         specifier: ^22.10.1
         version: 22.10.1
@@ -24,8 +21,8 @@ importers:
         specifier: ^0.10.5
         version: 0.10.5
       axios:
-        specifier: ^1.7.8
-        version: 1.7.8
+        specifier: ^1.7.9
+        version: 1.7.9
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5
@@ -431,13 +428,8 @@ packages:
   '@prisma/get-platform@5.22.0':
     resolution: {integrity: sha512-pHhpQdr1UPFpt+zFfnPazhulaZYCUqeIcPpJViYoq9R+D/yw4fjE+CtnsnKzPYm0ddUbeXUzjGVGIRVgPDCk4Q==}
 
-  '@rhinestone/module-sdk@0.1.31':
-    resolution: {integrity: sha512-TO6xS68OxsZz1RDJLeqoWKyQYGH0h6TgSN76KmnK/I7GLxbedVJWQmoJVxZ8nD3yxbyu9wM+SwxNVMRD0fta3A==}
-    peerDependencies:
-      viem: ^2.0.0
-
-  '@rhinestone/orchestrator-sdk@0.1.1':
-    resolution: {integrity: sha512-BG0pFmSBoMb5ldkrhfpv3GpzgdLNPKRAIZ/3eUDEBdRlZuUwzJSAFpv1sYHhHksUlCu3D3K7y7JF+0rdsgKDeQ==}
+  '@rhinestone/orchestrator-sdk@0.1.3':
+    resolution: {integrity: sha512-z4EsHXSrmauF32/+t5+YAvwhnw73uy/LQorVNWFlo1WvjvmVuoefjFDdLFCrdgDtz1hyJp1fp+DSr4YMvp9wuA==}
     peerDependencies:
       viem: ^2.17.8
 
@@ -589,8 +581,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios@1.7.8:
-    resolution: {integrity: sha512-Uu0wb7KNqK2t5K+YQyVCLM76prD5sRFjKHbJYCP1J7JFGEQ6nN7HWn9+04LAeiJ3ji54lgS/gZCH1oxyrf1SPw==}
+  axios@1.7.9:
+    resolution: {integrity: sha512-LhLcE7Hbiryz8oMDdDptSrWowmB4Bl6RCt6sIJKpRB4XtVf0iEgewX3au/pJqm+Py1kCASkb/FFKjxQaLtxJvw==}
 
   babel-jest@29.7.0:
     resolution: {integrity: sha512-BrvGY3xZSwEcCzKvKsCi2GgHqDqsYkOP4/by5xCgIwGXQxIEh+8ew3gmrE1y7XRR6LHZIj6yLYnUi/mm2KXKBg==}
@@ -1563,9 +1555,6 @@ packages:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
 
-  solady@0.0.235:
-    resolution: {integrity: sha512-JUEXLDG7ag3HmqUnrDG7ilhafH6R9bFPpwV63O2kH4UbnS2+gRGEOqqy4k01O7tHjo3MWkDD0cpG+UY9pjy/fQ==}
-
   source-map-support@0.5.13:
     resolution: {integrity: sha512-SHSKFHadjVA5oR4PPqhtAVdcBWwRYVd6g6cAXnIbRiIwc2EhPrTuKUBdSLvlEKyIP3GCf89fltvcZiP9MMFA1w==}
 
@@ -2278,13 +2267,7 @@ snapshots:
     dependencies:
       '@prisma/debug': 5.22.0
 
-  '@rhinestone/module-sdk@0.1.31(viem@2.21.55(typescript@5.7.2))':
-    dependencies:
-      solady: 0.0.235
-      tslib: 2.8.1
-      viem: 2.21.55(typescript@5.7.2)
-
-  '@rhinestone/orchestrator-sdk@0.1.1(viem@2.21.55(typescript@5.7.2))':
+  '@rhinestone/orchestrator-sdk@0.1.3(viem@2.21.55(typescript@5.7.2))':
     dependencies:
       viem: 2.21.55(typescript@5.7.2)
 
@@ -2441,7 +2424,7 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.7.8:
+  axios@1.7.9:
     dependencies:
       follow-redirects: 1.15.9
       form-data: 4.0.1
@@ -3556,8 +3539,6 @@ snapshots:
   sisteransi@1.0.5: {}
 
   slash@3.0.0: {}
-
-  solady@0.0.235: {}
 
   source-map-support@0.5.13:
     dependencies:
