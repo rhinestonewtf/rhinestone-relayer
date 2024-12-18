@@ -1,0 +1,28 @@
+[profile.default]
+  auto_detect_solc = false
+  bytecode_hash = "none"
+  evm_version = "shanghai"
+  fuzz = { runs = 1_000 }
+  gas_reports = ["*"]
+  optimizer = true
+  optimizer_runs = 10_000
+  via-ir=true
+  out = "out"
+  script = "script"
+  solc = "0.8.25"
+  src = "contracts"
+  test = "test/forgeTests"
+
+[profile.ci]
+  fuzz = { runs = 10_000 }
+  verbosity = 4
+
+[fmt]
+  bracket_spacing = true
+  int_types = "long"
+  line_length = 120
+  multiline_func_header = "all"
+  number_underscore = "thousands"
+  quote_style = "double"
+  tab_width = 4
+  wrap_comments = true

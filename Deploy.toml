@@ -1,0 +1,50 @@
+
+
+[deployments]
+rpcs = [
+    #"http://localhost:8545",
+    #"http://localhost:8846",
+    #"http://localhost:8847",
+    #"http://localhost:8848",
+
+    # Mainnet
+    #"https://eth.llamarpc.com",
+    #"http://localhost:8545",
+    #"https://ethereum-sepolia-rpc.publicnode.com",
+
+"https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}",
+"https://opt-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}",
+"https://base-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}",
+"https://arb-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}",
+"https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}",
+"https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}",
+"https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}",
+
+
+
+    # Optimism
+    #"https://optimism.llamarpc.com",
+    #"https://sepolia.optimism.io",
+
+    # Base
+    #"https://base.llamarpc.com",
+    #"https://sepolia.base.org",
+
+    # Arbitrum
+    #"https://arbitrum.llamarpc.com",
+    #"https://public.stackup.sh/api/v1/node/arbitrum-sepolia",
+]
+[deployments.dependencies]
+
+# verification_url="https://api.tenderly.co/api/v1/account/rhinestone/project/chain-abstraction/etherscan/verify"
+[deployments.verifier]
+# required to enable verification
+api_key ="${TENDERLY_API_KEY}"
+# optional verifier url - default is etherscan.io. Supports chain injection as {{chain_id}} place holder
+url = "https://api.tenderly.co/api/v1/account/rhinestone/project/chain-abstraction/etherscan/verify/network/{{chain_id}}"
+
+
+[deployments.singleton.RhinestoneRelayer]
+file = "./artifacts/RhinestoneRelayer/RhinestoneRelayer.json"
+salt = "0x0000000000000000000000000000000000000000e5068a3f93a9e201a1832998"
+
