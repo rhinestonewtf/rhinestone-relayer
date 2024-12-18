@@ -1,4 +1,11 @@
-import { Address, erc20Abi, getContract, Hex, zeroAddress } from 'viem'
+import {
+  Address,
+  encodeFunctionData,
+  erc20Abi,
+  getContract,
+  Hex,
+  zeroAddress,
+} from 'viem'
 
 import { spokepoolAbi } from './constants/abi'
 import { getPublicClient, getWalletClient } from './utils/getClients'
@@ -61,6 +68,30 @@ export async function fillBundle(bundle: any) {
       wallet: walletClient,
     },
   })
+
+  const data = encodeFunctionData({
+    abi: spokepoolAbi,
+    functionName: 'fillV3Relay',
+    args: [
+      {
+        depositor: depositEvent.depositor as Address,
+        recipient: depositEvent.recipient as Address,
+        exclusiveRelayer: depositEvent.exclusiveRelayer as Address,
+        inputToken: depositEvent.inputToken as Address,
+        outputToken: depositEvent.outputToken as Address,
+        inputAmount: BigInt(depositEvent.inputAmount),
+        outputAmount: BigInt(depositEvent.outputAmount),
+        originChainId: 42161n,
+        depositId: BigInt(depositEvent.depositId),
+        fillDeadline: depositEvent.fillDeadline,
+        exclusivityDeadline: depositEvent.exclusivityDeadline,
+        message: depositEvent.message as Hex,
+      },
+      REPAYMENT_CHAIN_ID, // repaymentChainId (Arbitrum)
+    ],
+  })
+
+  console.log('Data: ', data)
 
   const tx = await spokepool.write.fillV3Relay(
     [
