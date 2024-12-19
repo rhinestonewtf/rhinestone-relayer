@@ -20,10 +20,10 @@ require('dotenv').config()
 export async function fillBundle(bundle: any) {
   // NOTE: This should not be added for production fillers.
   // The rhinestone relayer skips filling test bundles, so that integrating fillers can test using these.
-  // if (bundle.executionDepositEvent.outputAmount == '2') {
-  //   console.log('Skipping fill for bundle:', bundle.bundleId)
-  //   return
-  // }
+  if (bundle.executionDepositEvent.outputAmount == '2') {
+    console.log('Skipping fill for bundle:', bundle.bundleId)
+    return
+  }
   console.log('Filling bundleId :', bundle.bundleId)
 
   const RELAYER = getRelayer(
