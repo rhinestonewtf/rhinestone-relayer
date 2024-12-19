@@ -2068,3 +2068,266 @@ export const wethAbi = [
   { type: 'error', name: 'PermitExpired', inputs: [] },
   { type: 'error', name: 'TotalSupplyOverflow', inputs: [] },
 ] as const
+
+export const rhinestoneRelayerAbi = [
+  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'function',
+    name: 'fillBundle',
+    inputs: [
+      {
+        name: 'executionDeposit',
+        type: 'tuple',
+        internalType: 'struct AcrossDeposit',
+        components: [
+          {
+            name: 'inputToken',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'outputToken',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'inputAmount',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'outputAmount',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'destinationChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'originChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'depositId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'quoteTimestamp',
+            type: 'uint32',
+            internalType: 'uint32',
+          },
+          {
+            name: 'fillDeadline',
+            type: 'uint32',
+            internalType: 'uint32',
+          },
+          {
+            name: 'exclusivityDeadline',
+            type: 'uint32',
+            internalType: 'uint32',
+          },
+          {
+            name: 'depositor',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'recipient',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'exclusiveRelayer',
+            type: 'address',
+            internalType: 'address',
+          },
+          { name: 'message', type: 'bytes', internalType: 'bytes' },
+        ],
+      },
+      {
+        name: 'standardDeposits',
+        type: 'tuple[]',
+        internalType: 'struct AcrossDeposit[]',
+        components: [
+          {
+            name: 'inputToken',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'outputToken',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'inputAmount',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'outputAmount',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'destinationChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'originChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'depositId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'quoteTimestamp',
+            type: 'uint32',
+            internalType: 'uint32',
+          },
+          {
+            name: 'fillDeadline',
+            type: 'uint32',
+            internalType: 'uint32',
+          },
+          {
+            name: 'exclusivityDeadline',
+            type: 'uint32',
+            internalType: 'uint32',
+          },
+          {
+            name: 'depositor',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'recipient',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'exclusiveRelayer',
+            type: 'address',
+            internalType: 'address',
+          },
+          { name: 'message', type: 'bytes', internalType: 'bytes' },
+        ],
+      },
+      {
+        name: 'repaymentChainId',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'multiCall',
+    inputs: [
+      {
+        name: 'executions',
+        type: 'tuple[]',
+        internalType: 'struct Execution[]',
+        components: [
+          { name: 'to', type: 'address', internalType: 'address' },
+          { name: 'value', type: 'uint256', internalType: 'uint256' },
+          { name: 'data', type: 'bytes', internalType: 'bytes' },
+        ],
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'owner',
+    inputs: [],
+    outputs: [{ name: '', type: 'address', internalType: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'renounceOwnership',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setSpokepool',
+    inputs: [{ name: '_spokepool', type: 'address', internalType: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'spokepool',
+    inputs: [],
+    outputs: [
+      { name: '', type: 'address', internalType: 'contract ISpokePool' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'transferOwnership',
+    inputs: [{ name: 'newOwner', type: 'address', internalType: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'withdrawFunds',
+    inputs: [
+      { name: 'recipient', type: 'address', internalType: 'address' },
+      { name: 'token', type: 'address', internalType: 'address' },
+      { name: 'amount', type: 'uint256', internalType: 'uint256' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    name: 'OwnershipTransferred',
+    inputs: [
+      {
+        name: 'previousOwner',
+        type: 'address',
+        indexed: true,
+        internalType: 'address',
+      },
+      {
+        name: 'newOwner',
+        type: 'address',
+        indexed: true,
+        internalType: 'address',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'OwnableInvalidOwner',
+    inputs: [{ name: 'owner', type: 'address', internalType: 'address' }],
+  },
+  {
+    type: 'error',
+    name: 'OwnableUnauthorizedAccount',
+    inputs: [{ name: 'account', type: 'address', internalType: 'address' }],
+  },
+  {
+    type: 'error',
+    name: 'SafeERC20FailedOperation',
+    inputs: [{ name: 'token', type: 'address', internalType: 'address' }],
+  },
+] as const

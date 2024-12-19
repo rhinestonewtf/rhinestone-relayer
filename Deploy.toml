@@ -26,7 +26,7 @@ rpcs = [
     #"https://optimism.llamarpc.com",
     #"https://sepolia.optimism.io",
 
-    # Base
+# Base
     #"https://base.llamarpc.com",
     #"https://sepolia.base.org",
 
@@ -36,15 +36,16 @@ rpcs = [
 ]
 [deployments.dependencies]
 
-# verification_url="https://api.tenderly.co/api/v1/account/rhinestone/project/chain-abstraction/etherscan/verify"
 [deployments.verifier]
 # required to enable verification
-api_key ="${TENDERLY_API_KEY}"
+api_key ="${ETHERSCAN_API_KEY}"
 # optional verifier url - default is etherscan.io. Supports chain injection as {{chain_id}} place holder
-url = "https://api.tenderly.co/api/v1/account/rhinestone/project/chain-abstraction/etherscan/verify/network/{{chain_id}}"
+# url = "https://api.tenderly.co/api/v1/account/rhinestone/project/chain-abstraction/etherscan/verify/network/{{chain_id}}"
 
 
 [deployments.singleton.RhinestoneRelayer]
 file = "./artifacts/RhinestoneRelayer/RhinestoneRelayer.json"
+source_file="./artifacts/RhinestoneRelayer/verify.json"
 salt = "0x0000000000000000000000000000000000000000e5068a3f93a9e201a1832998"
-
+args_sig = "(address)"
+args = ['0xe59aaf21c4D9Cf92d9eD4537f4404BA031f83b23']

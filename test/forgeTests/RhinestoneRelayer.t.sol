@@ -22,7 +22,7 @@ contract RhinestoneRelayerTest is Test {
         vm.startPrank(owner);
 
         // Deploy the RhinestoneRelayer contract
-        relayer = new RhinestoneRelayer();
+        relayer = new RhinestoneRelayer(address(owner));
 
         // Mock the ISpokePool and ERC20 token
         spokepool = ISpokePool(address(new MockSpokePool()));
@@ -60,6 +60,21 @@ contract RhinestoneRelayerTest is Test {
 
         assertEq(relayerBalanceBefore - amount, relayerBalanceAfter);
         assertEq(recipientBalanceBefore + amount, recipientBalanceAfter);
+
+        vm.stopPrank();
+    }
+
+    function testSendEther() public {
+        vm.startPrank(owner);
+        vm.deal(address(owner), 1 ether);
+
+        uint256 relayerBalanceBefore = address(relayer).balance;
+
+        address(relayer).call{ value: 1 ether - 5000 }('');
+
+        payable(address(relayer)).transfer(5000);
+
+        assertEq(address(relayer).balance, relayerBalanceBefore + 1 ether);
 
         vm.stopPrank();
     }
@@ -142,6 +157,25 @@ contract RhinestoneRelayerTest is Test {
         // MockSpokePool should log calls to `fillV3Relay`.
         MockSpokePool mockSpokePool = MockSpokePool(address(spokepool));
         assertEq(mockSpokePool.callsMade(), 2); // One for each deposit
+
+        vm.stopPrank();
+    }
+
+    function testApproveSpokepool() public {
+        vm.startPrank(owner);
+
+        uint256 amount = 100 * 10 ** 18;
+        token.mint(address(relayer), amount);
+
+        address[] memory tokens = new address[](1);
+        tokens[0] = address(token);
+
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = amount;
+
+        relayer.approveSpokepool(tokens, amounts);
+
+        assertEq(token.allowance(address(relayer), address(spokepool)), amount);
 
         vm.stopPrank();
     }
