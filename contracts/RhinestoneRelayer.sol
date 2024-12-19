@@ -33,10 +33,25 @@ contract RhinestoneRelayer is Ownable {
 
     ISpokePool public spokepool;
 
-    constructor() Ownable(msg.sender) {}
+    constructor(address _owner) Ownable(_owner) {}
 
     function setSpokepool(address _spokepool) public onlyOwner {
         spokepool = ISpokePool(_spokepool);
+    }
+
+    function approveSpokepool(
+        address[] calldata tokens,
+        uint256[] calldata amounts
+    ) public onlyOwner {
+        if (tokens.length != amounts.length) {
+            revert(
+                'RhinestoneRelayer: approveSpokepool: tokens and amounts length mismatch'
+            );
+        }
+
+        for (uint256 i = 0; i < tokens.length; i++) {
+            IERC20(tokens[i]).approve(address(spokepool), amounts[i]);
+        }
     }
 
     function withdrawFunds(
@@ -104,4 +119,6 @@ contract RhinestoneRelayer is Ownable {
             repaymentChainId
         );
     }
+
+    receive() external payable {}
 }

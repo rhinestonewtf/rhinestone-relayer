@@ -16,11 +16,12 @@ ws.on('open', () => {
 // Handle incoming messages
 ws.on('message', async (data) => {
   const bundle = JSON.parse(data.toString())
-  console.log('Received bundle:', bundle)
   try {
     if (bundle.type !== 'Ping') {
+      console.log('Received bundle:', bundle.bundleId)
       await fillBundle(bundle)
-      console.log('Successfully received bundle')
+    } else {
+      console.log('🟡 Received ping')
     }
   } catch (error) {
     console.error('Error filling bundle:', error)
