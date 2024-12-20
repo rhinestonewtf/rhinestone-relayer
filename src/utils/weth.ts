@@ -2,6 +2,7 @@ import { getContract, Hex } from 'viem'
 import { getPublicClient, getWalletClient } from './getClients'
 import { wethAbi } from '../constants/abi'
 import { getTokenAddress } from '@rhinestone/orchestrator-sdk'
+import { OWNER_ADDRESS } from '../constants/constants'
 
 function getWETH(chainId: number) {
   const walletClient = getWalletClient(
@@ -28,7 +29,7 @@ async function wrapEth(amount: bigint, chainId: number) {
   await getPublicClient(chainId).waitForTransactionReceipt({ hash: tx })
 }
 
-async function unwrapEth(amount: bigint, chainId: number) {
+async function unwrapWeth(amount: bigint, chainId: number) {
   const WETH = getWETH(chainId)
 
   const tx = await WETH.write.withdraw([amount])
@@ -37,3 +38,21 @@ async function unwrapEth(amount: bigint, chainId: number) {
 
   await getPublicClient(chainId).waitForTransactionReceipt({ hash: tx })
 }
+
+async function unwrapAllWeth(chainId: number) {
+  const WETH = getWETH(chainId)
+
+  const balance = await WETH.read.balanceOf([OWNER_ADDRESS])
+
+  await unwrapWeth(balance, chainId)
+}
+
+async function getWETHBalance(chainId: number) {
+  const WETH = getWETH(chainId)
+
+  const balance = await WETH.read.balanceOf([OWNER_ADDRESS])
+
+  return balance
+}
+
+unwrapAllWeth(8453)

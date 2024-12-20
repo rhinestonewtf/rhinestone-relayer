@@ -60,6 +60,7 @@ export async function fillBundle(bundle: any) {
     console.error('Error:', error.shortMessage)
     console.log('sender: ', error.sender)
     console.log('to: ', error.contractAddress)
+    console.log('bundle: ', bundle)
 
     console.error('Encoded Function Data:', encodedFunctionData)
   }
