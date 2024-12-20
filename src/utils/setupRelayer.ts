@@ -69,6 +69,10 @@ export async function approveSpokepool(tokens: TokenConfig[], chainId: number) {
         value: 0n,
         data: data,
       })
+    } else {
+      console.log(
+        `🟡 Skipping approvals for chainId: ${chainId}, token: ${token.symbol}`,
+      )
     }
   }
 
