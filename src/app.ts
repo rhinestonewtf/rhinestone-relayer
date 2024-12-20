@@ -16,11 +16,12 @@ ws.on('open', () => {
 // Handle incoming messages
 ws.on('message', async (data) => {
   const bundle = JSON.parse(data.toString())
-  console.log('Received bundle:', bundle)
   try {
     if (bundle.type !== 'Ping') {
+      console.log('Received bundle:', bundle.bundleId)
       await fillBundle(bundle)
-      console.log('Successfully received bundle')
+    } else {
+      console.log('🟡 Received ping')
     }
   } catch (error) {
     console.error('Error filling bundle:', error)
@@ -39,14 +40,14 @@ ws.on('error', (error) => {
 
 // Generate a bundle with a very small amount every 30 seconds, so that fillers can test integration
 // NOTE: This should not be added for production fillers.
-try {
-  setInterval(async () => {
-    try {
-      await generateBundle()
-    } catch (error) {
-      console.error('Error generating bundle:', error)
-    }
-  }, 30000)
-} catch (error) {
-  console.error('Error setting up interval:', error)
-}
+// try {
+//   setInterval(async () => {
+//     try {
+//       await generateBundle()
+//     } catch (error) {
+//       console.error('Error generating bundle:', error)
+//     }
+//   }, 30000)
+// } catch (error) {
+//   console.error('Error setting up interval:', error)
+// }

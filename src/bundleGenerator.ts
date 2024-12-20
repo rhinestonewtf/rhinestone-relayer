@@ -46,10 +46,5 @@ export const generateBundle = async () => {
     orchestrator,
   )
 
-  console.log(bundleId)
-
-  await new Promise((resolve) => setTimeout(resolve, 5000))
-  const bundleStatus = await orchestrator.getBundleStatus(userId, bundleId)
-
-  console.log(bundleStatus)
+  console.log('🔵 Bundle Generator Bundle ID: ', bundleId)
 }
