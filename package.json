@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@rhinestone/orchestrator-sdk": "^0.1.5",
+    "@rhinestone/orchestrator-sdk": "^0.1.6",
     "@types/node": "^22.10.1",
     "@types/ws": "^8.5.13",
     "amqplib": "^0.10.5",
