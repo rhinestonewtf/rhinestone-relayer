@@ -13,8 +13,8 @@ require('dotenv').config()
 const orchestrator = getOrchestrator(process.env.ORCHESTRATOR_API_KEY!)
 
 export const generateBundle = async () => {
-  const userId = 'd6f64241-a62c-4542-bb23-e78d7e1e0cd6'
-  const accountAddress = '0x9EB7504B7546b1B66e177B364A3566eC10132A40'
+  const userId = '320660fd-6805-4e1a-bbd0-c86575b5715e'
+  const accountAddress = '0xf781C5Cc66dbEacBc0Db3F7C7F9bDdC0F51b9499'
 
   const execution: Execution = {
     target: getTokenAddress('USDC', 8453),
@@ -22,7 +22,7 @@ export const generateBundle = async () => {
     callData: encodeFunctionData({
       abi: erc20Abi,
       functionName: 'transfer',
-      args: ['0xD1dcdD8e6Fe04c338aC3f76f7D7105bEcab74F77', 1n],
+      args: ['0x7E287A503f0D19b7899C15e80EB18C0Ee55fFd12', 1n],
     }),
   }
 
@@ -31,7 +31,7 @@ export const generateBundle = async () => {
     tokenTransfers: [
       {
         tokenAddress: getTokenAddress('USDC', 8453),
-        amount: 2n,
+        amount: 1n,
       },
     ],
     targetAccount: accountAddress,
