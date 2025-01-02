@@ -3,10 +3,15 @@ import { fillBundle } from './filler'
 import { generateBundle } from './bundleGenerator'
 
 // Define the WebSocket URL for the orchestrator
-const ORCHESTRATOR_URL = 'wss://orchestrator.api.rhinestone.wtf/bundles/events'
+// const ORCHESTRATOR_URL = 'wss://orchestrator.api.rhinestone.wtf/bundles/events'
+// const ORCHESTRATOR_URL = 'ws://localhost:3000/bundles/events'
+// const ORCHESTRATOR_URL =
+//   'wss://orchestrator-ts-dev-lu36d.ondigitalocean.app/bundles/events'
+
+require('dotenv').config()
 
 // Create a WebSocket client
-const ws = new WebSocket(ORCHESTRATOR_URL)
+const ws = new WebSocket(process.env.ORCHESTRATOR_EVENTS_URL!)
 
 // Handle connection open event
 ws.on('open', () => {
