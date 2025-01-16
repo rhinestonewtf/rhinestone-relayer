@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 import WebSocket from 'ws'
 import { fillBundle } from './filler'
 import { generateBundle } from './bundleGenerator'
@@ -7,8 +9,6 @@ import { generateBundle } from './bundleGenerator'
 // const ORCHESTRATOR_URL = 'ws://localhost:3000/bundles/events'
 // const ORCHESTRATOR_URL =
 //   'wss://orchestrator-ts-dev-lu36d.ondigitalocean.app/bundles/events'
-
-require('dotenv').config()
 
 // Create a WebSocket client
 const ws = new WebSocket(process.env.ORCHESTRATOR_EVENTS_URL!)

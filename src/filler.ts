@@ -1,30 +1,27 @@
-import {
-  Address,
-  ContractFunctionExecutionError,
-  encodeFunctionData,
-  erc20Abi,
-  getContract,
-  Hex,
-  WriteContractErrorType,
-  zeroAddress,
-} from 'viem'
+import { ContractFunctionExecutionError, encodeFunctionData } from 'viem'
 
-import { rhinestoneRelayerAbi, spokepoolAbi } from './constants/abi'
+import { rhinestoneRelayerAbi } from './constants/abi'
 
 import { REPAYMENT_CHAIN_ID } from './constants/constants'
 import { getRelayer } from './utils/getRelayer'
 import { formatDepositEvent } from './utils/formatDepositEvent'
-
-require('dotenv').config()
+import { logError, logMessage } from './utils/logger'
+import { checkBundleInventory } from './utils/inventoryNotifs'
 
 export async function fillBundle(bundle: any) {
+  // const validatedBundle: BundleEvent = await validateBundle(bundle)
   // NOTE: This should not be added for production fillers.
   // The rhinestone relayer skips filling test bundles, so that integrating fillers can test using these.
   if (bundle.executionDepositEvent.outputAmount == '1') {
-    console.log('Skipping fill for bundle:', bundle.bundleId)
+    logMessage('Skipping fill for bundle: ' + String(bundle.bundleId))
     return
   }
-  console.log('Filling bundleId :', bundle.bundleId)
+
+  logMessage(
+    '\n\n ==================================================================================================================== \n\n FILLING bundleId : ' +
+      String(bundle.bundleId) +
+      '\n\n ==================================================================================================================== \n\n',
+  )
 
   const RELAYER = getRelayer(
     Number(bundle.executionDepositEvent.destinationChainId),
@@ -37,13 +34,14 @@ export async function fillBundle(bundle: any) {
   ]
 
   try {
+    checkBundleInventory(bundle)
     const tx = await RELAYER.write.fillBundle([
       formatDepositEvent(bundle.executionDepositEvent),
       standardDepositEvents,
       BigInt(REPAYMENT_CHAIN_ID),
     ])
 
-    console.log('🟢 Successfully filled bundle with tx hash: ', tx)
+    logMessage('🟢 Successfully filled bundle with tx hash: ' + tx)
   } catch (e) {
     const error = e as ContractFunctionExecutionError
     const encodedFunctionData = encodeFunctionData({
@@ -56,12 +54,7 @@ export async function fillBundle(bundle: any) {
       ],
     })
 
-    console.error('🔴 Failed to fill bundle.')
-    console.error('Error:', error.shortMessage)
-    console.log('sender: ', error.sender)
-    console.log('to: ', error.contractAddress)
-    console.log('bundle: ', bundle)
-
-    console.error('Encoded Function Data:', encodedFunctionData)
+    const errorMessage = `🔴 Failed to fill bundle. \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n Bundle: ${JSON.stringify(bundle)} \n\n Encoded Function Data: ${encodedFunctionData}`
+    logError(errorMessage)
   }
 }
