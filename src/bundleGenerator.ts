@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 import {
   Execution,
   getEmptyUserOp,
@@ -7,8 +9,6 @@ import {
 } from '@rhinestone/orchestrator-sdk'
 import { encodeFunctionData, erc20Abi, Hex } from 'viem'
 import { postMetaIntentWithOwnableValidator } from '../test/safe7579Signature'
-
-require('dotenv').config()
 
 const orchestrator = getOrchestrator(process.env.ORCHESTRATOR_API_KEY!)
 

@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 import { Address, Hex, encodeFunctionData, erc20Abi, getContract } from 'viem'
 import { getPublicClient } from './getClients'
 
