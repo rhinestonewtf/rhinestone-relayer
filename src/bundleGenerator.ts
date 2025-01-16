@@ -31,7 +31,7 @@ export const generateBundle = async () => {
     tokenTransfers: [
       {
         tokenAddress: getTokenAddress('USDC', 8453),
-        amount: 1n,
+        amount: 2n,
       },
     ],
     targetAccount: accountAddress,
@@ -48,3 +48,5 @@ export const generateBundle = async () => {
 
   console.log('🔵 Bundle Generator Bundle ID: ', bundleId)
 }
+
+generateBundle()
