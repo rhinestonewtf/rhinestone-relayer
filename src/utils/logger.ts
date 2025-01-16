@@ -1,5 +1,10 @@
+require('dotenv').config()  
+
 export async function logToSlack(message: string) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL
+
+  console.log('Using webhook url: ', webhookUrl)
+
   if (!webhookUrl) {
     return
   }
@@ -11,6 +16,8 @@ export async function logToSlack(message: string) {
     },
     body: JSON.stringify({ text: message }),
   })
+
+  console.log(response)
 
   if (!response.ok) {
     console.error('Failed to send slack message:', response.statusText)
