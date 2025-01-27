@@ -82,7 +82,7 @@ export async function claimDepositEvent(depositEvent: any) {
     )
 
     logMessage(
-      `✅ Successfully claimed on Origin Chain: ${depositEvent.originChainId}` +
+      `✅ Successfully claimed on Origin Chain: ${depositEvent.originChainId} with tx hash: ` +
         tx,
     )
 
