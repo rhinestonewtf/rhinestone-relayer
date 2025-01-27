@@ -81,7 +81,10 @@ export async function claimDepositEvent(depositEvent: any) {
       {},
     )
 
-    logMessage('✅ Successfully filled bundle with tx hash: ' + tx)
+    logMessage(
+      `✅ Successfully claimed on Origin Chain: ${depositEvent.originChainId}` +
+        tx,
+    )
 
     await getPublicClient(depositEvent.originChainId).waitForTransactionReceipt(
       { hash: tx },
