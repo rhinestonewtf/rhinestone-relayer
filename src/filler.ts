@@ -7,6 +7,8 @@ import { getRelayer } from './utils/getRelayer'
 import { formatDepositEvent } from './utils/formatDepositEvent'
 import { logError, logMessage } from './utils/logger'
 import { checkBundleInventory } from './utils/inventoryNotifs'
+import { claimBundle } from './claimer'
+import { getPublicClient } from './utils/getClients'
 
 export async function fillBundle(bundle: any) {
   // const validatedBundle: BundleEvent = await validateBundle(bundle)
@@ -35,13 +37,21 @@ export async function fillBundle(bundle: any) {
 
   try {
     checkBundleInventory(bundle)
-    const tx = await RELAYER.write.fillBundle([
-      formatDepositEvent(bundle.executionDepositEvent),
-      standardDepositEvents,
-      BigInt(REPAYMENT_CHAIN_ID),
-    ])
-
+    const tx = await RELAYER.write.fillBundle(
+      [
+        formatDepositEvent(bundle.executionDepositEvent),
+        standardDepositEvents,
+        BigInt(REPAYMENT_CHAIN_ID),
+      ],
+      {},
+    )
     logMessage('🟢 Successfully filled bundle with tx hash: ' + tx)
+
+    await getPublicClient(
+      bundle.executionDepositEvent.destinationChainId,
+    ).waitForTransactionReceipt({ hash: tx })
+
+    claimBundle(bundle)
   } catch (e) {
     const error = e as ContractFunctionExecutionError
     const encodedFunctionData = encodeFunctionData({

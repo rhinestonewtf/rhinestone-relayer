@@ -57,8 +57,6 @@ export async function checkDepositEventInventory(
   chainId: number,
   amount: bigint,
 ) {
-  console.log('Checking balance for tokenAddress: ', tokenAddress, amount)
-
   const TOKEN = getToken(tokenAddress, chainId)
 
   const relayerBalance = await TOKEN.read.balanceOf([RELAYER_ADDRESS])
