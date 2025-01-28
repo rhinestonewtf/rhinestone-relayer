@@ -9,6 +9,7 @@ import { logError, logMessage } from './utils/logger'
 import { originModuleAbi } from './constants/abi'
 import { waitForTransactionReceipt } from 'viem/_types/actions/public/waitForTransactionReceipt'
 import { getPublicClient } from './utils/getClients'
+import { OWNER_ADDRESS } from './constants/constants'
 
 export function formatClaimPayload(payload: any) {
   return {
@@ -76,9 +77,15 @@ export async function claimDepositEvent(depositEvent: any) {
   )
 
   try {
+    const publicClient = getPublicClient(depositEvent.originChainId)
+
     const tx = await ORIGIN_MODULE.write.handleAcross(
       [formatClaimPayload(depositEvent.originClaimPayload)],
-      {},
+      {
+        nonce: await publicClient.getTransactionCount({
+          address: OWNER_ADDRESS,
+        }),
+      },
     )
 
     logMessage(
