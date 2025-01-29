@@ -18,12 +18,12 @@ export async function logToSlack(message: string) {
   }
 }
 
-export function logMessage(message: string) {
+export async function logMessage(message: string) {
   console.log(message)
   logToSlack(message)
 }
 
-export function logError(message: string) {
+export async function logError(message: string) {
   console.error(message)
   logToSlack(message)
 }

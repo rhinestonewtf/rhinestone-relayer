@@ -65,6 +65,6 @@ export async function fillBundle(bundle: any) {
     })
 
     const errorMessage = `🔴 Failed to fill bundle. \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n Bundle: ${JSON.stringify(bundle)} \n\n Encoded Function Data: ${encodedFunctionData}`
-    logError(errorMessage)
+    await logError(errorMessage)
   }
 }

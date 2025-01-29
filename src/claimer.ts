@@ -105,6 +105,6 @@ export async function claimDepositEvent(depositEvent: any) {
     })
 
     const errorMessage = `❌ Could not claim for origin chainId : ${depositEvent.originChainId} \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n DepositEvent: ${JSON.stringify(depositEvent)} \n\n Encoded Function Data: ${encodedFunctionData}`
-    logError(errorMessage)
+    await logError(errorMessage)
   }
 }
