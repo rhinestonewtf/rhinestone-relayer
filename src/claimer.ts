@@ -77,16 +77,9 @@ export async function claimDepositEvent(depositEvent: any) {
   )
 
   try {
-    const publicClient = getPublicClient(depositEvent.originChainId)
-
-    const tx = await ORIGIN_MODULE.write.handleAcross(
-      [formatClaimPayload(depositEvent.originClaimPayload)],
-      {
-        nonce: await publicClient.getTransactionCount({
-          address: OWNER_ADDRESS,
-        }),
-      },
-    )
+    const tx = await ORIGIN_MODULE.write.handleAcross([
+      formatClaimPayload(depositEvent.originClaimPayload),
+    ])
 
     logMessage(
       `✅ Successfully claimed on Origin Chain: ${depositEvent.originChainId} with tx hash: ` +

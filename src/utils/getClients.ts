@@ -8,6 +8,7 @@ import {
 } from 'viem'
 
 import { privateKeyToAccount } from 'viem/accounts'
+import { nonceManager } from 'viem'
 
 export const getPublicClient = (chainId: number) => {
   const chainConfig = getChainConfig(chainId)
@@ -22,7 +23,7 @@ export const getWalletClient = (chainId: number, privateKey: Hex) => {
   const chainConfig = getChainConfig(chainId)
 
   return createWalletClient({
-    account: privateKeyToAccount(privateKey),
+    account: privateKeyToAccount(privateKey, { nonceManager }),
     transport: http(chainConfig.rpcUrl),
     chain: chainConfig.viemChain,
   }).extend(publicActions)
