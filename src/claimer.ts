@@ -97,7 +97,9 @@ export async function claimDepositEvent(depositEvent: any) {
       args: [formatClaimPayload(depositEvent.originClaimPayload)],
     })
 
-    const errorMessage = `❌ Could not claim for origin chainId : ${depositEvent.originChainId} \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n DepositEvent: ${JSON.stringify(depositEvent)} \n\n Encoded Function Data: ${encodedFunctionData}`
+    const errorMessage = `❌ Could not claim for origin chainId : ${depositEvent.originChainId} \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n Encoded Function Data: ${encodedFunctionData}`
+
+    // const errorMessage = `❌ Could not claim for origin chainId : ${depositEvent.originChainId} \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n DepositEvent: ${JSON.stringify(depositEvent)} \n\n Encoded Function Data: ${encodedFunctionData}`
     await logError(errorMessage)
   }
 }
