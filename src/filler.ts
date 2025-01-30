@@ -2,7 +2,7 @@ import { ContractFunctionExecutionError, encodeFunctionData } from 'viem'
 
 import { rhinestoneRelayerAbi } from './constants/abi'
 
-import { REPAYMENT_CHAIN_ID } from './constants/constants'
+import { OWNER_ADDRESS, REPAYMENT_CHAIN_ID } from './constants/constants'
 import { getRelayer } from './utils/getRelayer'
 import { formatDepositEvent } from './utils/formatDepositEvent'
 import { logError, logMessage } from './utils/logger'
@@ -36,6 +36,10 @@ export async function fillBundle(bundle: any) {
   ]
 
   try {
+    const publicClient = getPublicClient(
+      bundle.executionDepositEvent.destinationChainId,
+    )
+
     checkBundleInventory(bundle)
     const tx = await RELAYER.write.fillBundle(
       [
@@ -43,13 +47,16 @@ export async function fillBundle(bundle: any) {
         standardDepositEvents,
         BigInt(REPAYMENT_CHAIN_ID),
       ],
-      {},
+      // Note: This is a temporary fix. Other relayers should replace the OWNER_ADDRESS with their EOA Address
+      {
+        nonce: await publicClient.getTransactionCount({
+          address: OWNER_ADDRESS,
+        }),
+      },
     )
     logMessage('🟢 Successfully filled bundle with tx hash: ' + tx)
 
-    await getPublicClient(
-      bundle.executionDepositEvent.destinationChainId,
-    ).waitForTransactionReceipt({ hash: tx })
+    publicClient.waitForTransactionReceipt({ hash: tx })
 
     claimBundle(bundle)
   } catch (e) {
