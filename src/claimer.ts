@@ -64,9 +64,9 @@ export function formatClaimPayload(payload: any) {
 }
 
 export async function claimBundle(bundle: any) {
-  claimDepositEvent(bundle.executionDepositEvent)
+  await claimDepositEvent(bundle.executionDepositEvent)
   for (const depositEvent of bundle.standardDepositEvents) {
-    claimDepositEvent(depositEvent)
+    await claimDepositEvent(depositEvent)
   }
 }
 
