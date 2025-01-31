@@ -7,7 +7,6 @@ import {
 import { getOriginModule } from './utils/getOriginModule'
 import { logError, logMessage } from './utils/logger'
 import { originModuleAbi } from './constants/abi'
-import { waitForTransactionReceipt } from 'viem/_types/actions/public/waitForTransactionReceipt'
 import { getPublicClient } from './utils/getClients'
 import { OWNER_ADDRESS } from './constants/constants'
 
@@ -76,19 +75,24 @@ export async function claimDepositEvent(depositEvent: any) {
     process.env.SOLVER_PRIVATE_KEY! as Hex,
   )
 
+  const publicClient = getPublicClient(depositEvent.originChainId)
+
   try {
-    const tx = await ORIGIN_MODULE.write.handleAcross([
-      formatClaimPayload(depositEvent.originClaimPayload),
-    ])
+    const tx = await ORIGIN_MODULE.write.handleAcross(
+      [formatClaimPayload(depositEvent.originClaimPayload)],
+      {
+        nonce: await publicClient.getTransactionCount({
+          address: OWNER_ADDRESS,
+        }),
+      },
+    )
 
     logMessage(
       `✅ Successfully claimed on Origin Chain: ${depositEvent.originChainId} with tx hash: ` +
         tx,
     )
 
-    await getPublicClient(depositEvent.originChainId).waitForTransactionReceipt(
-      { hash: tx },
-    )
+    await publicClient.waitForTransactionReceipt({ hash: tx })
   } catch (e) {
     const error = e as ContractFunctionExecutionError
     const encodedFunctionData = encodeFunctionData({
