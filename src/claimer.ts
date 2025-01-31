@@ -7,8 +7,9 @@ import {
 import { getOriginModule } from './utils/getOriginModule'
 import { logError, logMessage } from './utils/logger'
 import { originModuleAbi } from './constants/abi'
-import { getPublicClient } from './utils/getClients'
+import { getPublicClient, getWalletClient } from './utils/getClients'
 import { OWNER_ADDRESS } from './constants/constants'
+import { getOriginModuleAddress } from '@rhinestone/orchestrator-sdk'
 
 export function formatClaimPayload(payload: any) {
   return {
@@ -78,14 +79,28 @@ export async function claimDepositEvent(depositEvent: any) {
   const publicClient = getPublicClient(depositEvent.originChainId)
 
   try {
-    const tx = await ORIGIN_MODULE.write.handleAcross(
-      [formatClaimPayload(depositEvent.originClaimPayload)],
-      {
-        nonce: await publicClient.getTransactionCount({
-          address: OWNER_ADDRESS,
-        }),
-      },
+    const walletClient = getWalletClient(
+      depositEvent.originChainId,
+      process.env.SOLVER_PRIVATE_KEY! as Hex,
     )
+
+    const tx = await walletClient.sendTransaction({
+      to: getOriginModuleAddress(depositEvent.originChainId),
+      data: encodeFunctionData({
+        abi: originModuleAbi,
+        functionName: 'handleAcross',
+        args: [formatClaimPayload(depositEvent.originClaimPayload)],
+      }),
+      nonce: await publicClient.getTransactionCount({ address: OWNER_ADDRESS }),
+    })
+    // const tx = await ORIGIN_MODULE.write.handleAcross(
+    //   [formatClaimPayload(depositEvent.originClaimPayload)],
+    //   {
+    //     nonce: await publicClient.getTransactionCount({
+    //       address: OWNER_ADDRESS,
+    //     }),
+    //   },
+    // )
 
     logMessage(
       `✅ Successfully claimed on Origin Chain: ${depositEvent.originChainId} with tx hash: ` +
