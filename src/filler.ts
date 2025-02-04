@@ -29,11 +29,9 @@ export async function fillBundle(bundle: any) {
     Number(bundle.executionDepositEvent.destinationChainId),
   )
 
-  const standardDepositEvents = [
-    ...bundle.standardDepositEvents.map((depositEvent: any) =>
-      formatDepositEvent(depositEvent),
-    ),
-  ]
+  const standardDepositEvents = bundle.standardDepositEvents.map(
+    (depositEvent: any) => formatDepositEvent(depositEvent),
+  )
 
   try {
     const publicClient = getPublicClient(
