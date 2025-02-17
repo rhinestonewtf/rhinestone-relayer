@@ -1,124 +1,48 @@
-import {
-  Address,
-  ContractFunctionExecutionError,
-  encodeFunctionData,
-  Hex,
-} from 'viem'
-import { getOriginModule } from './utils/getOriginModule'
+import { ContractFunctionExecutionError, Hex } from 'viem'
+
 import { logError, logMessage } from './utils/logger'
-import { originModuleAbi } from './constants/abi'
 import { getPublicClient, getWalletClient } from './utils/getClients'
 import { OWNER_ADDRESS } from './constants/constants'
-import { getOriginModuleAddress } from '@rhinestone/orchestrator-sdk'
-
-export function formatClaimPayload(payload: any) {
-  return {
-    order: {
-      settlement: {
-        orchestrator: payload.order.settlement.orchestrator as Address,
-        recipient: payload.order.settlement.recipient as Address,
-        settlementContract: payload.order.settlement
-          .settlementContract as Address,
-        targetChainId: BigInt(payload.order.settlement.targetChainId),
-        fillDeadline: payload.order.settlement.fillDeadline,
-        lastDepositId: BigInt(payload.order.settlement.lastDepositId),
-      },
-      acrossTransfer: {
-        originModule: payload.order.acrossTransfer.originModule as Address,
-        originAccount: payload.order.acrossTransfer.originAccount as Address,
-        targetAccount: payload.order.acrossTransfer.targetAccount as Address,
-        originChainId: BigInt(payload.order.acrossTransfer.originChainId),
-        initiateDeadline: payload.order.acrossTransfer.initiateDeadline,
-        maxFee: BigInt(payload.order.acrossTransfer.maxFee),
-        depositId: BigInt(payload.order.acrossTransfer.depositId),
-        originTransfer: {
-          tokenAddress: payload.order.acrossTransfer.originTransfer
-            .tokenAddress as Address,
-          amount: BigInt(payload.order.acrossTransfer.originTransfer.amount),
-        },
-        targetTransfer: {
-          tokenAddress: payload.order.acrossTransfer.targetTransfer
-            .tokenAddress as Address,
-          amount: BigInt(payload.order.acrossTransfer.targetTransfer.amount),
-        },
-      },
-      smartDigests: {
-        acrossTransferDigests: {
-          digestIndex: BigInt(
-            payload.order.smartDigests.acrossTransferDigests.digestIndex,
-          ),
-          chainDataDigests:
-            payload.order.smartDigests.acrossTransferDigests.chainDataDigests.map(
-              (digest: string) => digest as Hex,
-            ),
-        },
-        executionDigest: payload.order.smartDigests.executionDigest as Hex,
-        userOpDigest: payload.order.smartDigests.userOpDigest as Hex,
-      },
-      userSig: payload.order.userSig as Hex,
-    },
-    auctionFee: BigInt(payload.auctionFee),
-    orchestratorSig: payload.orchestratorSignature as Hex,
-    acrossMessagePayload: payload.acrossMessagePayload as Hex,
-  }
-}
 
 export async function claimBundle(bundle: any) {
-  await claimDepositEvent(bundle.executionDepositEvent)
-  for (const depositEvent of bundle.standardDepositEvents) {
-    await claimDepositEvent(depositEvent)
-  }
-}
+  const claimTxs = bundle.originClaimPayloads.map(
+    // TODO: Better typing ofc
+    async (originPayload: {
+      chainId: number
+      to: any
+      value: any
+      data: any
+    }) => {
+      const walletClient = getWalletClient(
+        originPayload.chainId,
+        process.env.SOLVER_PRIVATE_KEY! as Hex,
+      )
 
-export async function claimDepositEvent(depositEvent: any) {
-  const ORIGIN_MODULE = getOriginModule(
-    depositEvent.originChainId,
-    process.env.SOLVER_PRIVATE_KEY! as Hex,
+      // Adding try/catch for the sendTransaction
+      try {
+        return await walletClient.sendTransaction({
+          to: originPayload.to,
+          value: originPayload.value,
+          data: originPayload.data,
+          nonce: await walletClient.getTransactionCount({
+            address: OWNER_ADDRESS,
+          }),
+        })
+      } catch (txError) {
+        const error = txError as ContractFunctionExecutionError
+        const errorMessage = `🔴 Failed to send transaction for origin chainId: ${originPayload.chainId}. Error: ${error.message}`
+        await logError(errorMessage)
+        throw txError // Rethrow the error to handle it in the Promise.all
+      }
+    },
   )
 
-  const publicClient = getPublicClient(depositEvent.originChainId)
-
   try {
-    const walletClient = getWalletClient(
-      depositEvent.originChainId,
-      process.env.SOLVER_PRIVATE_KEY! as Hex,
-    )
-
-    const tx = await walletClient.sendTransaction({
-      to: getOriginModuleAddress(depositEvent.originChainId),
-      data: encodeFunctionData({
-        abi: originModuleAbi,
-        functionName: 'handleAcross',
-        args: [formatClaimPayload(depositEvent.originClaimPayload)],
-      }),
-      nonce: await publicClient.getTransactionCount({ address: OWNER_ADDRESS }),
-    })
-    // const tx = await ORIGIN_MODULE.write.handleAcross(
-    //   [formatClaimPayload(depositEvent.originClaimPayload)],
-    //   {
-    //     nonce: await publicClient.getTransactionCount({
-    //       address: OWNER_ADDRESS,
-    //     }),
-    //   },
-    // )
-
-    logMessage(
-      `✅ Successfully claimed on Origin Chain: ${depositEvent.originChainId} with tx hash: ` +
-        tx,
-    )
-
-    await publicClient.waitForTransactionReceipt({ hash: tx })
+    await Promise.all(claimTxs)
   } catch (e) {
+    // Handle any errors that occurred in the Promise.all
     const error = e as ContractFunctionExecutionError
-    const encodedFunctionData = encodeFunctionData({
-      abi: originModuleAbi,
-      functionName: 'handleAcross',
-      args: [formatClaimPayload(depositEvent.originClaimPayload)],
-    })
-
-    const errorMessage = `❌ Could not claim for origin chainId : ${depositEvent.originChainId} \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n Encoded Function Data: ${encodedFunctionData}`
-
-    // const errorMessage = `❌ Could not claim for origin chainId : ${depositEvent.originChainId} \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n DepositEvent: ${JSON.stringify(depositEvent)} \n\n Encoded Function Data: ${encodedFunctionData}`
+    const errorMessage = `❌ One or more claims failed. Error: ${error.shortMessage}`
     await logError(errorMessage)
   }
 }
