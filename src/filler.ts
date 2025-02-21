@@ -1,7 +1,5 @@
 import { ContractFunctionExecutionError, encodeFunctionData, Hex } from 'viem'
 
-import { rhinestoneRelayerAbi } from './constants/abi'
-
 import { OWNER_ADDRESS, REPAYMENT_CHAIN_ID } from './constants/constants'
 import { logError, logMessage } from './utils/logger'
 import { checkBundleInventory } from './utils/inventoryNotifs'
@@ -12,10 +10,10 @@ export async function fillBundle(bundle: any) {
   // const validatedBundle: BundleEvent = await validateBundle(bundle)
   // NOTE: This should not be added for production fillers.
   // The rhinestone relayer skips filling test bundles, so that integrating fillers can test using these.
-  if (bundle.executionDepositEvent.outputAmount == '3') {
-    logMessage('Skipping fill for bundle: ' + String(bundle.bundleId))
-    return
-  }
+  // if (bundle.executionDepositEvent.outputAmount == '3') {
+  //   logMessage('Skipping fill for bundle: ' + String(bundle.bundleId))
+  //   return
+  // }
 
   logMessage(
     '\n\n ==================================================================================================================== \n\n FILLING bundleId : ' +
@@ -25,26 +23,31 @@ export async function fillBundle(bundle: any) {
 
   try {
     const walletClient = getWalletClient(
-      bundle.fillPayload,
+      bundle.targetFillPayload.chainId,
       process.env.SOLVER_PRIVATE_KEY! as Hex,
     )
 
-    checkBundleInventory(bundle)
+    // checkBundleInventory(bundle)
+
+    console.log('Filling bundle with payload:', bundle.targetFillPayload)
     const fillTx = await walletClient.sendTransaction({
-      to: bundle.fillPayload.to,
-      value: bundle.fillPayload.value,
-      data: bundle.fillPayload.data,
+      to: bundle.targetFillPayload.to,
+      value: BigInt(bundle.targetFillPayload.value),
+      data: bundle.targetFillPayload.data,
       // TODO: There's got to be a better way.
       nonce: await walletClient.getTransactionCount({
         address: OWNER_ADDRESS,
       }),
     })
 
+    logMessage('🚢 I AM FILLING A BUNDLE FOR THE PROD ORCH')
+
     logMessage('🟢 Successfully filled bundle with tx hash: ' + fillTx)
 
     walletClient.waitForTransactionReceipt({ hash: fillTx })
 
-    claimBundle(bundle)
+    // TODO: Enable this when deposits are live
+    // claimBundle(bundle)
   } catch (e) {
     const error = e as ContractFunctionExecutionError
 
