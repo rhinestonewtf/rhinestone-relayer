@@ -46,8 +46,7 @@ export async function fillBundle(bundle: any) {
 
     walletClient.waitForTransactionReceipt({ hash: fillTx })
 
-    // TODO: Enable this when deposits are live
-    // claimBundle(bundle)
+    claimBundle(bundle)
   } catch (e) {
     const error = e as ContractFunctionExecutionError
 

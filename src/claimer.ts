@@ -5,40 +5,42 @@ import { getPublicClient, getWalletClient } from './utils/getClients'
 import { OWNER_ADDRESS } from './constants/constants'
 
 export async function claimBundle(bundle: any) {
-  const claimTxs = bundle.originClaimPayloads.map(
-    // TODO: Better typing ofc
-    async (originPayload: {
-      chainId: number
-      to: any
-      value: any
-      data: any
-    }) => {
+  // TODO: Optimize this with promise all stuff
+  try {
+    for (const depositEvent of bundle.acrossDepositEvents) {
+      console.log(
+        'Claiming bundle with payload:',
+        depositEvent.originClaimPayload,
+      )
+
       const walletClient = getWalletClient(
-        originPayload.chainId,
+        depositEvent.originClaimPayload.chainId,
         process.env.SOLVER_PRIVATE_KEY! as Hex,
       )
 
       // Adding try/catch for the sendTransaction
       try {
-        return await walletClient.sendTransaction({
-          to: originPayload.to,
-          value: originPayload.value,
-          data: originPayload.data,
+        const claimTx = await walletClient.sendTransaction({
+          to: depositEvent.originClaimPayload.to,
+          value: BigInt(depositEvent.originClaimPayload.value),
+          data: depositEvent.originClaimPayload.data,
           nonce: await walletClient.getTransactionCount({
             address: OWNER_ADDRESS,
           }),
         })
+
+        logMessage(
+          '✅ Successfully claimed a bundle for the Prod Orch: ' + claimTx,
+        )
+
+        walletClient.waitForTransactionReceipt({ hash: claimTx })
       } catch (txError) {
         const error = txError as ContractFunctionExecutionError
-        const errorMessage = `🔴 Failed to send transaction for origin chainId: ${originPayload.chainId}. Error: ${error.message}`
+        const errorMessage = `🔴 Failed to send transaction for origin chainId: ${depositEvent.originClaimPayload.chainId}. Error: ${error.message}`
         await logError(errorMessage)
         throw txError // Rethrow the error to handle it in the Promise.all
       }
-    },
-  )
-
-  try {
-    await Promise.all(claimTxs)
+    }
   } catch (e) {
     // Handle any errors that occurred in the Promise.all
     const error = e as ContractFunctionExecutionError
