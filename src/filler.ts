@@ -1,23 +1,19 @@
-import { ContractFunctionExecutionError, encodeFunctionData } from 'viem'
-
-import { rhinestoneRelayerAbi } from './constants/abi'
+import { ContractFunctionExecutionError, encodeFunctionData, Hex } from 'viem'
 
 import { OWNER_ADDRESS, REPAYMENT_CHAIN_ID } from './constants/constants'
-import { getRelayer } from './utils/getRelayer'
-import { formatDepositEvent } from './utils/formatDepositEvent'
 import { logError, logMessage } from './utils/logger'
 import { checkBundleInventory } from './utils/inventoryNotifs'
 import { claimBundle } from './claimer'
-import { getPublicClient } from './utils/getClients'
+import { getWalletClient } from './utils/getClients'
 
 export async function fillBundle(bundle: any) {
   // const validatedBundle: BundleEvent = await validateBundle(bundle)
   // NOTE: This should not be added for production fillers.
   // The rhinestone relayer skips filling test bundles, so that integrating fillers can test using these.
-  if (bundle.executionDepositEvent.outputAmount == '1') {
-    logMessage('Skipping fill for bundle: ' + String(bundle.bundleId))
-    return
-  }
+  // if (bundle.executionDepositEvent.outputAmount == '3') {
+  //   logMessage('Skipping fill for bundle: ' + String(bundle.bundleId))
+  //   return
+  // }
 
   logMessage(
     '\n\n ==================================================================================================================== \n\n FILLING bundleId : ' +
@@ -25,53 +21,37 @@ export async function fillBundle(bundle: any) {
       '\n\n ==================================================================================================================== \n\n',
   )
 
-  const RELAYER = getRelayer(
-    Number(bundle.executionDepositEvent.destinationChainId),
-  )
-
-  const standardDepositEvents = [
-    ...bundle.standardDepositEvents.map((depositEvent: any) =>
-      formatDepositEvent(depositEvent),
-    ),
-  ]
-
   try {
-    const publicClient = getPublicClient(
-      bundle.executionDepositEvent.destinationChainId,
+    const walletClient = getWalletClient(
+      bundle.targetFillPayload.chainId,
+      process.env.SOLVER_PRIVATE_KEY! as Hex,
     )
 
-    checkBundleInventory(bundle)
-    const tx = await RELAYER.write.fillBundle(
-      [
-        formatDepositEvent(bundle.executionDepositEvent),
-        standardDepositEvents,
-        BigInt(REPAYMENT_CHAIN_ID),
-      ],
-      // Note: This is a temporary fix. Other relayers should replace the OWNER_ADDRESS with their EOA Address
-      {
-        nonce: await publicClient.getTransactionCount({
-          address: OWNER_ADDRESS,
-        }),
-      },
-    )
-    logMessage('🟢 Successfully filled bundle with tx hash: ' + tx)
+    // checkBundleInventory(bundle)
 
-    publicClient.waitForTransactionReceipt({ hash: tx })
-
-    claimBundle(bundle)
-  } catch (e) {
-    const error = e as ContractFunctionExecutionError
-    const encodedFunctionData = encodeFunctionData({
-      abi: rhinestoneRelayerAbi,
-      functionName: 'fillBundle',
-      args: [
-        formatDepositEvent(bundle.executionDepositEvent),
-        standardDepositEvents,
-        BigInt(REPAYMENT_CHAIN_ID),
-      ],
+    console.log('Filling bundle with payload:', bundle.targetFillPayload)
+    const fillTx = await walletClient.sendTransaction({
+      to: bundle.targetFillPayload.to,
+      value: BigInt(bundle.targetFillPayload.value),
+      data: bundle.targetFillPayload.data,
+      // TODO: There's got to be a better way.
+      nonce: await walletClient.getTransactionCount({
+        address: OWNER_ADDRESS,
+      }),
     })
 
-    const errorMessage = `🔴 Failed to fill bundle. \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n Bundle: ${JSON.stringify(bundle)} \n\n Encoded Function Data: ${encodedFunctionData}`
+    logMessage('🚢 I AM FILLING A BUNDLE FOR THE PROD ORCH')
+
+    logMessage('🟢 Successfully filled bundle with tx hash: ' + fillTx)
+
+    walletClient.waitForTransactionReceipt({ hash: fillTx })
+
+    // TODO: Enable this when deposits are live
+    // claimBundle(bundle)
+  } catch (e) {
+    const error = e as ContractFunctionExecutionError
+
+    const errorMessage = `🔴 Failed to fill bundle. \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n Bundle: ${JSON.stringify(bundle)} \n\n Encoded Function Data: ${bundle.fillPayload.data}`
     await logError(errorMessage)
   }
 }
