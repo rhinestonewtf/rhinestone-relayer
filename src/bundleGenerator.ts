@@ -2,7 +2,6 @@ require('dotenv').config()
 
 import {
   Execution,
-  getEmptyUserOp,
   getOrchestrator,
   getTokenAddress,
   MetaIntent,
@@ -10,10 +9,12 @@ import {
 import { encodeFunctionData, erc20Abi, Hex } from 'viem'
 import { postMetaIntentWithOwnableValidator } from '../test/safe7579Signature'
 
-const orchestrator = getOrchestrator(process.env.ORCHESTRATOR_API_KEY!)
+const orchestrator = getOrchestrator(
+  process.env.ORCHESTRATOR_API_KEY!,
+  process.env.ORCHESTRATOR_URL,
+)
 
 export const generateBundle = async () => {
-  const userId = '320660fd-6805-4e1a-bbd0-c86575b5715e'
   const accountAddress = '0xf781C5Cc66dbEacBc0Db3F7C7F9bDdC0F51b9499'
 
   const execution: Execution = {
@@ -36,15 +37,18 @@ export const generateBundle = async () => {
     ],
     targetAccount: accountAddress,
     targetExecutions: [execution],
-    userOp: getEmptyUserOp(),
+    accountAccessList: [
+      { chainId: 42161, tokenAddress: getTokenAddress('USDC', 42161) },
+    ],
   }
 
   const bundleId = await postMetaIntentWithOwnableValidator(
     metaIntent,
-    userId,
+    accountAddress,
     process.env.BUNDLE_GENERATOR_PRIVATE_KEY! as Hex,
     orchestrator,
   )
 
   console.log('🔵 Bundle Generator Bundle ID: ', bundleId)
 }
+generateBundle()
