@@ -3,8 +3,10 @@ import {
   getSignedOrderBundle,
   MetaIntent,
   Orchestrator,
-  SignedIntent,
-  SignedOrderBundle,
+  MultiChainCompact,
+  SignedMultiChainCompact,
+  PostOrderBundleResult,
+  applyInjectedExecutions,
 } from '@rhinestone/orchestrator-sdk'
 import { Address, Hex } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
@@ -14,10 +16,10 @@ const OWNABLE_VALIDATOR_ADDRESS: Address =
 
 // NOTE: This only works for Safe7579
 export async function signOrderBundleWithOwnableValidator(
-  orderBundle: SignedIntent,
+  orderBundle: MultiChainCompact,
   privateKey: Hex,
-): Promise<SignedOrderBundle> {
-  const digest = await getOrderBundleHash(orderBundle)
+): Promise<SignedMultiChainCompact> {
+  const digest = getOrderBundleHash(orderBundle)
 
   const account = privateKeyToAccount(privateKey)
 
@@ -36,23 +38,25 @@ export async function signOrderBundleWithOwnableValidator(
 
 export async function postMetaIntentWithOwnableValidator(
   metaIntent: MetaIntent,
-  userId: string,
+  userAddress: Address,
   privateKey: Hex,
   orchestrator: Orchestrator,
-): Promise<string> {
+): Promise<PostOrderBundleResult> {
   try {
-    const { orderBundle, injectedExecutions } = await orchestrator.getOrderPath(
+    const orderPath = await orchestrator.getOrderPath(
       metaIntent,
-      userId,
+      userAddress,
     )
 
     // TODO: Add injected executions to orderBundleExecution
     const signedOrderBundle = await signOrderBundleWithOwnableValidator(
-      orderBundle,
+      applyInjectedExecutions(orderPath[0]),
       privateKey,
     )
 
-    return orchestrator.postSignedOrderBundle(signedOrderBundle, userId)
+    console.log('Posting signed order bundle:', signedOrderBundle)
+
+    return orchestrator.postSignedOrderBundle([{ signedOrderBundle }])
   } catch (error) {
     if (error instanceof Error) {
       console.log(error)

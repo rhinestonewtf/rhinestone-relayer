@@ -21,6 +21,7 @@ export async function claimBundle(bundle: any) {
       // Adding try/catch for the sendTransaction
       try {
         const claimTx = await walletClient.sendTransaction({
+          chain: depositEvent.originClaimPayload.chainId,
           to: depositEvent.originClaimPayload.to,
           value: BigInt(depositEvent.originClaimPayload.value),
           data: depositEvent.originClaimPayload.data,
