@@ -54,6 +54,8 @@ export async function postMetaIntentWithOwnableValidator(
       privateKey,
     )
 
+    console.log('Posting signed order bundle:', signedOrderBundle)
+
     return orchestrator.postSignedOrderBundle([{ signedOrderBundle }])
   } catch (error) {
     if (error instanceof Error) {

@@ -10,10 +10,10 @@ export async function fillBundle(bundle: any) {
   // const validatedBundle: BundleEvent = await validateBundle(bundle)
   // NOTE: This should not be added for production fillers.
   // The rhinestone relayer skips filling test bundles, so that integrating fillers can test using these.
-  // if (bundle.executionDepositEvent.outputAmount == '3') {
-  //   logMessage('Skipping fill for bundle: ' + String(bundle.bundleId))
-  //   return
-  // }
+  if (bundle.acrossDepositEvents[0].outputAmount == '3') {
+    logMessage('Skipping fill for bundle: ' + String(bundle.bundleId))
+    return
+  }
 
   logMessage(
     '\n\n ==================================================================================================================== \n\n FILLING bundleId : ' +
@@ -34,6 +34,7 @@ export async function fillBundle(bundle: any) {
       to: bundle.targetFillPayload.to,
       value: BigInt(bundle.targetFillPayload.value),
       data: bundle.targetFillPayload.data,
+      chain: bundle.targetFillPayload.chainId,
       // TODO: There's got to be a better way.
       nonce: await walletClient.getTransactionCount({
         address: OWNER_ADDRESS,

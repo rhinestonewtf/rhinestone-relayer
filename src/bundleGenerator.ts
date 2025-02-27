@@ -15,15 +15,15 @@ const orchestrator = getOrchestrator(
 )
 
 export const generateBundle = async () => {
-  const accountAddress = '0x579d5631f76126991c00fb8fe5467fa9d49e5f6a'
+  const accountAddress = '0x35c8652241edff0a873e78fbb184a3907eda9582'
 
   const execution: Execution = {
-    target: getTokenAddress('USDC', 8453),
+    to: getTokenAddress('USDC', 8453),
     value: 0n,
-    callData: encodeFunctionData({
+    data: encodeFunctionData({
       abi: erc20Abi,
       functionName: 'transfer',
-      args: ['0xD1dcdD8e6Fe04c338aC3f76f7D7105bEcab74F77', 10n],
+      args: ['0xD1dcdD8e6Fe04c338aC3f76f7D7105bEcab74F77', 1n],
     }),
   }
 
@@ -32,7 +32,7 @@ export const generateBundle = async () => {
     tokenTransfers: [
       {
         tokenAddress: getTokenAddress('USDC', 8453),
-        amount: 10n,
+        amount: 3n,
       },
     ],
     targetAccount: accountAddress,
@@ -49,7 +49,7 @@ export const generateBundle = async () => {
     orchestrator,
   )
 
-  for (const { bundleId, status} of bundleResult) {
+  for (const { bundleId, status } of bundleResult) {
     console.log(`🔵 Bundle Generator Bundle ID: ${bundleId} Status: ${status}`)
   }
 }
