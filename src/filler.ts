@@ -34,7 +34,7 @@ export async function fillBundle(bundle: any) {
       to: bundle.targetFillPayload.to,
       value: BigInt(bundle.targetFillPayload.value),
       data: bundle.targetFillPayload.data,
-      chain: bundle.targetFillPayload.chainId,
+      chain: walletClient.chain,
       // TODO: There's got to be a better way.
       nonce: await walletClient.getTransactionCount({
         address: OWNER_ADDRESS,
@@ -51,7 +51,7 @@ export async function fillBundle(bundle: any) {
   } catch (e) {
     const error = e as ContractFunctionExecutionError
 
-    const errorMessage = `🔴 Failed to fill bundle. \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n Bundle: ${JSON.stringify(bundle)} \n\n Encoded Function Data: ${bundle.fillPayload.data}`
+    const errorMessage = `🔴 Failed to fill bundle. \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n Bundle: ${JSON.stringify(bundle)} \n\n Encoded Function Data: ${bundle.targetFillPayload.data}`
     await logError(errorMessage)
   }
 }

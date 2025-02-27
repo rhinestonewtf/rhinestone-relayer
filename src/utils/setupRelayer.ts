@@ -3,7 +3,12 @@ require('dotenv').config()
 import { Address, Hex, erc20Abi, getContract } from 'viem'
 import { getPublicClient, getWalletClient } from './getClients'
 
-import { registry, TokenConfig } from '@rhinestone/orchestrator-sdk'
+import {
+  getSupportedChainIds,
+  getSupportedTokens,
+  registry,
+  TokenConfig,
+} from '@rhinestone/orchestrator-sdk'
 
 import { OWNER_ADDRESS } from '../constants/constants'
 
@@ -33,10 +38,15 @@ export async function approveSpokepool(tokens: TokenConfig[], chainId: number) {
     ])
 
     if (currentAllowance < MAX_UINT256 - 1000000000000000000000n) {
-      const tx = await ERC20.write.approve([
-        getRhinestoneSpokepoolAddress(),
-        MAX_UINT256,
-      ])
+      const tx = await ERC20.write.approve(
+        [getRhinestoneSpokepoolAddress(), MAX_UINT256],
+        {
+          chain: getWalletClient(
+            chainId,
+            process.env.SOLVER_PRIVATE_KEY! as Hex,
+          ).chain,
+        },
+      )
       await publicClient.waitForTransactionReceipt({ hash: tx })
 
       console.log('🟢 Approving token:', token.address, 'for chainId:', chainId)
@@ -53,7 +63,7 @@ export async function approveAllRhinestoneSpokepools() {
   const chainIds = Object.keys(registry).map(Number) // Get all chain IDs
 
   for (const chainId of chainIds) {
-    const tokens = Object.values(registry[chainId].supportedTokens)
+    const tokens = getSupportedTokens(chainId)
 
     await approveSpokepool(tokens, chainId)
   }
