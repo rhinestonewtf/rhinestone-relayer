@@ -36,8 +36,11 @@ export function getRPCUrl(chainId: number): string {
     10: {
       rpcUrl: `https://opt-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
     }, // Optimism
+    137: {
+      rpcUrl: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+    }, // Polygon
     11155111: {
-      rpcUrl: `https://sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+      rpcUrl: `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
     }, // Sepolia
     84532: {
       rpcUrl: `https://base-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
@@ -47,7 +50,11 @@ export function getRPCUrl(chainId: number): string {
     }, // Arbitrum Testnet
     11155420: {
       rpcUrl: `https://opt-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    },
+    }, // Optimism Testnet
+    // Polygon Amoy
+    80002: {
+      rpcUrl: `https://polygon-amoy.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+    }, // Polygon Testnet
   }
 
   if (!chainConfigs[chainId]) {
