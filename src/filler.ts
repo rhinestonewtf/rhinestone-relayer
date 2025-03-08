@@ -74,7 +74,12 @@ export async function fillBundle(bundle: any) {
 
     logMessage('🚢 I AM FILLING A BUNDLE FOR THE PROD ORCH')
 
-    logMessage('🟢 Successfully filled bundle with tx hash: ' + fillTx)
+    logMessage(
+      '🟢 Successfully filled bundle with tx hash: ' +
+        fillTx +
+        ' on chain: ' +
+        walletClient.chain,
+    )
 
     walletClient.waitForTransactionReceipt({ hash: fillTx })
 
