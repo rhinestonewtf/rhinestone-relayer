@@ -25,9 +25,9 @@ export async function claimBundle(bundle: any) {
           to: depositEvent.originClaimPayload.to,
           value: BigInt(depositEvent.originClaimPayload.value),
           data: depositEvent.originClaimPayload.data,
-          nonce: await walletClient.getTransactionCount({
-            address: OWNER_ADDRESS,
-          }),
+          // nonce: await walletClient.getTransactionCount({
+          //   address: OWNER_ADDRESS,
+          // }),
         })
 
         logMessage(
