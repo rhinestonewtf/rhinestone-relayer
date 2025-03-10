@@ -53,7 +53,7 @@ export async function fillBundle(bundle: any) {
       Number(updatedPayload.chainId) === 42161 ||
       Number(updatedPayload.chainId) === 10
     ) {
-      console.log("Waiting for 20 seconds")
+      console.log('Waiting for 20 seconds')
       // Wait for 20 seconds before proceeding
       await new Promise((resolve) => setTimeout(resolve, 20000))
     }
@@ -68,9 +68,9 @@ export async function fillBundle(bundle: any) {
       data: updatedPayload.data,
       chain: walletClient.chain,
       // TODO: There's got to be a better way.
-      nonce: await walletClient.getTransactionCount({
-        address: OWNER_ADDRESS,
-      }),
+      // nonce: await walletClient.getTransactionCount({
+      //   address: OWNER_ADDRESS,
+      // }),
     })
 
     logMessage('🚢 I AM FILLING A BUNDLE FOR THE PROD ORCH')
