@@ -53,8 +53,9 @@ export async function fillBundle(bundle: any) {
       Number(updatedPayload.chainId) === 42161 ||
       Number(updatedPayload.chainId) === 10
     ) {
+      console.log("Waiting for 20 seconds")
       // Wait for 20 seconds before proceeding
-      await new Promise((resolve) => setTimeout(resolve, 200))
+      await new Promise((resolve) => setTimeout(resolve, 20000))
     }
 
     // checkBundleInventory(bundle)
