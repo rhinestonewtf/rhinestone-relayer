@@ -3,6 +3,7 @@ import {
   createWalletClient,
   Hex,
   http,
+  nonceManager,
   publicActions,
 } from 'viem'
 
