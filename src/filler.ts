@@ -79,7 +79,7 @@ export async function fillBundle(bundle: any) {
       '🟢 Successfully filled bundle with tx hash: ' +
         fillTx +
         ' on chain: ' +
-        walletClient.chain,
+        bundle.targetFillPayload.chainId,
     )
 
     walletClient.waitForTransactionReceipt({ hash: fillTx })
