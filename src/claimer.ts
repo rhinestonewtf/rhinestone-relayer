@@ -6,6 +6,7 @@ import { OWNER_ADDRESS } from './constants/constants'
 
 export async function claimBundle(bundle: any) {
   // TODO: Optimize this with promise all stuff
+  // TODO: this currently will make 1 claim tx per token on any chain, but anything but the first claim on a chain will fail
   try {
     for (const depositEvent of bundle.acrossDepositEvents) {
       console.log(
