@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@rhinestone/orchestrator-sdk':
-        specifier: 0.2.0-rc.3
-        version: 0.2.0-rc.3(viem@2.23.5(typescript@5.7.2))
+        specifier: 0.2.0-rc.6
+        version: 0.2.0-rc.6(viem@2.23.5(typescript@5.7.2))
       '@types/node':
         specifier: ^22.10.1
         version: 22.10.1
@@ -428,8 +428,8 @@ packages:
   '@prisma/get-platform@5.22.0':
     resolution: {integrity: sha512-pHhpQdr1UPFpt+zFfnPazhulaZYCUqeIcPpJViYoq9R+D/yw4fjE+CtnsnKzPYm0ddUbeXUzjGVGIRVgPDCk4Q==}
 
-  '@rhinestone/orchestrator-sdk@0.2.0-rc.3':
-    resolution: {integrity: sha512-ATg3E/WPuO69KxymvfJCfsV92E47DDl+5QhZAaa4bfnclK9FF/xOEWEPIknzWawzACMZs0LRof2dHvNSP7jTRw==}
+  '@rhinestone/orchestrator-sdk@0.2.0-rc.6':
+    resolution: {integrity: sha512-FJ98U0uDb41t6SjYuVgxn9CZjzxgf+bzHbNsH876VhdQ+u1OTSLsBR+TH30sTjrman84EqgCph5bUHmczDgzUg==}
     peerDependencies:
       viem: ^2.17.8
 
@@ -2267,7 +2267,7 @@ snapshots:
     dependencies:
       '@prisma/debug': 5.22.0
 
-  '@rhinestone/orchestrator-sdk@0.2.0-rc.3(viem@2.23.5(typescript@5.7.2))':
+  '@rhinestone/orchestrator-sdk@0.2.0-rc.6(viem@2.23.5(typescript@5.7.2))':
     dependencies:
       viem: 2.23.5(typescript@5.7.2)
 
