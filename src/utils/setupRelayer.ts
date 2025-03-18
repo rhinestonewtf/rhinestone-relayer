@@ -17,7 +17,7 @@ const MAX_UINT256 =
 
 // TODO: Replace with orchestrator SDK functions
 function getRhinestoneSpokepoolAddress(): Address {
-  return '0xea34faadb44f6078c24cb82d6be3185a262ddee6'
+  return '0x000000000060f6e853447881951574CDd0663530'
 }
 
 export async function approveSpokepool(tokens: TokenConfig[], chainId: number) {

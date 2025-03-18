@@ -1,4 +1,10 @@
-import { ContractFunctionExecutionError, encodeFunctionData, Hex } from 'viem'
+import {
+  Address,
+  ContractFunctionExecutionError,
+  encodeFunctionData,
+  Hex,
+  zeroAddress,
+} from 'viem'
 
 import { OWNER_ADDRESS, REPAYMENT_CHAIN_ID } from './constants/constants'
 import { logError, logMessage } from './utils/logger'
@@ -6,6 +12,14 @@ import { checkBundleInventory } from './utils/inventoryNotifs'
 import { claimBundle } from './claimer'
 import { getWalletClient } from './utils/getClients'
 import { updateTargetFillPayload } from '@rhinestone/orchestrator-sdk'
+
+function isWhitelistedAddress(address: Address) {
+  // Replace with clave provided address here
+  if (address === zeroAddress) {
+    return true
+  }
+  return false
+}
 
 export async function fillBundle(bundle: any) {
   // const validatedBundle: BundleEvent = await validateBundle(bundle)
@@ -54,8 +68,15 @@ export async function fillBundle(bundle: any) {
       Number(updatedPayload.chainId) === 10
     ) {
       console.log('Waiting for 20 seconds')
-      // Wait for 20 seconds before proceeding
-      await new Promise((resolve) => setTimeout(resolve, 20000))
+
+      if (
+        !isWhitelistedAddress(
+          bundle.acrossDepositEvents[0].recipient as Address,
+        )
+      ) {
+        // Wait for 20 seconds before proceeding
+        await new Promise((resolve) => setTimeout(resolve, 20000))
+      }
     }
 
     // checkBundleInventory(bundle)
