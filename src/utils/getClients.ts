@@ -26,7 +26,7 @@ export const getWalletClient = (chainId: number, privateKey: Hex) => {
 export function getRPCUrl(chainId: number): string {
   const chainConfigs: { [key: number]: { rpcUrl: string } } = {
     1: {
-      rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
+      rpcUrl: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
     }, // Mainnet
     42161: {
       rpcUrl: `https://arb-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
