@@ -15,7 +15,12 @@ import { updateTargetFillPayload } from '@rhinestone/orchestrator-sdk'
 
 function isWhitelistedAddress(address: Address) {
   // Replace with clave provided address here
-  if (address === zeroAddress) {
+  if (
+    address.toLowerCase() ===
+      '0x8BBF760ca40215C630C54E7b1c91317DCCB5eE63'.toLowerCase() ||
+    address.toLowerCase() ===
+      '0x423A44964012825a5B54Bf19d32151C440765115'.toLowerCase()
+  ) {
     return true
   }
   return false
