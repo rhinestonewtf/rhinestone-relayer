@@ -14,6 +14,11 @@ export async function claimBundle(bundle: any) {
         depositEvent.originClaimPayload,
       )
 
+      if (depositEvent.originClaimPayload.chainId === 0) {
+        console.log('Skipping same chain claim')
+        continue
+      }
+
       const walletClient = getWalletClient(
         depositEvent.originClaimPayload.chainId,
         process.env.SOLVER_PRIVATE_KEY! as Hex,
