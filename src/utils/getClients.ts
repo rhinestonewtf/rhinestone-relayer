@@ -5,9 +5,11 @@ import {
   http,
   nonceManager,
   publicActions,
+  extractChain
 } from 'viem'
 
 import { privateKeyToAccount } from 'viem/accounts'
+import { loadConfig } from './config'
 // import { nonceManager } from 'viem'
 
 export const getPublicClient = (chainId: number) => {
@@ -23,44 +25,27 @@ export const getWalletClient = (chainId: number, privateKey: Hex) => {
   }).extend(publicActions)
 }
 
-export function getRPCUrl(chainId: number): string {
-  const chainConfigs: { [key: number]: { rpcUrl: string } } = {
-    1: {
-      rpcUrl: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    }, // Mainnet
-    42161: {
-      rpcUrl: `https://arb-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    }, // Arbitrum
-    8453: {
-      rpcUrl: `https://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    }, // Base
-    10: {
-      rpcUrl: `https://opt-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    }, // Optimism
-    137: {
-      rpcUrl: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    }, // Polygon
-    11155111: {
-      rpcUrl: `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    }, // Sepolia
-    84532: {
-      rpcUrl: `https://base-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    }, // Base Testnet
-    421614: {
-      rpcUrl: `https://arb-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    }, // Arbitrum Testnet
-    11155420: {
-      rpcUrl: `https://opt-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    }, // Optimism Testnet
-    // Polygon Amoy
-    80002: {
-      rpcUrl: `https://polygon-amoy.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    }, // Polygon Testnet
+
+
+const loadChainConfig = (path: string) => {
+  const config = loadConfig(path)
+  const res: { [key: number]: { rpcUrl: string } } = {}
+
+  for (const [key, value] of Object.entries(config)) {
+    const numKey = parseInt(key)
+
+    res[numKey] = value as { rpcUrl: string }
   }
 
-  if (!chainConfigs[chainId]) {
+  return res
+}
+
+const chains = loadChainConfig(process.env.CHAINS_CONFIG ?? 'chains.json')
+
+export function getRPCUrl(chainId: number): string {
+
+  if (!chains[chainId]) {
     throw new Error(`No RPC URL found for chainId: ${chainId}`)
   }
-
-  return chainConfigs[chainId].rpcUrl
+  return chains[chainId].rpcUrl
 }

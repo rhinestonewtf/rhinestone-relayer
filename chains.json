@@ -1,0 +1,32 @@
+{
+    "1": {
+        "rpcUrl": "https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+    },
+    "10": {
+        "rpcUrl": "https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+    },
+    "137": {
+        "rpcUrl": "https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+    },
+    "8453": {
+        "rpcUrl": "https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+    },
+    "42161": {
+        "rpcUrl": "https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+    },
+    "80002": {
+        "rpcUrl": "https://polygon-amoy.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+    },
+    "84532": {
+        "rpcUrl": "https://base-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+    },
+    "421614": {
+        "rpcUrl": "https://arb-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+    },
+    "11155111": {
+        "rpcUrl": "https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+    },
+    "11155420": {
+        "rpcUrl": "https://opt-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+    }
+}
