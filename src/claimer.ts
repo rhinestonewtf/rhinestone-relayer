@@ -32,7 +32,9 @@ export async function claimBundle(bundle: any) {
           to: depositEvent.originClaimPayload.to,
           value: BigInt(depositEvent.originClaimPayload.value),
           data: depositEvent.originClaimPayload.data,
-          nonce: nonceManager.getNonce({ chainId: depositEvent.chain.id }),
+          nonce: nonceManager.getNonce({
+            chainId: depositEvent.originClaimPayload.chainId,
+          }),
           // nonce: await walletClient.getTransactionCount({
           //   address: OWNER_ADDRESS,
           // }),
