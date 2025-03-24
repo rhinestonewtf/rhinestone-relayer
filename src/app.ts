@@ -3,6 +3,8 @@ require('dotenv').config()
 import WebSocket from 'ws'
 import { fillBundle } from './filler'
 import { generateBundle } from './bundleGenerator'
+import { chains } from './utils/getClients'
+import { nonceManager } from './nonceManager'
 
 // Define the WebSocket URL for the orchestrator
 // const ORCHESTRATOR_URL = 'wss://orchestrator.api.rhinestone.wtf/bundles/events'
@@ -14,8 +16,13 @@ import { generateBundle } from './bundleGenerator'
 const ws = new WebSocket(process.env.ORCHESTRATOR_EVENTS_URL!)
 
 // Handle connection open event
-ws.on('open', () => {
+ws.on('open', async () => {
   console.log('Connected to the orchestrator WebSocket server')
+  for (const key of Object.keys(chains)) {
+    const numKey = parseInt(key)
+    await nonceManager.initialize({ chainId: numKey })
+  }
+  console.log('Nonce manager initialized')
 })
 
 // Handle incoming messages

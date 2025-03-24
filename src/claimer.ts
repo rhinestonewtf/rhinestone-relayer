@@ -3,6 +3,7 @@ import { ContractFunctionExecutionError, Hex } from 'viem'
 import { logError, logMessage } from './utils/logger'
 import { getPublicClient, getWalletClient } from './utils/getClients'
 import { OWNER_ADDRESS } from './constants/constants'
+import { nonceManager } from './nonceManager'
 
 export async function claimBundle(bundle: any) {
   // TODO: Optimize this with promise all stuff
@@ -31,6 +32,7 @@ export async function claimBundle(bundle: any) {
           to: depositEvent.originClaimPayload.to,
           value: BigInt(depositEvent.originClaimPayload.value),
           data: depositEvent.originClaimPayload.data,
+          nonce: nonceManager.getNonce({ chainId: depositEvent.chain.id }),
           // nonce: await walletClient.getTransactionCount({
           //   address: OWNER_ADDRESS,
           // }),
