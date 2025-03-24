@@ -80,7 +80,12 @@ export async function fillBundle(bundle: any) {
         )
       ) {
         // Wait for 20 seconds before proceeding
-        await new Promise((resolve) => setTimeout(resolve, 20000))
+        await new Promise((resolve) =>
+          setTimeout(
+            resolve,
+            Number(process.env.SOLVER_MAINNET_DELAY) ?? 20000,
+          ),
+        )
       }
     }
 
