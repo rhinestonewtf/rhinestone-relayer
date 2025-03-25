@@ -25,6 +25,10 @@ export async function claimBundle(bundle: any) {
         process.env.SOLVER_PRIVATE_KEY! as Hex,
       )
 
+      const nonce = nonceManager.getNonce({
+        chainId: depositEvent.originClaimPayload.chainId,
+      })
+
       // Adding try/catch for the sendTransaction
       try {
         const claimTx = await walletClient.sendTransaction({
@@ -32,16 +36,18 @@ export async function claimBundle(bundle: any) {
           to: depositEvent.originClaimPayload.to,
           value: BigInt(depositEvent.originClaimPayload.value),
           data: depositEvent.originClaimPayload.data,
-          nonce: nonceManager.getNonce({
-            chainId: depositEvent.originClaimPayload.chainId,
-          }),
-          // nonce: await walletClient.getTransactionCount({
+          nonce, // nonce: await walletClient.getTransactionCount({
           //   address: OWNER_ADDRESS,
           // }),
         })
 
         logMessage(
-          '✅ Successfully claimed a bundle for the Prod Orch: ' + claimTx,
+          '✅ Successfully claimed a bundle for the Prod Orch: ' +
+            claimTx +
+            ' on chainId: ' +
+            depositEvent.originClaimPayload.chainId +
+            ' with nonce: ' +
+            nonce,
         )
 
         walletClient.waitForTransactionReceipt({ hash: claimTx })
