@@ -3,6 +3,7 @@ import { ContractFunctionExecutionError, Hex } from 'viem'
 import { logError, logMessage } from './utils/logger'
 import { getPublicClient, getWalletClient } from './utils/getClients'
 import { OWNER_ADDRESS } from './constants/constants'
+import { nonceManager } from './nonceManager'
 
 export async function claimBundle(bundle: any) {
   // TODO: Optimize this with promise all stuff
@@ -24,6 +25,10 @@ export async function claimBundle(bundle: any) {
         process.env.SOLVER_PRIVATE_KEY! as Hex,
       )
 
+      const nonce = nonceManager.getNonce({
+        chainId: depositEvent.originClaimPayload.chainId,
+      })
+
       // Adding try/catch for the sendTransaction
       try {
         const claimTx = await walletClient.sendTransaction({
@@ -31,13 +36,18 @@ export async function claimBundle(bundle: any) {
           to: depositEvent.originClaimPayload.to,
           value: BigInt(depositEvent.originClaimPayload.value),
           data: depositEvent.originClaimPayload.data,
-          // nonce: await walletClient.getTransactionCount({
+          nonce, // nonce: await walletClient.getTransactionCount({
           //   address: OWNER_ADDRESS,
           // }),
         })
 
         logMessage(
-          '✅ Successfully claimed a bundle for the Prod Orch: ' + claimTx,
+          '✅ Successfully claimed a bundle for the Prod Orch: ' +
+            claimTx +
+            ' on chainId: ' +
+            depositEvent.originClaimPayload.chainId +
+            ' with nonce: ' +
+            nonce,
         )
 
         walletClient.waitForTransactionReceipt({ hash: claimTx })

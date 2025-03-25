@@ -12,6 +12,7 @@ import { checkBundleInventory } from './utils/inventoryNotifs'
 import { claimBundle } from './claimer'
 import { getWalletClient } from './utils/getClients'
 import { updateTargetFillPayload } from '@rhinestone/orchestrator-sdk'
+import { nonceManager } from './nonceManager'
 
 function isWhitelistedAddress(address: Address) {
   // Replace with clave provided address here
@@ -92,6 +93,10 @@ export async function fillBundle(bundle: any) {
     // checkBundleInventory(bundle)
     // console.log(bundle)
 
+    const nonce = nonceManager.getNonce({
+      chainId: bundle.targetFillPayload.chainId,
+    })
+
     // console.log('Filling bundle with payload:', updatedPayload)
     const fillTx = await walletClient.sendTransaction({
       to: updatedPayload.to,
@@ -99,7 +104,7 @@ export async function fillBundle(bundle: any) {
       data: updatedPayload.data,
       chain: walletClient.chain,
       // TODO: There's got to be a better way.
-      // nonce: await walletClient.getTransactionCount({
+      nonce, // nonce: await walletClient.getTransactionCount({
       //   address: OWNER_ADDRESS,
       // }),
     })
@@ -110,7 +115,9 @@ export async function fillBundle(bundle: any) {
       '🟢 Successfully filled bundle with tx hash: ' +
         fillTx +
         ' on chain: ' +
-        bundle.targetFillPayload.chainId,
+        bundle.targetFillPayload.chainId +
+        ' with nonce: ' +
+        nonce,
     )
 
     walletClient.waitForTransactionReceipt({ hash: fillTx })
