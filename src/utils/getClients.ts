@@ -5,11 +5,12 @@ import {
   http,
   nonceManager,
   publicActions,
-  extractChain,
+  extractChain
 } from 'viem'
 
 import { privateKeyToAccount } from 'viem/accounts'
 import { loadConfig } from './config'
+// import { nonceManager } from 'viem'
 
 export const getPublicClient = (chainId: number) => {
   return createPublicClient({
@@ -24,6 +25,8 @@ export const getWalletClient = (chainId: number, privateKey: Hex) => {
   }).extend(publicActions)
 }
 
+
+
 const loadChainConfig = (path: string) => {
   const config = loadConfig(path)
   const res: { [key: number]: { rpcUrl: string } } = {}
@@ -37,11 +40,10 @@ const loadChainConfig = (path: string) => {
   return res
 }
 
-export const chains = loadChainConfig(
-  process.env.CHAINS_CONFIG ?? 'chains.json',
-)
+const chains = loadChainConfig(process.env.CHAINS_CONFIG ?? 'chains.json')
 
 export function getRPCUrl(chainId: number): string {
+
   if (!chains[chainId]) {
     throw new Error(`No RPC URL found for chainId: ${chainId}`)
   }
