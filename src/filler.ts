@@ -76,20 +76,20 @@ export async function fillBundle(bundle: any) {
       Number(updatedPayload.chainId) === 42161 ||
       Number(updatedPayload.chainId) === 10
     ) {
-      console.log('Waiting for 20 seconds')
+      // console.log('Waiting for 20 seconds')
 
       if (
         !isWhitelistedAddress(
           bundle.acrossDepositEvents[0].recipient as Address,
         )
       ) {
-        // Wait for 20 seconds before proceeding
-        await new Promise((resolve) =>
-          setTimeout(
-            resolve,
-            Number(process.env.SOLVER_MAINNET_DELAY) ?? 20000,
-          ),
-        )
+        // // Wait for 20 seconds before proceeding
+        // await new Promise((resolve) =>
+        //   setTimeout(
+        //     resolve,
+        //     Number(process.env.SOLVER_MAINNET_DELAY) ?? 20000,
+        //   ),
+        // )
 
         // Check the bundle is still valid post delay
         const bundleStatus = await getOrchestrator(
@@ -122,9 +122,10 @@ export async function fillBundle(bundle: any) {
         data: updatedPayload.data,
         chain: walletClient.chain,
         // TODO: There's got to be a better way.
-        // nonce, // nonce: await walletClient.getTransactionCount({
-        //   address: OWNER_ADDRESS,
-        // }),
+        // nonce,
+        nonce: await walletClient.getTransactionCount({
+          address: OWNER_ADDRESS,
+        }),
       })
     } catch (txError) {
       console.log('txError', txError)
