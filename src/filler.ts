@@ -11,7 +11,10 @@ import { logError, logMessage } from './utils/logger'
 import { checkBundleInventory } from './utils/inventoryNotifs'
 import { claimBundle } from './claimer'
 import { getWalletClient } from './utils/getClients'
-import { getOrchestrator, updateTargetFillPayload } from '@rhinestone/orchestrator-sdk'
+import {
+  getOrchestrator,
+  updateTargetFillPayload,
+} from '@rhinestone/orchestrator-sdk'
 import { nonceManager } from './nonceManager'
 
 function isWhitelistedAddress(address: Address) {
@@ -93,7 +96,11 @@ export async function fillBundle(bundle: any) {
           process.env.ORCHESTRATOR_API_KEY!,
           process.env.ORCHESTRATOR_URL,
         ).getBundleStatus(bundle.bundleId)
-        if (bundleStatus.fillTransactionHash !== undefined || bundleStatus.status === 'EXPIRED' || bundleStatus.status === 'FAILED') {
+        if (
+          bundleStatus.fillTransactionHash !== undefined ||
+          bundleStatus.status === 'EXPIRED' ||
+          bundleStatus.status === 'FAILED'
+        ) {
           return
         }
       }
@@ -115,7 +122,7 @@ export async function fillBundle(bundle: any) {
         data: updatedPayload.data,
         chain: walletClient.chain,
         // TODO: There's got to be a better way.
-        nonce, // nonce: await walletClient.getTransactionCount({
+        // nonce, // nonce: await walletClient.getTransactionCount({
         //   address: OWNER_ADDRESS,
         // }),
       })
