@@ -11,7 +11,7 @@ import { logError, logMessage } from './utils/logger'
 import { checkBundleInventory } from './utils/inventoryNotifs'
 import { claimBundle } from './claimer'
 import { getWalletClient } from './utils/getClients'
-import { updateTargetFillPayload } from '@rhinestone/orchestrator-sdk'
+import { getOrchestrator, updateTargetFillPayload } from '@rhinestone/orchestrator-sdk'
 import { nonceManager } from './nonceManager'
 
 function isWhitelistedAddress(address: Address) {
@@ -87,6 +87,15 @@ export async function fillBundle(bundle: any) {
             Number(process.env.SOLVER_MAINNET_DELAY) ?? 20000,
           ),
         )
+
+        // Check the bundle is still valid post delay
+        const bundleStatus = await getOrchestrator(
+          process.env.ORCHESTRATOR_API_KEY!,
+          process.env.ORCHESTRATOR_URL,
+        ).getBundleStatus(bundle.bundleId)
+        if (bundleStatus.fillTransactionHash !== undefined || bundleStatus.status === 'EXPIRED' || bundleStatus.status === 'FAILED') {
+          return
+        }
       }
     }
 
@@ -98,16 +107,23 @@ export async function fillBundle(bundle: any) {
     })
 
     // console.log('Filling bundle with payload:', updatedPayload)
-    const fillTx = await walletClient.sendTransaction({
-      to: updatedPayload.to,
-      value: updatedPayload.value,
-      data: updatedPayload.data,
-      chain: walletClient.chain,
-      // TODO: There's got to be a better way.
-      nonce, // nonce: await walletClient.getTransactionCount({
-      //   address: OWNER_ADDRESS,
-      // }),
-    })
+    let fillTx
+    try {
+      fillTx = await walletClient.sendTransaction({
+        to: updatedPayload.to,
+        value: updatedPayload.value,
+        data: updatedPayload.data,
+        chain: walletClient.chain,
+        // TODO: There's got to be a better way.
+        nonce, // nonce: await walletClient.getTransactionCount({
+        //   address: OWNER_ADDRESS,
+        // }),
+      })
+    } catch (txError) {
+      console.log('txError', txError)
+      // TODO: Synchronize nonce at this point, either by decrementing the nonce or by getting the latest nonce from the chain
+      return
+    }
 
     logMessage('🚢 I AM FILLING A BUNDLE FOR THE PROD ORCH')
 

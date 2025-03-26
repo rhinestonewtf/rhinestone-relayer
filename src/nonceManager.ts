@@ -28,6 +28,20 @@ export class NonceManager {
       return
     }
 
+    // NOTE: Nonce must be set initially in order to call syncNonce
+    this.nonces.set(chainId, 0)
+    await this.syncNonce({ chainId })
+  }
+
+  isInitialized({ chainId }: { chainId: number }) {
+    return this.nonces.has(chainId)
+  }
+
+  async syncNonce({ chainId }: { chainId: number }) {
+    if (this.nonces.has(chainId)) {
+      return
+    }
+
     const publicClient = getPublicClient(chainId)
 
     const solver: Account = privateKeyToAccount(
@@ -39,10 +53,6 @@ export class NonceManager {
     })
 
     this.nonces.set(chainId, nonce)
-  }
-
-  isInitialized({ chainId }: { chainId: number }) {
-    return this.nonces.has(chainId)
   }
 
   getNonce({ chainId }: { chainId: number }) {

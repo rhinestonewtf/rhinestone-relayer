@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@rhinestone/orchestrator-sdk':
-        specifier: 0.2.0-rc.6
-        version: 0.2.0-rc.6(viem@2.23.5(typescript@5.7.2))
+        specifier: 0.2.0-rc.8
+        version: 0.2.0-rc.8(viem@2.23.5(typescript@5.7.2))
       '@types/node':
         specifier: ^22.10.1
         version: 22.10.1
@@ -428,8 +428,8 @@ packages:
   '@prisma/get-platform@5.22.0':
     resolution: {integrity: sha512-pHhpQdr1UPFpt+zFfnPazhulaZYCUqeIcPpJViYoq9R+D/yw4fjE+CtnsnKzPYm0ddUbeXUzjGVGIRVgPDCk4Q==}
 
-  '@rhinestone/orchestrator-sdk@0.2.0-rc.6':
-    resolution: {integrity: sha512-FJ98U0uDb41t6SjYuVgxn9CZjzxgf+bzHbNsH876VhdQ+u1OTSLsBR+TH30sTjrman84EqgCph5bUHmczDgzUg==}
+  '@rhinestone/orchestrator-sdk@0.2.0-rc.8':
+    resolution: {integrity: sha512-ACGdTj06y5/2jBEB4prpddNpKKFM2XtZK9iezKBc1/I60XBEXr8iuDzacgAG+/LrQhvrnRzxX2j29I+5RZgStQ==}
     peerDependencies:
       viem: ^2.17.8
 
@@ -583,6 +583,9 @@ packages:
 
   axios@1.7.9:
     resolution: {integrity: sha512-LhLcE7Hbiryz8oMDdDptSrWowmB4Bl6RCt6sIJKpRB4XtVf0iEgewX3au/pJqm+Py1kCASkb/FFKjxQaLtxJvw==}
+
+  axios@1.8.4:
+    resolution: {integrity: sha512-eBSYY4Y68NNlHbHBMdeDmKNtDgXWhQsJcGqzO3iLUM0GraQFSS9cVgPX5I9b3lbdFKyYoAEGAZF1DwhTaljNAw==}
 
   babel-jest@29.7.0:
     resolution: {integrity: sha512-BrvGY3xZSwEcCzKvKsCi2GgHqDqsYkOP4/by5xCgIwGXQxIEh+8ew3gmrE1y7XRR6LHZIj6yLYnUi/mm2KXKBg==}
@@ -2267,9 +2270,12 @@ snapshots:
     dependencies:
       '@prisma/debug': 5.22.0
 
-  '@rhinestone/orchestrator-sdk@0.2.0-rc.6(viem@2.23.5(typescript@5.7.2))':
+  '@rhinestone/orchestrator-sdk@0.2.0-rc.8(viem@2.23.5(typescript@5.7.2))':
     dependencies:
+      axios: 1.8.4
       viem: 2.23.5(typescript@5.7.2)
+    transitivePeerDependencies:
+      - debug
 
   '@scure/base@1.2.4': {}
 
@@ -2425,6 +2431,14 @@ snapshots:
   asynckit@0.4.0: {}
 
   axios@1.7.9:
+    dependencies:
+      follow-redirects: 1.15.9
+      form-data: 4.0.1
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
+  axios@1.8.4:
     dependencies:
       follow-redirects: 1.15.9
       form-data: 4.0.1
