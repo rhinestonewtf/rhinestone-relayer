@@ -69,42 +69,42 @@ export async function fillBundle(bundle: any) {
       process.env.SOLVER_PRIVATE_KEY! as Hex,
     )
 
-    if (
-      Number(updatedPayload.chainId) === 8453 ||
-      Number(updatedPayload.chainId) === 1 ||
-      Number(updatedPayload.chainId) === 137 ||
-      Number(updatedPayload.chainId) === 42161 ||
-      Number(updatedPayload.chainId) === 10
-    ) {
-      // console.log('Waiting for 20 seconds')
-
-      if (
-        !isWhitelistedAddress(
-          bundle.acrossDepositEvents[0].recipient as Address,
-        )
-      ) {
-        // // Wait for 20 seconds before proceeding
-        // await new Promise((resolve) =>
-        //   setTimeout(
-        //     resolve,
-        //     Number(process.env.SOLVER_MAINNET_DELAY) ?? 20000,
-        //   ),
-        // )
-
-        // Check the bundle is still valid post delay
-        const bundleStatus = await getOrchestrator(
-          process.env.ORCHESTRATOR_API_KEY!,
-          process.env.ORCHESTRATOR_URL,
-        ).getBundleStatus(bundle.bundleId)
-        if (
-          bundleStatus.fillTransactionHash !== undefined ||
-          bundleStatus.status === 'EXPIRED' ||
-          bundleStatus.status === 'FAILED'
-        ) {
-          return
-        }
-      }
-    }
+    // if (
+    //   Number(updatedPayload.chainId) === 8453 ||
+    //   Number(updatedPayload.chainId) === 1 ||
+    //   Number(updatedPayload.chainId) === 137 ||
+    //   Number(updatedPayload.chainId) === 42161 ||
+    //   Number(updatedPayload.chainId) === 10
+    // ) {
+    //   // console.log('Waiting for 20 seconds')
+    //
+    //   if (
+    //     !isWhitelistedAddress(
+    //       bundle.acrossDepositEvents[0].recipient as Address,
+    //     )
+    //   ) {
+    //     // // Wait for 20 seconds before proceeding
+    //     // await new Promise((resolve) =>
+    //     //   setTimeout(
+    //     //     resolve,
+    //     //     Number(process.env.SOLVER_MAINNET_DELAY) ?? 20000,
+    //     //   ),
+    //     // )
+    //
+    //     // Check the bundle is still valid post delay
+    //     const bundleStatus = await getOrchestrator(
+    //       process.env.ORCHESTRATOR_API_KEY!,
+    //       process.env.ORCHESTRATOR_URL,
+    //     ).getBundleStatus(bundle.bundleId)
+    //     if (
+    //       bundleStatus.fillTransactionHash !== undefined ||
+    //       bundleStatus.status === 'EXPIRED' ||
+    //       bundleStatus.status === 'FAILED'
+    //     ) {
+    //       return
+    //     }
+    //   }
+    // }
 
     // checkBundleInventory(bundle)
     // console.log(bundle)
