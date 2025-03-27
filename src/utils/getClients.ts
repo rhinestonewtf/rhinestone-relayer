@@ -19,7 +19,7 @@ export const getPublicClient = (chainId: number) => {
 
 export const getWalletClient = (chainId: number, privateKey: Hex) => {
   return createWalletClient({
-    account: privateKeyToAccount(privateKey, { nonceManager }),
+    account: privateKeyToAccount(privateKey),
     transport: http(getRPCUrl(chainId)),
   }).extend(publicActions)
 }

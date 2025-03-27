@@ -16,6 +16,7 @@ import {
   updateTargetFillPayload,
 } from '@rhinestone/orchestrator-sdk'
 import { nonceManager } from './nonceManager'
+import { privateKeyToAccount } from 'viem/accounts'
 
 function isWhitelistedAddress(address: Address) {
   // Replace with clave provided address here
@@ -69,56 +70,84 @@ export async function fillBundle(bundle: any) {
       process.env.SOLVER_PRIVATE_KEY! as Hex,
     )
 
-    if (
-      Number(updatedPayload.chainId) === 8453 ||
-      Number(updatedPayload.chainId) === 42161
-    ) {
-      console.log('Waiting for 10 seconds')
-
-      if (
-        !isWhitelistedAddress(
-          bundle.acrossDepositEvents[0].recipient as Address,
-        )
-      ) {
-        // Wait for 20 seconds before proceeding
-        await new Promise((resolve) => setTimeout(resolve, 10000))
-
-        // Check the bundle is still valid post delay
-        const bundleStatus = await getOrchestrator(
-          process.env.ORCHESTRATOR_API_KEY!,
-          process.env.ORCHESTRATOR_URL,
-        ).getBundleStatus(bundle.bundleId)
-        if (
-          bundleStatus.fillTransactionHash !== undefined ||
-          bundleStatus.status === 'EXPIRED' ||
-          bundleStatus.status === 'FAILED'
-        ) {
-          return
-        }
-      }
-    }
+    // if (
+    //   Number(updatedPayload.chainId) === 8453 ||
+    //   Number(updatedPayload.chainId) === 42161
+    // ) {
+    //   console.log('Waiting for 10 seconds')
+    //
+    //   if (
+    //     !isWhitelistedAddress(
+    //       bundle.acrossDepositEvents[0].recipient as Address,
+    //     )
+    //   ) {
+    //     // Wait for 20 seconds before proceeding
+    //     await new Promise((resolve) => setTimeout(resolve, 10000))
+    //
+    //     // Check the bundle is still valid post delay
+    //     const bundleStatus = await getOrchestrator(
+    //       process.env.ORCHESTRATOR_API_KEY!,
+    //       process.env.ORCHESTRATOR_URL,
+    //     ).getBundleStatus(bundle.bundleId)
+    //     if (
+    //       bundleStatus.fillTransactionHash !== undefined ||
+    //       bundleStatus.status === 'EXPIRED' ||
+    //       bundleStatus.status === 'FAILED'
+    //     ) {
+    //       return
+    //     }
+    //   }
+    // }
 
     // checkBundleInventory(bundle)
     // console.log(bundle)
 
-    const nonce = nonceManager.getNonce({
-      chainId: bundle.targetFillPayload.chainId,
-    })
-
+    let nonce
     // console.log('Filling bundle with payload:', updatedPayload)
     let fillTx
     try {
-      fillTx = await walletClient.sendTransaction({
+      const account = privateKeyToAccount(
+        process.env.SOLVER_PRIVATE_KEY! as Hex,
+      )
+      const gas = await walletClient.estimateGas({
+        account,
         to: updatedPayload.to,
         value: updatedPayload.value,
         data: updatedPayload.data,
-        chain: walletClient.chain,
-        // TODO: There's got to be a better way.
-        // nonce,
-        nonce: await walletClient.getTransactionCount({
-          address: OWNER_ADDRESS,
+      })
+
+      const { maxFeePerGas, maxPriorityFeePerGas } =
+        await walletClient.estimateFeesPerGas()
+
+      nonce = nonceManager.getNonce({
+        chainId: bundle.targetFillPayload.chainId,
+      })
+
+      fillTx = await walletClient.sendRawTransaction({
+        serializedTransaction: await account.signTransaction({
+          to: updatedPayload.to,
+          value: updatedPayload.value,
+          data: updatedPayload.data,
+          chainId: bundle.targetFillPayload.chainId,
+          type: 'eip1559',
+          maxFeePerGas,
+          maxPriorityFeePerGas,
+          gas,
+          nonce,
         }),
       })
+
+      // fillTx = await walletClient.sendTransaction({
+      //   to: updatedPayload.to,
+      //   value: updatedPayload.value,
+      //   data: updatedPayload.data,
+      //   chain: walletClient.chain,
+      //   // TODO: There's got to be a better way.
+      //   // nonce,
+      //   nonce: await walletClient.getTransactionCount({
+      //     address: OWNER_ADDRESS,
+      //   }),
+      // })
     } catch (txError) {
       console.log('txError', txError)
       // TODO: Synchronize nonce at this point, either by decrementing the nonce or by getting the latest nonce from the chain
