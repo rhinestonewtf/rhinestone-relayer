@@ -1,6 +1,10 @@
-import { Address, erc20Abi, getContract } from 'viem'
+import { Address, erc20Abi, getContract, zeroAddress } from 'viem'
+import {
+  getSupportedTokens,
+  getSupportedChainIds,
+} from '@rhinestone/orchestrator-sdk'
 import { getPublicClient, getWalletClient } from './getClients'
-import { RELAYER_ADDRESS } from '../constants/constants'
+import { RELAYER_ADDRESS, TOKEN_SYMBOLS } from '../constants/constants'
 import { logError } from './logger'
 
 export function getToken(tokenAddress: Address, chainId: number) {
@@ -51,15 +55,57 @@ export async function checkBundleInventory(bundle: any) {
   }
 }
 
+export async function getAllBalances(
+  chainIds: number[] = getSupportedChainIds(),
+  symbols: string[] = TOKEN_SYMBOLS,
+) {
+  const balances = await Promise.all(
+    chainIds.map(async (chainId) => {
+      const tokens = getSupportedTokens(chainId).filter((token) =>
+        symbols.includes(token.symbol),
+      )
+      if (tokens.length === 0) {
+        return []
+      }
+      const balances = await Promise.all(
+        tokens.map(async (token) => {
+          const tokenAddress = token.address as Address
+          const tokenDecimals = token.decimals
+          const symbol = token.symbol
+          const balance = await getBalance(tokenAddress, chainId)
+          return { chainId, tokenAddress, balance, tokenDecimals, symbol }
+        }),
+      )
+      return balances
+    }),
+  )
+  return balances.flat()
+}
+
+export async function getBalance(
+  tokenAddress: Address,
+  chainId: number,
+  tokenHolder: Address = RELAYER_ADDRESS,
+): Promise<bigint> {
+  if (tokenAddress === zeroAddress) {
+    return getPublicClient(chainId).getBalance({
+      address: tokenHolder,
+    })
+  }
+  const TOKEN = getToken(tokenAddress, chainId)
+
+  const relayerBalance = await TOKEN.read.balanceOf([tokenHolder])
+
+  return relayerBalance
+}
+
 export async function checkDepositEventInventory(
   bundleId: string,
   tokenAddress: Address,
   chainId: number,
   amount: bigint,
 ) {
-  const TOKEN = getToken(tokenAddress, chainId)
-
-  const relayerBalance = await TOKEN.read.balanceOf([RELAYER_ADDRESS])
+  const relayerBalance = await getBalance(tokenAddress, chainId)
 
   if (relayerBalance < amount) {
     logError(

@@ -5,6 +5,7 @@ import { fillBundle } from './filler'
 import { generateBundle } from './bundleGenerator'
 import { chains } from './utils/getClients'
 import { nonceManager } from './nonceManager'
+import { startSlackListener } from './utils/slack'
 
 // Define the WebSocket URL for the orchestrator
 // const ORCHESTRATOR_URL = 'wss://orchestrator.api.rhinestone.wtf/bundles/events'
@@ -49,6 +50,8 @@ ws.on('close', () => {
 ws.on('error', (error) => {
   console.error('WebSocket error:', error)
 })
+
+startSlackListener()
 
 // Generate a bundle with a very small amount every 30 seconds, so that fillers can test integration
 // NOTE: This should not be added for production fillers.

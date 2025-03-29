@@ -1,22 +1,4 @@
-export async function logToSlack(message: string) {
-  const webhookUrl = process.env.SLACK_WEBHOOK_URL
-
-  if (!webhookUrl) {
-    return
-  }
-
-  const response = await fetch(webhookUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ text: message }),
-  })
-
-  if (!response.ok) {
-    console.error('Failed to send slack message:', response.statusText)
-  }
-}
+import { logToSlack } from './slack'
 
 export async function logMessage(message: string) {
   console.log(message)
