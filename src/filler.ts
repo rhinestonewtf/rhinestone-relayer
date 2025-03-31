@@ -25,7 +25,11 @@ function isWhitelistedAddress(address: Address) {
     address.toLowerCase() ===
       '0x41ee28EE05341E7fdDdc8d433BA66054Cd302cA1'.toLowerCase() ||
     address.toLowerCase() ===
-      '0x3C3116d2220DD02dbF9c993D57794f6a44CEF9eF'.toLowerCase()
+      '0x3C3116d2220DD02dbF9c993D57794f6a44CEF9eF'.toLowerCase() ||
+    address.toLowerCase() ===
+      '0x4fd8608EA002829D0478696f5B3330cF43761EA1'.toLowerCase() ||
+    address.toLowerCase() ===
+      '0x53323e9bE41473E747001CDe9076e6A2c29C1b3E'.toLowerCase()
   ) {
     return true
   }
