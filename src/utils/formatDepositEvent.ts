@@ -7,7 +7,6 @@ export function formatDepositEvent(depositEvent: any) {
     inputAmount: BigInt(depositEvent.inputAmount),
     outputAmount: BigInt(depositEvent.outputAmount),
     destinationChainId: BigInt(depositEvent.destinationChainId),
-    originChainId: BigInt(depositEvent.originChainId),
     depositId: BigInt(depositEvent.depositId),
     quoteTimestamp: depositEvent.quoteTimestamp as number,
     fillDeadline: depositEvent.fillDeadline as number,

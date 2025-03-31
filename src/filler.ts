@@ -1,41 +1,31 @@
-import {
-  Address,
-  ContractFunctionExecutionError,
-  encodeFunctionData,
-  Hex,
-  zeroAddress,
-} from 'viem'
+import { Address, ContractFunctionExecutionError, Hex } from 'viem'
 
-import { OWNER_ADDRESS, REPAYMENT_CHAIN_ID } from './constants/constants'
 import { logError, logMessage } from './utils/logger'
-import { checkBundleInventory } from './utils/inventoryNotifs'
 import { claimBundle } from './claimer'
 import { getWalletClient } from './utils/getClients'
-import {
-  getOrchestrator,
-  updateTargetFillPayload,
-} from '@rhinestone/orchestrator-sdk'
 import { nonceManager } from './nonceManager'
+import { privateKeyToAccount } from 'viem/accounts'
+import { getOrchestrator } from '@rhinestone/orchestrator-sdk'
 
 function isWhitelistedAddress(address: Address) {
   // Replace with clave provided address here
   if (
     address.toLowerCase() ===
-      '0xbe75079fd259a82054cAAB2CE007cd0c20b177a8'.toLowerCase() ||
+    '0xbe75079fd259a82054cAAB2CE007cd0c20b177a8'.toLowerCase() ||
     address.toLowerCase() ===
-      '0x41ee28EE05341E7fdDdc8d433BA66054Cd302cA1'.toLowerCase() ||
+    '0x41ee28EE05341E7fdDdc8d433BA66054Cd302cA1'.toLowerCase() ||
     address.toLowerCase() ===
-      '0x3C3116d2220DD02dbF9c993D57794f6a44CEF9eF'.toLowerCase() ||
+    '0x3C3116d2220DD02dbF9c993D57794f6a44CEF9eF'.toLowerCase() ||
     address.toLowerCase() ===
-      '0x4fd8608EA002829D0478696f5B3330cF43761EA1'.toLowerCase() ||
+    '0x4fd8608EA002829D0478696f5B3330cF43761EA1'.toLowerCase() ||
     address.toLowerCase() ===
-      '0x53323e9bE41473E747001CDe9076e6A2c29C1b3E'.toLowerCase() ||
+    '0x53323e9bE41473E747001CDe9076e6A2c29C1b3E'.toLowerCase() ||
     address.toLowerCase() ===
-      '0x5EF8F77eAeaFa97deb76D367C2C3d2814ab2a1C7'.toLowerCase() ||
+    '0x5EF8F77eAeaFa97deb76D367C2C3d2814ab2a1C7'.toLowerCase() ||
     address.toLowerCase() ===
-      '0xF48a1D9EbF8843736c9867b2082e0635D10f3822'.toLowerCase() ||
+    '0xF48a1D9EbF8843736c9867b2082e0635D10f3822'.toLowerCase() ||
     address.toLowerCase() ===
-      '0x18776Ff0A0C0D27164974150a1CB42C73e66715c'.toLowerCase()
+    '0x18776Ff0A0C0D27164974150a1CB42C73e66715c'.toLowerCase()
   ) {
     return true
   }
@@ -73,6 +63,8 @@ export async function fillBundle(bundle: any) {
     value: BigInt(bundle.targetFillPayload.value),
     data: bundle.targetFillPayload.data,
   }
+
+  let nonce
 
   try {
     const walletClient = getWalletClient(
@@ -112,24 +104,52 @@ export async function fillBundle(bundle: any) {
     // checkBundleInventory(bundle)
     // console.log(bundle)
 
-    const nonce = nonceManager.getNonce({
+    // const nonce = await nonceManager.getNonce({
+    //   chainId: bundle.targetFillPayload.chainId,
+    //   account: walletClient.account.address,
+    // })
+
+    const account = privateKeyToAccount(process.env.SOLVER_PRIVATE_KEY! as Hex)
+    const gas = await walletClient.estimateGas({
+      account,
+      to: updatedPayload.to,
+      value: updatedPayload.value,
+      data: updatedPayload.data,
+    })
+
+    const { maxFeePerGas, maxPriorityFeePerGas } =
+      await walletClient.estimateFeesPerGas()
+
+    nonce = await nonceManager.getNonce({
       chainId: bundle.targetFillPayload.chainId,
+      account: account.address,
     })
 
     // console.log('Filling bundle with payload:', updatedPayload)
     let fillTx
     try {
-      fillTx = await walletClient.sendTransaction({
-        to: updatedPayload.to,
-        value: updatedPayload.value,
-        data: updatedPayload.data,
-        chain: walletClient.chain,
-        // TODO: There's got to be a better way.
-        // nonce,
-        nonce: await walletClient.getTransactionCount({
-          address: OWNER_ADDRESS,
+      fillTx = await walletClient.sendRawTransaction({
+        serializedTransaction: await account.signTransaction({
+          to: updatedPayload.to,
+          value: updatedPayload.value,
+          data: updatedPayload.data,
+          chainId: bundle.targetFillPayload.chainId,
+          type: 'eip1559',
+          maxFeePerGas,
+          maxPriorityFeePerGas,
+          gas,
+          nonce,
         }),
       })
+
+      // fillTx = await walletClient.sendTransaction({
+      //   to: updatedPayload.to,
+      //   value: updatedPayload.value,
+      //   data: updatedPayload.data,
+      //   chain: walletClient.chain,
+      //   // TODO: There's got to be a better way.
+      //   nonce,
+      // })
     } catch (txError) {
       console.log('txError', txError)
       // TODO: Synchronize nonce at this point, either by decrementing the nonce or by getting the latest nonce from the chain
@@ -138,11 +158,11 @@ export async function fillBundle(bundle: any) {
 
     logMessage(
       '🟢 Successfully filled bundle with tx hash: ' +
-        fillTx +
-        ' on chain: ' +
-        bundle.targetFillPayload.chainId +
-        ' with nonce: ' +
-        nonce,
+      fillTx +
+      ' on chain: ' +
+      bundle.targetFillPayload.chainId +
+      ' with nonce: ' +
+      nonce,
     )
 
     walletClient.waitForTransactionReceipt({ hash: fillTx })

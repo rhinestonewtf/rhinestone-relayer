@@ -1,7 +1,7 @@
 import { Address, erc20Abi, getContract } from 'viem'
 import { getPublicClient, getWalletClient } from './getClients'
-import { RELAYER_ADDRESS } from '../constants/constants'
 import { logError } from './logger'
+import { getRelayerWallet } from './getRelayer'
 
 export function getToken(tokenAddress: Address, chainId: number) {
   const TOKEN = getContract({
@@ -59,7 +59,7 @@ export async function checkDepositEventInventory(
 ) {
   const TOKEN = getToken(tokenAddress, chainId)
 
-  const relayerBalance = await TOKEN.read.balanceOf([RELAYER_ADDRESS])
+  const relayerBalance = await TOKEN.read.balanceOf([getRelayerWallet(chainId).account.address])
 
   if (relayerBalance < amount) {
     logError(
