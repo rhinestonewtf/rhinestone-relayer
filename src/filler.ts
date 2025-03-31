@@ -21,9 +21,11 @@ function isWhitelistedAddress(address: Address) {
   // Replace with clave provided address here
   if (
     address.toLowerCase() ===
-      '0x8BBF760ca40215C630C54E7b1c91317DCCB5eE63'.toLowerCase() ||
+      '0xbe75079fd259a82054cAAB2CE007cd0c20b177a8'.toLowerCase() ||
     address.toLowerCase() ===
-      '0x423A44964012825a5B54Bf19d32151C440765115'.toLowerCase()
+      '0x41ee28EE05341E7fdDdc8d433BA66054Cd302cA1'.toLowerCase() ||
+    address.toLowerCase() ===
+      '0x3C3116d2220DD02dbF9c993D57794f6a44CEF9eF'.toLowerCase()
   ) {
     return true
   }
@@ -69,37 +71,34 @@ export async function fillBundle(bundle: any) {
       process.env.SOLVER_PRIVATE_KEY! as Hex,
     )
 
-    // if (
-    //   Number(updatedPayload.chainId) === 1 ||
-    //   Number(updatedPayload.chainId) === 10 ||
-    //   Number(updatedPayload.chainId) === 137 ||
-    //   Number(updatedPayload.chainId) === 8453 ||
-    //   Number(updatedPayload.chainId) === 42161
-    // ) {
-    //   console.log('Waiting for 12 seconds')
-    
-    //   if (
-    //     !isWhitelistedAddress(
-    //       bundle.acrossDepositEvents[0].recipient as Address,
-    //     )
-    //   ) {
-    //     // Wait for 12 seconds before proceeding
-    //     await new Promise((resolve) => setTimeout(resolve, 12_000))
-    
-    //     // Check the bundle is still valid post delay
-    //     const bundleStatus = await getOrchestrator(
-    //       process.env.ORCHESTRATOR_API_KEY!,
-    //       process.env.ORCHESTRATOR_URL,
-    //     ).getBundleStatus(bundle.bundleId)
-    //     if (
-    //       bundleStatus.fillTransactionHash !== undefined ||
-    //       bundleStatus.status === 'EXPIRED' ||
-    //       bundleStatus.status === 'FAILED'
-    //     ) {
-    //       return
-    //     }
-    //   }
-    // }
+    if (
+      Number(updatedPayload.chainId) === 1 ||
+      Number(updatedPayload.chainId) === 10 ||
+      Number(updatedPayload.chainId) === 137 ||
+      Number(updatedPayload.chainId) === 8453 ||
+      Number(updatedPayload.chainId) === 42161
+    ) {
+      if (
+        isWhitelistedAddress(bundle.acrossDepositEvents[0].recipient as Address)
+      ) {
+        console.log('waiting for 20 seconds')
+        // Wait for 20 seconds before proceeding
+        await new Promise((resolve) => setTimeout(resolve, 20_000))
+
+        // Check the bundle is still valid post delay
+        const bundleStatus = await getOrchestrator(
+          process.env.ORCHESTRATOR_API_KEY!,
+          process.env.ORCHESTRATOR_URL,
+        ).getBundleStatus(bundle.bundleId)
+        if (
+          bundleStatus.fillTransactionHash !== undefined ||
+          bundleStatus.status === 'EXPIRED' ||
+          bundleStatus.status === 'FAILED'
+        ) {
+          return
+        }
+      }
+    }
 
     // checkBundleInventory(bundle)
     // console.log(bundle)
