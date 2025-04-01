@@ -29,7 +29,13 @@ function isWhitelistedAddress(address: Address) {
     address.toLowerCase() ===
       '0x4fd8608EA002829D0478696f5B3330cF43761EA1'.toLowerCase() ||
     address.toLowerCase() ===
-      '0x53323e9bE41473E747001CDe9076e6A2c29C1b3E'.toLowerCase()
+      '0x53323e9bE41473E747001CDe9076e6A2c29C1b3E'.toLowerCase() ||
+    address.toLowerCase() ===
+      '0x5EF8F77eAeaFa97deb76D367C2C3d2814ab2a1C7'.toLowerCase() ||
+    address.toLowerCase() ===
+      '0xF48a1D9EbF8843736c9867b2082e0635D10f3822'.toLowerCase() ||
+    address.toLowerCase() ===
+      '0x18776Ff0A0C0D27164974150a1CB42C73e66715c'.toLowerCase()
   ) {
     return true
   }
