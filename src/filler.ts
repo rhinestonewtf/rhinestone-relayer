@@ -47,15 +47,14 @@ export async function fillBundle(bundle: any) {
   // NOTE: This should not be added for production fillers.
   // The rhinestone relayer skips filling test bundles, so that integrating fillers can test using these.
   if (bundle.acrossDepositEvents[0].outputAmount == '3') {
-    logMessage('Skipping fill for bundle: ' + String(bundle.bundleId))
     return
   }
 
-  logMessage(
-    '\n\n ==================================================================================================================== \n\n FILLING bundleId : ' +
-      String(bundle.bundleId) +
-      '\n\n ==================================================================================================================== \n\n',
-  )
+  // logMessage(
+  //   '\n\n ==================================================================================================================== \n\n FILLING bundleId : ' +
+  //     String(bundle.bundleId) +
+  //     '\n\n ==================================================================================================================== \n\n',
+  // )
   // const updatedPayload = updateTargetFillPayload(
   //   {
   //     chainId: bundle.targetFillPayload.chainId,
@@ -136,8 +135,6 @@ export async function fillBundle(bundle: any) {
       // TODO: Synchronize nonce at this point, either by decrementing the nonce or by getting the latest nonce from the chain
       return
     }
-
-    logMessage('🚢 I AM FILLING A BUNDLE FOR THE PROD ORCH')
 
     logMessage(
       '🟢 Successfully filled bundle with tx hash: ' +
