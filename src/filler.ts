@@ -11,21 +11,23 @@ function isWhitelistedAddress(address: Address) {
   // Replace with clave provided address here
   if (
     address.toLowerCase() ===
-    '0xbe75079fd259a82054cAAB2CE007cd0c20b177a8'.toLowerCase() ||
+      '0xbe75079fd259a82054cAAB2CE007cd0c20b177a8'.toLowerCase() ||
     address.toLowerCase() ===
-    '0x41ee28EE05341E7fdDdc8d433BA66054Cd302cA1'.toLowerCase() ||
+      '0x41ee28EE05341E7fdDdc8d433BA66054Cd302cA1'.toLowerCase() ||
     address.toLowerCase() ===
-    '0x3C3116d2220DD02dbF9c993D57794f6a44CEF9eF'.toLowerCase() ||
+      '0x3C3116d2220DD02dbF9c993D57794f6a44CEF9eF'.toLowerCase() ||
     address.toLowerCase() ===
-    '0x4fd8608EA002829D0478696f5B3330cF43761EA1'.toLowerCase() ||
+      '0x4fd8608EA002829D0478696f5B3330cF43761EA1'.toLowerCase() ||
     address.toLowerCase() ===
-    '0x53323e9bE41473E747001CDe9076e6A2c29C1b3E'.toLowerCase() ||
+      '0x53323e9bE41473E747001CDe9076e6A2c29C1b3E'.toLowerCase() ||
     address.toLowerCase() ===
-    '0x5EF8F77eAeaFa97deb76D367C2C3d2814ab2a1C7'.toLowerCase() ||
+      '0x5EF8F77eAeaFa97deb76D367C2C3d2814ab2a1C7'.toLowerCase() ||
     address.toLowerCase() ===
-    '0xF48a1D9EbF8843736c9867b2082e0635D10f3822'.toLowerCase() ||
+      '0xF48a1D9EbF8843736c9867b2082e0635D10f3822'.toLowerCase() ||
     address.toLowerCase() ===
-    '0x18776Ff0A0C0D27164974150a1CB42C73e66715c'.toLowerCase()
+      '0x18776Ff0A0C0D27164974150a1CB42C73e66715c'.toLowerCase() ||
+    address.toLowerCase() ===
+      '0x5b4EBF3F804Ae9Bd78B37eAd3E791a799536Bf81'.toLowerCase()
   ) {
     return true
   }
@@ -158,11 +160,11 @@ export async function fillBundle(bundle: any) {
 
     logMessage(
       '🟢 Successfully filled bundle with tx hash: ' +
-      fillTx +
-      ' on chain: ' +
-      bundle.targetFillPayload.chainId +
-      ' with nonce: ' +
-      nonce,
+        fillTx +
+        ' on chain: ' +
+        bundle.targetFillPayload.chainId +
+        ' with nonce: ' +
+        nonce,
     )
 
     walletClient.waitForTransactionReceipt({ hash: fillTx })
