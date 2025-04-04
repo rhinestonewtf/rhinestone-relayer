@@ -1,19 +1,22 @@
 import { Hex, getContract } from 'viem'
 import { rhinestoneRelayerAbi } from '../constants/abi'
-import { RELAYER_ADDRESS } from '../constants/constants'
 import { getWalletClient } from './getClients'
 
 export function getRelayer(chainId: number) {
-  const walletClient = getWalletClient(
-    chainId,
-    process.env.SOLVER_PRIVATE_KEY! as Hex,
-  )
+  const walletClient = getRelayerWallet(chainId)
 
   const RELAYER = getContract({
     abi: rhinestoneRelayerAbi,
-    address: RELAYER_ADDRESS,
+    address: walletClient.account.address,
     client: walletClient,
   })
 
   return RELAYER
+}
+
+export function getRelayerWallet(chainId: number) {
+  return getWalletClient(
+    chainId,
+    process.env.SOLVER_PRIVATE_KEY! as Hex,
+  )
 }

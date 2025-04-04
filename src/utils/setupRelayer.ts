@@ -10,8 +10,6 @@ import {
   TokenConfig,
 } from '@rhinestone/orchestrator-sdk'
 
-import { OWNER_ADDRESS } from '../constants/constants'
-
 const MAX_UINT256 =
   115792089237316195423570985008687907853269984665640564039457584007913129639935n
 
@@ -22,6 +20,7 @@ function getRhinestoneSpokepoolAddress(): Address {
 
 export async function approveSpokepool(tokens: TokenConfig[], chainId: number) {
   const publicClient = getPublicClient(chainId)
+  const walletClient = getWalletClient(chainId, process.env.SOLVER_PRIVATE_KEY! as Hex)
 
   for (const token of tokens) {
     if (token.symbol === 'ETH') {
@@ -30,10 +29,10 @@ export async function approveSpokepool(tokens: TokenConfig[], chainId: number) {
     const ERC20 = getContract({
       abi: erc20Abi,
       address: token.address,
-      client: getWalletClient(chainId, process.env.SOLVER_PRIVATE_KEY! as Hex),
+      client: walletClient,
     })
     const currentAllowance: bigint = await ERC20.read.allowance([
-      OWNER_ADDRESS,
+      walletClient.account.address,
       getRhinestoneSpokepoolAddress(),
     ])
 
@@ -41,10 +40,7 @@ export async function approveSpokepool(tokens: TokenConfig[], chainId: number) {
       const tx = await ERC20.write.approve(
         [getRhinestoneSpokepoolAddress(), MAX_UINT256],
         {
-          chain: getWalletClient(
-            chainId,
-            process.env.SOLVER_PRIVATE_KEY! as Hex,
-          ).chain,
+          chain: walletClient.chain
         },
       )
       await publicClient.waitForTransactionReceipt({ hash: tx })

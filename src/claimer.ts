@@ -1,9 +1,11 @@
 import { ContractFunctionExecutionError, Hex } from 'viem'
 
 import { logError, logMessage } from './utils/logger'
-import { getPublicClient, getWalletClient } from './utils/getClients'
-import { OWNER_ADDRESS } from './constants/constants'
+import { getWalletClient } from './utils/getClients'
 import { nonceManager } from './nonceManager'
+import { privateKeyToAccount } from 'viem/accounts'
+import { formatDepositEvent } from './utils/formatDepositEvent'
+import './utils/serializeBigInts'
 
 export async function claimBundle(bundle: any) {
   // TODO: Optimize this with promise all stuff
@@ -25,30 +27,59 @@ export async function claimBundle(bundle: any) {
         process.env.SOLVER_PRIVATE_KEY! as Hex,
       )
 
-      const nonce = nonceManager.getNonce({
+      // const nonce = await nonceManager.getNonce({
+      //   chainId: depositEvent.originClaimPayload.chainId,
+      //   account: walletClient.account.address,
+      // })
+
+      const account = privateKeyToAccount(
+        process.env.SOLVER_PRIVATE_KEY! as Hex,
+      )
+      const gas = await walletClient.estimateGas({
+        account,
+        to: depositEvent.originClaimPayload.to,
+        value: BigInt(depositEvent.originClaimPayload.value),
+        data: depositEvent.originClaimPayload.data,
+      })
+
+      const { maxFeePerGas, maxPriorityFeePerGas } =
+        await walletClient.estimateFeesPerGas()
+
+      let nonce = await nonceManager.getNonce({
         chainId: depositEvent.originClaimPayload.chainId,
+        account: account.address,
       })
 
       // Adding try/catch for the sendTransaction
       try {
-        const claimTx = await walletClient.sendTransaction({
-          chain: walletClient.chain,
-          to: depositEvent.originClaimPayload.to,
-          value: BigInt(depositEvent.originClaimPayload.value),
-          data: depositEvent.originClaimPayload.data,
-          // nonce,
-          nonce: await walletClient.getTransactionCount({
-            address: OWNER_ADDRESS,
+        // const claimTx = await walletClient.sendTransaction({
+        //   chain: walletClient.chain,
+        //   to: depositEvent.originClaimPayload.to,
+        //   value: BigInt(depositEvent.originClaimPayload.value),
+        //   data: depositEvent.originClaimPayload.data,
+        //   nonce,
+        // })
+        const claimTx = await walletClient.sendRawTransaction({
+          serializedTransaction: await account.signTransaction({
+            to: depositEvent.originClaimPayload.to,
+            value: BigInt(depositEvent.originClaimPayload.value),
+            data: depositEvent.originClaimPayload.data,
+            chainId: depositEvent.originClaimPayload.chainId,
+            type: 'eip1559',
+            maxFeePerGas,
+            maxPriorityFeePerGas,
+            gas,
+            nonce,
           }),
         })
 
         logMessage(
           '✅ Successfully claimed a bundle for the Prod Orch: ' +
-            claimTx +
-            ' on chainId: ' +
-            depositEvent.originClaimPayload.chainId +
-            ' with nonce: ' +
-            nonce,
+          claimTx +
+          ' on chainId: ' +
+          depositEvent.originClaimPayload.chainId +
+          ' with nonce: ' +
+          nonce,
         )
 
         walletClient.waitForTransactionReceipt({ hash: claimTx })

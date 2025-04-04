@@ -1,69 +1,71 @@
-import { Account, Hex } from 'viem'
-import { privateKeyToAccount } from 'viem/accounts'
+import { Address } from 'viem'
 import { getPublicClient } from './utils/getClients'
 
-export type NonceManagerType = {
-  nonces: Map<number, number>
-  constructor: () => void
-  initialize: (params: { chainId: number }) => Promise<void>
-  isInitialized: (params: { chainId: number }) => boolean
-  getNonce: (params: { chainId: number }) => number
-}
 
-export class NonceManager {
-  private static instance: NonceManager
-  nonces: Map<number, number> = new Map()
+class AggregatedNonceManager {
+  private static instance: AggregatedNonceManager
+  chainAccountNonces: Map<number, Map<Address, NonceManager>> = new Map()
 
-  constructor() {}
+  constructor() { }
 
-  public static getInstance(): NonceManager {
-    if (!NonceManager.instance) {
-      NonceManager.instance = new NonceManager()
+  public static getInstance(): AggregatedNonceManager {
+    if (!AggregatedNonceManager.instance) {
+      AggregatedNonceManager.instance = new AggregatedNonceManager()
     }
-    return NonceManager.instance
+    return AggregatedNonceManager.instance
   }
 
-  async initialize({ chainId }: { chainId: number }) {
-    if (this.nonces.has(chainId)) {
-      return
+  getAccountNonces(chainId: number): Map<Address, NonceManager> {
+    let res = this.chainAccountNonces.get(chainId)
+    if (!res) {
+      res = new Map()
+      this.chainAccountNonces.set(chainId, res)
     }
 
-    // NOTE: Nonce must be set initially in order to call syncNonce
-    this.nonces.set(chainId, 0)
-    await this.syncNonce({ chainId })
+    return res
   }
 
-  isInitialized({ chainId }: { chainId: number }) {
-    return this.nonces.has(chainId)
-  }
-
-  async syncNonce({ chainId }: { chainId: number }) {
-    if (this.nonces.has(chainId)) {
-      return
+  getNonceManager(chainId: number, account: Address): NonceManager {
+    let addressNonces = this.getAccountNonces(chainId)
+    let nonceManager = addressNonces.get(account)
+    if (!nonceManager) {
+      nonceManager = new NonceManager(chainId, account)
+      addressNonces.set(account, nonceManager)
     }
-
-    const publicClient = getPublicClient(chainId)
-
-    const solver: Account = privateKeyToAccount(
-      process.env.SOLVER_PRIVATE_KEY! as Hex,
-    )
-
-    const nonce = await publicClient.getTransactionCount({
-      address: solver.address,
-    })
-
-    this.nonces.set(chainId, nonce)
+    return nonceManager
   }
 
-  getNonce({ chainId }: { chainId: number }) {
-    const latest = this.nonces.get(chainId)
-    if (latest === undefined) {
-      throw new Error('NonceManager not initialized for chain')
-    }
-
-    this.nonces.set(chainId, latest + 1)
-    return latest
+  async getNonce({ chainId, account }: { chainId: number, account: Address }): Promise<number> {
+    let nonceManager = this.getNonceManager(chainId, account)
+    return await nonceManager.getNonce()
   }
 }
 
-export const nonceManager = NonceManager.getInstance()
+// this nonce manager IS NOT thread-safe
+class NonceManager {
+  private chainId: number;
+  private account: Address;
+  private nonce?: number;
+  private initializing?: Promise<void>;
+
+  constructor(chainId: number, account: Address) {
+    this.chainId = chainId
+    this.account = account
+  }
+
+  async getNonce() {
+    if (this.nonce === undefined) {
+      if (!this.initializing) {
+        this.initializing = (async () => {
+          let client = getPublicClient(this.chainId)
+          this.nonce = await client.getTransactionCount({ address: this.account });
+          this.initializing = undefined; // set to undefined to cleanup some memory, but not strictly neeeded
+        })();
+      }
+      await this.initializing;
+    }
+    return this.nonce!++; // we are sure nonce is here at this point
+  }
+}
+
+export const nonceManager = AggregatedNonceManager.getInstance()

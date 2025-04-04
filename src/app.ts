@@ -18,11 +18,6 @@ const ws = new WebSocket(process.env.ORCHESTRATOR_EVENTS_URL!)
 // Handle connection open event
 ws.on('open', async () => {
   console.log('Connected to the orchestrator WebSocket server')
-  for (const key of Object.keys(chains)) {
-    const numKey = parseInt(key)
-    await nonceManager.initialize({ chainId: numKey })
-  }
-  console.log('Nonce manager initialized')
 })
 
 // Handle incoming messages
