@@ -1,16 +1,16 @@
 require('dotenv').config()
 
+import { setupSDK } from './opentelemetry/setup'
+setupSDK({
+  version: process.env.VERSION,
+  env: process.env.DEPLOYMENT_ENV,
+  serviceName: 'rhinestone-relayer',
+})
+
 import WebSocket from 'ws'
 import { fillBundle } from './filler'
-import { generateBundle } from './bundleGenerator'
-import { chains } from './utils/getClients'
-import { nonceManager } from './nonceManager'
-
-// Define the WebSocket URL for the orchestrator
-// const ORCHESTRATOR_URL = 'wss://orchestrator.api.rhinestone.wtf/bundles/events'
-// const ORCHESTRATOR_URL = 'ws://localhost:3000/bundles/events'
-// const ORCHESTRATOR_URL =
-//   'wss://orchestrator-ts-dev-lu36d.ondigitalocean.app/bundles/events'
+import { withSpan } from './opentelemetry/api'
+import { addBundleId, recordError } from './tracing'
 
 // Create a WebSocket client
 const ws = new WebSocket(process.env.ORCHESTRATOR_EVENTS_URL!)
@@ -21,19 +21,21 @@ ws.on('open', async () => {
 })
 
 // Handle incoming messages
-ws.on('message', async (data) => {
+ws.on('message', async (data) => withSpan('Handle WS event', async () => {
   const bundle = JSON.parse(data.toString())
   try {
     if (bundle.type !== 'Ping') {
       console.log('Received bundle:', bundle.bundleId)
+      addBundleId(bundle.bundleId)
       await fillBundle(bundle)
     } else {
       console.log('🟡 Received ping')
     }
-  } catch (error) {
+  } catch (error: any) {
+    recordError(error)
     console.error('Error filling bundle:', error)
   }
-})
+}))
 
 // Handle connection close event
 ws.on('close', () => {

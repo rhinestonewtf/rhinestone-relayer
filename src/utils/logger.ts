@@ -1,3 +1,5 @@
+import { withSpan } from "../opentelemetry/api"
+
 export async function logToSlack(message: string) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL
 
@@ -23,7 +25,7 @@ export async function logMessage(message: string) {
   logToSlack(message)
 }
 
-export async function logError(message: string) {
+export const logError = async (message: string) => withSpan('log error to slack', async () => {
   console.error(message)
   logToSlack(message)
-}
+})

@@ -1,5 +1,6 @@
 import { Address } from 'viem'
 import { getPublicClient } from './utils/getClients'
+import { addSpanAttributes, CreateSpan } from './opentelemetry/api'
 
 
 class AggregatedNonceManager {
@@ -35,7 +36,12 @@ class AggregatedNonceManager {
     return nonceManager
   }
 
+  @CreateSpan('getNonce')
   async getNonce({ chainId, account }: { chainId: number, account: Address }): Promise<number> {
+    addSpanAttributes({
+      'chainId': chainId.toString(),
+      'account': account.toString(),
+    })
     let nonceManager = this.getNonceManager(chainId, account)
     return await nonceManager.getNonce()
   }
