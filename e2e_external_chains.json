@@ -1,0 +1,11 @@
+{
+    "1": {
+        "rpcUrl": "http://localhost:30001"
+    },
+    "8453": {
+        "rpcUrl": "http://localhost:30003"
+    },
+    "42161": {
+        "rpcUrl": "http://localhost:30002"
+    }
+}

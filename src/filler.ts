@@ -6,6 +6,10 @@ import { getWalletClient } from './utils/getClients'
 import { nonceManager } from './nonceManager'
 import { privateKeyToAccount } from 'viem/accounts'
 import { getOrchestrator } from '@rhinestone/orchestrator-sdk'
+import { withSpan } from './opentelemetry/api'
+import { addChainId, addFillStatus, addTransactionId, BundleActionStatus, recordError } from './tracing'
+import { addChain } from 'viem/_types/actions/wallet/addChain'
+import { recordBundleFill } from './metrics'
 
 function isWhitelistedAddress(address: Address) {
   // Replace with clave provided address here
@@ -34,11 +38,13 @@ function isWhitelistedAddress(address: Address) {
   return false
 }
 
-export async function fillBundle(bundle: any) {
+export const fillBundle = async (bundle: any) => withSpan('fillBundle', async () => {
   // const validatedBundle: BundleEvent = await validateBundle(bundle)
   // NOTE: This should not be added for production fillers.
   // The rhinestone relayer skips filling test bundles, so that integrating fillers can test using these.
+  addChainId(bundle.targetFillPayload.chainId)
   if (bundle.acrossDepositEvents[0].outputAmount == '3') {
+    addFillStatus(BundleActionStatus.SKIPPED)
     return
   }
 
@@ -153,6 +159,9 @@ export async function fillBundle(bundle: any) {
       //   nonce,
       // })
     } catch (txError) {
+      addFillStatus(BundleActionStatus.FAILED)
+      recordError(txError)
+      recordBundleFill(bundle.targetFillPayload.chainId, walletClient.account.address, BundleActionStatus.FAILED)
       console.log('txError', txError)
       // TODO: Synchronize nonce at this point, either by decrementing the nonce or by getting the latest nonce from the chain
       return
@@ -169,11 +178,16 @@ export async function fillBundle(bundle: any) {
 
     walletClient.waitForTransactionReceipt({ hash: fillTx })
 
+    addTransactionId(fillTx)
+    addFillStatus(BundleActionStatus.SUCCESS)
+    recordBundleFill(bundle.targetFillPayload.chainId, walletClient.account.address, BundleActionStatus.SUCCESS)
+
     claimBundle(bundle)
   } catch (e) {
     const error = e as ContractFunctionExecutionError
-
+    addFillStatus(BundleActionStatus.FAILED)
+    recordError(e)
     const errorMessage = `🔴 Failed to fill bundle. \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n Bundle: ${JSON.stringify(bundle)} \n\n Encoded Function Data: ${updatedPayload.data}`
     await logError(errorMessage)
   }
-}
+})
