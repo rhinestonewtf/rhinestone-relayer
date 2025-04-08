@@ -89,6 +89,8 @@ export const fillBundle = async (bundle: any) =>
       delay = 15000 // 15 seconds
     }
 
+    console.log(delay)
+
     if (delay > 0) {
       console.log(`waiting for ${delay / 1000} seconds`)
       await new Promise((resolve) => setTimeout(resolve, delay))
