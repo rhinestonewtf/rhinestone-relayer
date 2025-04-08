@@ -59,22 +59,77 @@ export const fillBundle = async (bundle: any) =>
       return
     }
 
-    // logMessage(
-    //   '\n\n ==================================================================================================================== \n\n FILLING bundleId : ' +
-    //     String(bundle.bundleId) +
-    //     '\n\n ==================================================================================================================== \n\n',
-    // )
-    // const updatedPayload = updateTargetFillPayload(
-    //   {
-    //     chainId: bundle.targetFillPayload.chainId,
-    //     to: bundle.targetFillPayload.to,
-    //     value: BigInt(bundle.targetFillPayload.value),
-    //     data: bundle.targetFillPayload.data,
-    //   },
-    //   // ['0x000000000000000000000000000000000000dEaD'],
-    //   [OWNER_ADDRESS],
-    //   [10],
-    // )
+    let delay = 0
+    let hasEth
+    let hasL2s
+
+    // check if pure same chain flow first
+    if (
+      bundle.acrossDepositEvents.length === 1 &&
+      bundle.acrossDepositEvents[0].originClaimPayload.chainId === 0
+    ) {
+      const chainId = bundle.targetFillPayload.chainId
+      if (chainId == 1) {
+        hasEth = true
+      } else if (
+        chainId == 10 ||
+        chainId == 137 ||
+        chainId == 8453 ||
+        chainId == 42161
+      ) {
+        hasL2s = true
+      }
+    } else {
+      for (const depositEvent of bundle.acrossDepositEvents) {
+        const chainId = depositEvent.originClaimPayload.chainId
+
+        if (chainId === 1) {
+          hasEth = true
+        } else if (
+          chainId === 10 ||
+          chainId === 137 ||
+          chainId === 8453 ||
+          chainId === 42161
+        ) {
+          hasL2s = true
+        }
+
+        // terminate early if we have eth
+        if (hasEth) {
+          break
+        }
+      }
+    }
+
+    if (hasEth) {
+      delay = 25000 // 25 seconds
+    } else if (hasL2s) {
+      delay = 15000 // 15 seconds
+    }
+
+    if (delay > 0) {
+      console.log(`waiting for ${delay / 1000} seconds`)
+      await new Promise((resolve) => setTimeout(resolve, delay))
+
+      // Check the bundle is still valid post delay
+      const bundleStatus = await getOrchestrator(
+        process.env.ORCHESTRATOR_API_KEY!,
+        process.env.ORCHESTRATOR_URL,
+      ).getBundleStatus(bundle.bundleId)
+      if (
+        bundleStatus.fillTransactionHash !== undefined ||
+        bundleStatus.status === 'EXPIRED' ||
+        bundleStatus.status === 'FAILED'
+      ) {
+        return
+      }
+    }
+
+    const { success } = await claimBundle(bundle)
+
+    if (!success) {
+      console.log('Claim bundle failed, skipping fill')
+    }
 
     const updatedPayload = {
       chainId: bundle.targetFillPayload.chainId,
@@ -91,36 +146,36 @@ export const fillBundle = async (bundle: any) =>
         process.env.SOLVER_PRIVATE_KEY! as Hex,
       )
 
-      if (
-        Number(updatedPayload.chainId) === 1 ||
-        Number(updatedPayload.chainId) === 10 ||
-        Number(updatedPayload.chainId) === 137 ||
-        Number(updatedPayload.chainId) === 8453 ||
-        Number(updatedPayload.chainId) === 42161
-      ) {
-        if (
-          isWhitelistedAddress(
-            bundle.acrossDepositEvents[0].recipient as Address,
-          )
-        ) {
-          console.log('waiting for 20 seconds')
-          // Wait for 20 seconds before proceeding
-          await new Promise((resolve) => setTimeout(resolve, 20_000))
-
-          // Check the bundle is still valid post delay
-          const bundleStatus = await getOrchestrator(
-            process.env.ORCHESTRATOR_API_KEY!,
-            process.env.ORCHESTRATOR_URL,
-          ).getBundleStatus(bundle.bundleId)
-          if (
-            bundleStatus.fillTransactionHash !== undefined ||
-            bundleStatus.status === 'EXPIRED' ||
-            bundleStatus.status === 'FAILED'
-          ) {
-            return
-          }
-        }
-      }
+      // if (
+      //   Number(updatedPayload.chainId) === 1 ||
+      //   Number(updatedPayload.chainId) === 10 ||
+      //   Number(updatedPayload.chainId) === 137 ||
+      //   Number(updatedPayload.chainId) === 8453 ||
+      //   Number(updatedPayload.chainId) === 42161
+      // ) {
+      //   if (
+      //     isWhitelistedAddress(
+      //       bundle.acrossDepositEvents[0].recipient as Address,
+      //     )
+      //   ) {
+      //     console.log('waiting for 20 seconds')
+      //     // Wait for 20 seconds before proceeding
+      //     await new Promise((resolve) => setTimeout(resolve, 20_000))
+      //
+      //     // Check the bundle is still valid post delay
+      //     const bundleStatus = await getOrchestrator(
+      //       process.env.ORCHESTRATOR_API_KEY!,
+      //       process.env.ORCHESTRATOR_URL,
+      //     ).getBundleStatus(bundle.bundleId)
+      //     if (
+      //       bundleStatus.fillTransactionHash !== undefined ||
+      //       bundleStatus.status === 'EXPIRED' ||
+      //       bundleStatus.status === 'FAILED'
+      //     ) {
+      //       return
+      //     }
+      //   }
+      // }
 
       // checkBundleInventory(bundle)
       // console.log(bundle)
@@ -204,8 +259,6 @@ export const fillBundle = async (bundle: any) =>
         walletClient.account.address,
         BundleActionStatus.SUCCESS,
       )
-
-      claimBundle(bundle)
     } catch (e) {
       const error = e as ContractFunctionExecutionError
       addFillStatus(BundleActionStatus.FAILED)
