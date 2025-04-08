@@ -19,9 +19,19 @@ export const claimBundle = async (bundle: any) =>
   withSpan('claim bundle', async () => {
     // TODO: Optimize this with promise all stuff
     // TODO: this currently will make 1 claim tx per token on any chain, but anything but the first claim on a chain will fail
+
     try {
+      const claimedChainIds: number[] = []
       for (const depositEvent of bundle.acrossDepositEvents) {
+        // Check if the chainId is already claimed
+        if (claimedChainIds.includes(depositEvent.originClaimPayload.chainId)) {
+          console.log(
+            `Skipping claim for chainId ${depositEvent.originClaimPayload.chainId} as it has already been claimed.`,
+          )
+          continue
+        }
         await claimBundleEvent(depositEvent)
+        claimedChainIds.push(depositEvent.originClaimPayload.chainId)
       }
       addClaimStatus(BundleActionStatus.SUCCESS)
       return { success: true }
@@ -131,4 +141,3 @@ const claimBundleEvent = async (depositEvent: any) =>
       throw txError // Rethrow the error to handle it in the Promise.all
     }
   })
-
