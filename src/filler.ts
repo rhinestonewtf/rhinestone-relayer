@@ -66,7 +66,7 @@ export const fillBundle = async (bundle: any) =>
     // check if pure same chain flow first
     if (
       bundle.acrossDepositEvents.length === 1 &&
-      bundle.acrossDepositEvents[0].originChainId === 0
+      bundle.acrossDepositEvents[0].originClaimPayload.chainId === 0
     ) {
       const chainId = bundle.targetFillPayload.chainId
       if (chainId == 1) {
