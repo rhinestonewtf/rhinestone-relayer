@@ -63,23 +63,41 @@ export const fillBundle = async (bundle: any) =>
     let hasEth
     let hasL2s
 
-    for (const depositEvent of bundle.acrossDepositEvents) {
-      const chainId = depositEvent.originClaimPayload.chainId
-
-      if (chainId === 1) {
+    // check if pure same chain flow first
+    if (
+      bundle.acrossDepositEvents.length === 1 &&
+      bundle.acrossDepositEvents[0].originChainId === 0
+    ) {
+      const chainId = bundle.targetFillPayload.chainId
+      if (chainId == 1) {
         hasEth = true
       } else if (
-        chainId === 10 ||
-        chainId === 137 ||
-        chainId === 8453 ||
-        chainId === 42161
+        chainId == 10 ||
+        chainId == 137 ||
+        chainId == 8453 ||
+        chainId == 42161
       ) {
         hasL2s = true
       }
+    } else {
+      for (const depositEvent of bundle.acrossDepositEvents) {
+        const chainId = depositEvent.originClaimPayload.chainId
 
-      // terminate early if we have eth
-      if (hasEth) {
-        break
+        if (chainId === 1) {
+          hasEth = true
+        } else if (
+          chainId === 10 ||
+          chainId === 137 ||
+          chainId === 8453 ||
+          chainId === 42161
+        ) {
+          hasL2s = true
+        }
+
+        // terminate early if we have eth
+        if (hasEth) {
+          break
+        }
       }
     }
 
@@ -88,8 +106,6 @@ export const fillBundle = async (bundle: any) =>
     } else if (hasL2s) {
       delay = 15000 // 15 seconds
     }
-
-    console.log(delay)
 
     if (delay > 0) {
       console.log(`waiting for ${delay / 1000} seconds`)
