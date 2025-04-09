@@ -2,7 +2,7 @@ import { Address, ContractFunctionExecutionError, Hex } from 'viem'
 
 import { logError, logMessage } from './utils/logger'
 import { claimBundle } from './claimer'
-import { getWalletClient } from './utils/getClients'
+import { getPublicClient, getWalletClient } from './utils/getClients'
 import { nonceManager } from './nonceManager'
 import { privateKeyToAccount } from 'viem/accounts'
 import { getOrchestrator } from '@rhinestone/orchestrator-sdk'
@@ -16,6 +16,7 @@ import {
 } from './tracing'
 import { addChain } from 'viem/_types/actions/wallet/addChain'
 import { recordBundleFill } from './metrics'
+import { getTenderlySimulation } from './utils/tenderly'
 
 function isWhitelistedAddress(address: Address) {
   // Replace with clave provided address here
@@ -254,7 +255,22 @@ export const fillBundle = async (bundle: any) =>
       const error = e as ContractFunctionExecutionError
       addFillStatus(BundleActionStatus.FAILED)
       recordError(e)
-      const errorMessage = `🔴 Failed to fill bundle. \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n Bundle: ${JSON.stringify(bundle)} \n\n Encoded Function Data: ${updatedPayload.data}`
+      let errorMessage = `🔴 Failed to fill bundle. \n\n Error: ${error.shortMessage} \n\n Sender: ${error.sender} \n\n To: ${error.contractAddress} \n\n Bundle: ${JSON.stringify(bundle)} \n\n Encoded Function Data: ${updatedPayload.data}`
+      const tenderlyUrl = await getTenderlySimulation({
+        chainId: updatedPayload.chainId,
+        from: privateKeyToAccount(process.env.SOLVER_PRIVATE_KEY! as Hex)
+          .address,
+        to: updatedPayload.to,
+        calldata: updatedPayload.data,
+        blockNumber: Number(
+          await getPublicClient(
+            updatedPayload.chainId,
+          ).getBlockNumber(),
+        ),
+      })
+      if (tenderlyUrl) {
+        errorMessage += `\n\n Tenderly simulation: ${tenderlyUrl}`
+      }
       await logError(errorMessage)
     }
   })

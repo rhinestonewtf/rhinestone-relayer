@@ -1,7 +1,7 @@
 import { ContractFunctionExecutionError, Hex } from 'viem'
 
 import { logError, logMessage } from './utils/logger'
-import { getWalletClient } from './utils/getClients'
+import { getPublicClient, getWalletClient } from './utils/getClients'
 import { nonceManager } from './nonceManager'
 import { privateKeyToAccount } from 'viem/accounts'
 import './utils/serializeBigInts'
@@ -14,6 +14,7 @@ import {
   recordError,
 } from './tracing'
 import { recordBundleClaim } from './metrics'
+import { getTenderlySimulation } from './utils/tenderly'
 
 export const claimBundle = async (bundle: any) =>
   withSpan('claim bundle', async () => {
@@ -129,7 +130,22 @@ const claimBundleEvent = async (depositEvent: any) =>
       )
     } catch (txError) {
       const error = txError as ContractFunctionExecutionError
-      const errorMessage = `🔴 Failed to send transaction for origin chainId: ${depositEvent.originClaimPayload.chainId}. Error: ${error.message}`
+      let errorMessage = `🔴 Failed to send transaction for origin chainId: ${depositEvent.originClaimPayload.chainId}. Error: ${error.message}`
+      const tenderlyUrl = await getTenderlySimulation({
+        chainId: depositEvent.originClaimPayload.chainId,
+        from: privateKeyToAccount(process.env.SOLVER_PRIVATE_KEY! as Hex)
+          .address,
+        to: depositEvent.originClaimPayload.to,
+        calldata: depositEvent.originClaimPayload.data,
+        blockNumber: Number(
+          await getPublicClient(
+            depositEvent.originClaimPayload.chainId,
+          ).getBlockNumber(),
+        ),
+      })
+      if (tenderlyUrl) {
+        errorMessage += `\n\n Tenderly simulation: ${tenderlyUrl}`
+      }
       addClaimStatus(BundleActionStatus.FAILED)
       recordBundleClaim(
         depositEvent.originClaimPayload.chainId.toString(),
