@@ -108,7 +108,7 @@ export const fillBundle = async (bundle: any) =>
       delay = 15000 // 15 seconds
     }
 
-    if (delay > 0) {
+    if (delay > 0 && process.env.DEPLOYMENT_ENV == 'prod') {
       console.log(`waiting for ${delay / 1000} seconds`)
       await new Promise((resolve) => setTimeout(resolve, delay))
 
