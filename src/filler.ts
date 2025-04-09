@@ -69,17 +69,7 @@ export const fillBundle = async (bundle: any) =>
         (depositEvent: any) => depositEvent.originClaimPayload.chainId === 0,
       )
     ) {
-      const chainId = bundle.targetFillPayload.chainId
-      if (chainId == 1) {
-        hasEth = true
-      } else if (
-        chainId == 10 ||
-        chainId == 137 ||
-        chainId == 8453 ||
-        chainId == 42161
-      ) {
-        hasL2s = true
-      }
+      delay = 4000
     } else {
       for (const depositEvent of bundle.acrossDepositEvents) {
         const chainId = depositEvent.originClaimPayload.chainId
