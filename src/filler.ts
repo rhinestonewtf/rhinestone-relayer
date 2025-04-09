@@ -108,11 +108,7 @@ export const fillBundle = async (bundle: any) =>
         process.env.ORCHESTRATOR_API_KEY!,
         process.env.ORCHESTRATOR_URL,
       ).getBundleStatus(bundle.bundleId)
-      if (
-        bundleStatus.fillTransactionHash !== undefined ||
-        bundleStatus.status === 'EXPIRED' ||
-        bundleStatus.status === 'FAILED'
-      ) {
+      if (bundleStatus.status !== 'PENDING') {
         return
       }
     }
@@ -263,9 +259,7 @@ export const fillBundle = async (bundle: any) =>
         to: updatedPayload.to,
         calldata: updatedPayload.data,
         blockNumber: Number(
-          await getPublicClient(
-            updatedPayload.chainId,
-          ).getBlockNumber(),
+          await getPublicClient(updatedPayload.chainId).getBlockNumber(),
         ),
       })
       if (tenderlyUrl) {
