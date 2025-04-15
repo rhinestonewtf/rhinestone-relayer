@@ -2,10 +2,10 @@ import { Address, ContractFunctionExecutionError, Hex } from 'viem'
 
 import { logError, logMessage } from './utils/logger'
 import { claimBundle } from './claimer'
-import { getPublicClient, getWalletClient } from './utils/getClients'
+import { getPublicClient, getRPCUrl, getWalletClient } from './utils/getClients'
 import { nonceManager } from './nonceManager'
 import { privateKeyToAccount } from 'viem/accounts'
-import { getOrchestrator } from '@rhinestone/orchestrator-sdk'
+// import { getOrchestrator } from '@rhinestone/orchestrator-sdk'
 import { withSpan } from './opentelemetry/api'
 import {
   addChainId,
@@ -104,19 +104,20 @@ export const fillBundle = async (bundle: any) =>
       await new Promise((resolve) => setTimeout(resolve, delay))
 
       // Check the bundle is still valid post delay
-      const bundleStatus = await getOrchestrator(
-        process.env.ORCHESTRATOR_API_KEY!,
-        process.env.ORCHESTRATOR_URL,
-      ).getBundleStatus(bundle.bundleId)
-      if (bundleStatus.status !== 'PENDING') {
-        return
-      }
+      // const bundleStatus = await getOrchestrator(
+      //   process.env.ORCHESTRATOR_API_KEY!,
+      //   process.env.ORCHESTRATOR_URL,
+      // ).getBundleStatus(bundle.bundleId)
+      // if (bundleStatus.status !== 'PENDING') {
+      //   return
+      // }
     }
 
     const { success } = await claimBundle(bundle)
 
     if (!success) {
       console.log('Claim bundle failed, skipping fill')
+      return
     }
 
     const updatedPayload = {

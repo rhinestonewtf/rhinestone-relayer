@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "ts-node src/app.ts",
     "dev": "nodemon --exec ts-node src/app.ts",
-    "test": ""
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -41,6 +41,8 @@
     "eslint-plugin-prettier": "^5.2.1",
     "nodemon": "^3.1.7",
     "prettier": "^3.4.1",
-    "prisma": "^5.22.0"
+    "prisma": "^5.22.0",
+    "prool": "^0.0.24",
+    "vitest": "^3.1.1"
   }
 }

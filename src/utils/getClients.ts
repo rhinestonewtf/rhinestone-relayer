@@ -10,40 +10,22 @@ import {
 
 import { privateKeyToAccount } from 'viem/accounts'
 import { loadConfig } from './config'
+import { getRPCUrl } from './chains'
 
 export const getPublicClient = (chainId: number) => {
+  console.log('hi')
+  console.log(getRPCUrl(chainId))
   return createPublicClient({
     transport: http(getRPCUrl(chainId)),
   })
 }
 
 export const getWalletClient = (chainId: number, privateKey: Hex) => {
+  console.log('herro')
+  console.log(getRPCUrl(chainId))
+
   return createWalletClient({
     account: privateKeyToAccount(privateKey, { nonceManager }),
     transport: http(getRPCUrl(chainId)),
   }).extend(publicActions)
-}
-
-const loadChainConfig = (path: string) => {
-  const config = loadConfig(path)
-  const res: { [key: number]: { rpcUrl: string } } = {}
-
-  for (const [key, value] of Object.entries(config)) {
-    const numKey = parseInt(key)
-
-    res[numKey] = value as { rpcUrl: string }
-  }
-
-  return res
-}
-
-export const chains = loadChainConfig(
-  process.env.CHAINS_CONFIG ?? 'chains.json',
-)
-
-export function getRPCUrl(chainId: number): string {
-  if (!chains[chainId]) {
-    throw new Error(`No RPC URL found for chainId: ${chainId}`)
-  }
-  return chains[chainId].rpcUrl
 }
