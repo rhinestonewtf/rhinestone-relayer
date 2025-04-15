@@ -129,6 +129,7 @@ const claimBundleEvent = async (depositEvent: any) =>
         BundleActionStatus.SUCCESS,
       )
     } catch (txError) {
+      console.log(txError)
       const error = txError as ContractFunctionExecutionError
       let errorMessage = `🔴 Failed to send transaction for origin chainId: ${depositEvent.originClaimPayload.chainId}. Error: ${error.message}`
       const tenderlyUrl = await getTenderlySimulation({
