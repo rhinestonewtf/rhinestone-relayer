@@ -1,33 +1,96 @@
-import { describe, beforeAll, it, assert } from 'vitest'
-import { createServer } from 'prool'
-import { anvil } from 'prool/instances'
-import { createTestClient, http } from 'viem'
-import { foundry } from 'viem/chains'
+import { describe, it, expect } from 'vitest'
+import { Hex } from 'viem'
+import { fillBundle } from '../../src/filler'
+import { getEmptyBundleEvent } from '../common/utils'
+import { privateKeyToAccount } from 'viem/accounts'
+import { getCount, mockGetRPRUrl, setupChain } from './common/utils'
+import { RHINESTONE_SPOKEPOOL_ADDRESS } from '../../src/utils/constants'
 
-const executionServer = createServer({
-  instance: () =>
-    anvil({
-      // forkUrl: 'https://sepolia.base.org',
-      // chainId: 31337,
-    }),
-  port: 8545,
-})
+const solverAccount = privateKeyToAccount(
+  process.env.SOLVER_PRIVATE_KEY! as Hex,
+)
 
 describe('samechain', () => {
-  beforeAll(async () => {
-    await executionServer.start()
+  it.concurrent(
+    'should make a single transaction for pure samechain',
+    async () => {
+      const threadId = 5
 
-    const testClient = createTestClient({
-      chain: foundry,
-      mode: 'anvil',
-      transport: http('http://localhost:8545/1'),
-    })
+      await setupChain({
+        rpcUrl: `http://localhost:8545/${threadId}`,
+        solverAddress: solverAccount.address,
+      })
+      const bundle = getEmptyBundleEvent()
 
-    await testClient.setCode({
-      address: '0x000000000060f6e853447881951574CDd0663530',
-      bytecode: '0x',
-    })
-  })
+      bundle.acrossDepositEvents[0].originClaimPayload = {
+        ...bundle.acrossDepositEvents[0].originClaimPayload,
+        chainId: 1,
+        to: RHINESTONE_SPOKEPOOL_ADDRESS,
+        data: '0xd09de08a',
+      }
+      bundle.targetFillPayload.chainId = 1
+      bundle.targetFillPayload.to = RHINESTONE_SPOKEPOOL_ADDRESS
+      bundle.targetFillPayload.data = '0xd09de08a'
 
-  it('should be able to set code on the same chain', async () => {})
+      await fillBundle(bundle, mockGetRPRUrl(threadId))
+
+      const sourceCount = await getCount({
+        rpcUrl: `http://localhost:8545/${threadId}`,
+        address: solverAccount.address,
+      })
+      expect(sourceCount).toEqual(1n)
+    },
+  )
+
+  it.concurrent(
+    'should make a single transaction for mixed samechain',
+    async () => {
+      const threadId = 6
+
+      await setupChain({
+        rpcUrl: `http://localhost:8545/${threadId}`,
+        solverAddress: solverAccount.address,
+      })
+      await setupChain({
+        rpcUrl: `http://localhost:8546/${threadId}`,
+        solverAddress: solverAccount.address,
+      })
+
+      const bundle = getEmptyBundleEvent()
+
+      bundle.acrossDepositEvents[0].originClaimPayload = {
+        ...bundle.acrossDepositEvents[0].originClaimPayload,
+        chainId: 1,
+        to: RHINESTONE_SPOKEPOOL_ADDRESS,
+        data: '0xd09de08a',
+      }
+      bundle.acrossDepositEvents.push(
+        getEmptyBundleEvent().acrossDepositEvents[0],
+      )
+      bundle.acrossDepositEvents[1].originClaimPayload = {
+        ...bundle.acrossDepositEvents[1].originClaimPayload,
+        chainId: 2,
+        to: RHINESTONE_SPOKEPOOL_ADDRESS,
+        data: '0xd09de08a',
+      }
+
+      bundle.targetFillPayload.chainId = 1
+      bundle.targetFillPayload.to = RHINESTONE_SPOKEPOOL_ADDRESS
+      bundle.targetFillPayload.data = '0xd09de08a'
+
+      await fillBundle(bundle, mockGetRPRUrl(threadId))
+
+      const firstSourceCount = await getCount({
+        rpcUrl: `http://localhost:8545/${threadId}`,
+        address: solverAccount.address,
+      })
+      expect(firstSourceCount).toEqual(1n)
+
+      const secondSourceCount = await getCount({
+        rpcUrl: `http://localhost:8546/${threadId}`,
+        address: solverAccount.address,
+      })
+      expect(secondSourceCount).toEqual(1n)
+    },
+  )
 })

@@ -1,66 +1,16 @@
-import { describe, beforeAll, it, assert, vi, afterEach, expect } from 'vitest'
-import { createServer } from 'prool'
-import { anvil } from 'prool/instances'
-import {
-  createPublicClient,
-  createTestClient,
-  Hex,
-  http,
-  parseAbi,
-  parseEther,
-  zeroAddress,
-} from 'viem'
-import { foundry } from 'viem/chains'
+import { describe, it, expect } from 'vitest'
+import { Hex } from 'viem'
 import { fillBundle } from '../../src/filler'
 import { getEmptyBundleEvent } from '../common/utils'
 import { privateKeyToAccount } from 'viem/accounts'
 import { getCount, mockGetRPRUrl, setupChain } from './common/utils'
 import { RHINESTONE_SPOKEPOOL_ADDRESS } from '../../src/utils/constants'
 
-// this should be fine since we just do one tx per chain
-vi.mock('../../src/nonceManager', () => {
-  return {
-    nonceManager: {
-      getNonce: vi.fn().mockResolvedValue(0),
-    },
-  }
-})
-
-const executionServer1 = createServer({
-  instance: () =>
-    anvil({
-      chainId: 1,
-    }),
-  port: 8545,
-})
-
-const executionServer2 = createServer({
-  instance: () =>
-    anvil({
-      chainId: 2,
-    }),
-  port: 8546,
-})
-
-const executionServer3 = createServer({
-  instance: () =>
-    anvil({
-      chainId: 3,
-    }),
-  port: 8547,
-})
-
 const solverAccount = privateKeyToAccount(
   process.env.SOLVER_PRIVATE_KEY! as Hex,
 )
 
 describe('multi chain', () => {
-  beforeAll(async () => {
-    await executionServer1.start()
-    await executionServer2.start()
-    await executionServer3.start()
-  })
-
   it.concurrent('should claim first and then fill', async () => {
     const threadId = 1
 
