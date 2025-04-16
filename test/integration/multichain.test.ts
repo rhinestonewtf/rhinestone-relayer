@@ -14,7 +14,7 @@ import { foundry } from 'viem/chains'
 import { fillBundle } from '../../src/filler'
 import { getEmptyBundleEvent } from '../common/utils'
 import { privateKeyToAccount } from 'viem/accounts'
-import { getCount, setupChain } from './common/utils'
+import { getCount, mockGetRPRUrl, setupChain } from './common/utils'
 import { RHINESTONE_SPOKEPOOL_ADDRESS } from '../../src/utils/constants'
 
 // this should be fine since we just do one tx per chain
@@ -85,16 +85,7 @@ describe('multi chain', () => {
     bundle.targetFillPayload.to = RHINESTONE_SPOKEPOOL_ADDRESS
     bundle.targetFillPayload.data = '0xd09de08a'
 
-    await fillBundle(bundle, (chainId: number) => {
-      switch (chainId) {
-        case 1:
-          return `http://localhost:8545/${threadId}`
-        case 2:
-          return `http://localhost:8546/${threadId}`
-        default:
-          return ''
-      }
-    })
+    await fillBundle(bundle, mockGetRPRUrl(threadId))
 
     const sourceCount = await getCount({
       rpcUrl: `http://localhost:8545/${threadId}`,
@@ -133,28 +124,9 @@ describe('multi chain', () => {
       to: RHINESTONE_SPOKEPOOL_ADDRESS,
       data: '0xd09de08a',
     }
-    bundle.acrossDepositEvents.push({
-      originClaimPayload: {
-        to: zeroAddress,
-        value: 0n,
-        data: zeroAddress,
-        chainId: 0,
-      },
-      originChainId: 0,
-      inputToken: zeroAddress,
-      inputAmount: 0n,
-      outputToken: zeroAddress,
-      outputAmount: 0n,
-      destinationChainId: 0,
-      depositId: 0n,
-      quoteTimestamp: 0,
-      fillDeadline: 0,
-      exclusivityDeadline: 0,
-      depositor: zeroAddress,
-      recipient: zeroAddress,
-      exclusiveRelayer: zeroAddress,
-      message: '0x',
-    })
+    bundle.acrossDepositEvents.push(
+      getEmptyBundleEvent().acrossDepositEvents[0],
+    )
     bundle.acrossDepositEvents[1].originClaimPayload = {
       ...bundle.acrossDepositEvents[1].originClaimPayload,
       chainId: 2,
@@ -166,18 +138,7 @@ describe('multi chain', () => {
     bundle.targetFillPayload.to = RHINESTONE_SPOKEPOOL_ADDRESS
     bundle.targetFillPayload.data = '0xd09de08a'
 
-    await fillBundle(bundle, (chainId: number) => {
-      switch (chainId) {
-        case 1:
-          return `http://localhost:8545/${threadId}`
-        case 2:
-          return `http://localhost:8546/${threadId}`
-        case 3:
-          return `http://localhost:8547/${threadId}`
-        default:
-          return ''
-      }
-    })
+    await fillBundle(bundle, mockGetRPRUrl(threadId))
 
     const firstSourceCount = await getCount({
       rpcUrl: `http://localhost:8545/${threadId}`,
@@ -198,7 +159,102 @@ describe('multi chain', () => {
     expect(targetCount).toEqual(1n)
   })
 
-  it.concurrent('should not fill if claim fails', async () => {})
+  it.concurrent('should not fill if claim fails', async () => {
+    const threadId = 3
 
-  it.concurrent('should not fill if one of many claims fails', async () => {})
+    await setupChain({
+      rpcUrl: `http://localhost:8545/${threadId}`,
+      solverAddress: solverAccount.address,
+    })
+    await setupChain({
+      rpcUrl: `http://localhost:8546/${threadId}`,
+      solverAddress: solverAccount.address,
+    })
+
+    const bundle = getEmptyBundleEvent()
+
+    bundle.acrossDepositEvents[0].originClaimPayload = {
+      ...bundle.acrossDepositEvents[0].originClaimPayload,
+      chainId: 1,
+      to: RHINESTONE_SPOKEPOOL_ADDRESS,
+      data: '0x69696969',
+    }
+    bundle.targetFillPayload.chainId = 2
+    bundle.targetFillPayload.to = RHINESTONE_SPOKEPOOL_ADDRESS
+    bundle.targetFillPayload.data = '0xd09de08a'
+
+    await fillBundle(bundle, mockGetRPRUrl(threadId))
+
+    const sourceCount = await getCount({
+      rpcUrl: `http://localhost:8545/${threadId}`,
+      address: solverAccount.address,
+    })
+    expect(sourceCount).toEqual(0n)
+
+    const targetCount = await getCount({
+      rpcUrl: `http://localhost:8546/${threadId}`,
+      address: solverAccount.address,
+    })
+    expect(targetCount).toEqual(0n)
+  })
+
+  it.concurrent('should not fill if one of many claims fails', async () => {
+    const threadId = 4
+
+    await setupChain({
+      rpcUrl: `http://localhost:8545/${threadId}`,
+      solverAddress: solverAccount.address,
+    })
+    await setupChain({
+      rpcUrl: `http://localhost:8546/${threadId}`,
+      solverAddress: solverAccount.address,
+    })
+    await setupChain({
+      rpcUrl: `http://localhost:8547/${threadId}`,
+      solverAddress: solverAccount.address,
+    })
+
+    const bundle = getEmptyBundleEvent()
+
+    bundle.acrossDepositEvents[0].originClaimPayload = {
+      ...bundle.acrossDepositEvents[0].originClaimPayload,
+      chainId: 1,
+      to: RHINESTONE_SPOKEPOOL_ADDRESS,
+      data: '0xd09de08a',
+    }
+
+    bundle.acrossDepositEvents.push(
+      getEmptyBundleEvent().acrossDepositEvents[0],
+    )
+    bundle.acrossDepositEvents[1].originClaimPayload = {
+      ...bundle.acrossDepositEvents[1].originClaimPayload,
+      chainId: 2,
+      to: RHINESTONE_SPOKEPOOL_ADDRESS,
+      data: '0x69696969',
+    }
+
+    bundle.targetFillPayload.chainId = 3
+    bundle.targetFillPayload.to = RHINESTONE_SPOKEPOOL_ADDRESS
+    bundle.targetFillPayload.data = '0xd09de08a'
+
+    await fillBundle(bundle, mockGetRPRUrl(threadId))
+
+    const firstSourceCount = await getCount({
+      rpcUrl: `http://localhost:8545/${threadId}`,
+      address: solverAccount.address,
+    })
+    expect(firstSourceCount).toEqual(1n)
+
+    const secondSourceCount = await getCount({
+      rpcUrl: `http://localhost:8546/${threadId}`,
+      address: solverAccount.address,
+    })
+    expect(secondSourceCount).toEqual(0n)
+
+    const targetCount = await getCount({
+      rpcUrl: `http://localhost:8547/${threadId}`,
+      address: solverAccount.address,
+    })
+    expect(targetCount).toEqual(0n)
+  })
 })

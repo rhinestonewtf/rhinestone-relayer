@@ -32,25 +32,6 @@ export const setupChain = async ({
     address: solverAddress,
     value: parseEther('10'),
   })
-
-  // const res = await fetch(rpcUrl, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: JSON.stringify({
-  //     jsonrpc: '2.0',
-  //     method: 'anvil_setChainId',
-  //     params: [69],
-  //   }),
-  // })
-  // console.log(res)
-  //
-  // const publicClient = createPublicClient({
-  //   chain: foundry,
-  //   transport: http(rpcUrl),
-  // })
-  // console.log(await publicClient.getChainId())
 }
 
 export const getCount = async ({
@@ -73,4 +54,21 @@ export const getCount = async ({
   })
 
   return count
+}
+
+export const mockGetRPRUrl = (
+  threadId: number,
+): ((chainId: number) => string) => {
+  return (chainId: number) => {
+    switch (chainId) {
+      case 1:
+        return `http://localhost:8545/${threadId}`
+      case 2:
+        return `http://localhost:8546/${threadId}`
+      case 3:
+        return `http://localhost:8547/${threadId}`
+      default:
+        return ''
+    }
+  }
 }
