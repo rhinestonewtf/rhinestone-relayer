@@ -72,3 +72,9 @@ export const mockGetRPRUrl = (
     }
   }
 }
+
+let threadId = 0
+export const getThreadId = (base?: number) => {
+  threadId += 1
+  return threadId + (base || 0)
+}

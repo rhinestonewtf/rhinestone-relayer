@@ -3,7 +3,12 @@ import { Hex } from 'viem'
 import { fillBundle } from '../../src/filler'
 import { getEmptyBundleEvent } from '../common/utils'
 import { privateKeyToAccount } from 'viem/accounts'
-import { getCount, mockGetRPRUrl, setupChain } from './common/utils'
+import {
+  getCount,
+  getThreadId,
+  mockGetRPRUrl,
+  setupChain,
+} from './common/utils'
 import { RHINESTONE_SPOKEPOOL_ADDRESS } from '../../src/utils/constants'
 
 const solverAccount = privateKeyToAccount(
@@ -12,7 +17,7 @@ const solverAccount = privateKeyToAccount(
 
 describe('multi chain', () => {
   it.concurrent('should claim first and then fill', async () => {
-    const threadId = 1
+    const threadId = getThreadId()
 
     await setupChain({
       rpcUrl: `http://localhost:8545/${threadId}`,
@@ -51,7 +56,7 @@ describe('multi chain', () => {
   })
 
   it.concurrent('should claim on multiple chains and then fill', async () => {
-    const threadId = 2
+    const threadId = getThreadId()
 
     await setupChain({
       rpcUrl: `http://localhost:8545/${threadId}`,
@@ -110,7 +115,7 @@ describe('multi chain', () => {
   })
 
   it.concurrent('should not fill if claim fails', async () => {
-    const threadId = 3
+    const threadId = getThreadId()
 
     await setupChain({
       rpcUrl: `http://localhost:8545/${threadId}`,
@@ -149,7 +154,7 @@ describe('multi chain', () => {
   })
 
   it.concurrent('should not fill if one of many claims fails', async () => {
-    const threadId = 4
+    const threadId = getThreadId()
 
     await setupChain({
       rpcUrl: `http://localhost:8545/${threadId}`,

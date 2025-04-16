@@ -3,7 +3,12 @@ import { Hex } from 'viem'
 import { fillBundle } from '../../src/filler'
 import { getEmptyBundleEvent } from '../common/utils'
 import { privateKeyToAccount } from 'viem/accounts'
-import { getCount, mockGetRPRUrl, setupChain } from './common/utils'
+import {
+  getCount,
+  getThreadId,
+  mockGetRPRUrl,
+  setupChain,
+} from './common/utils'
 import { RHINESTONE_SPOKEPOOL_ADDRESS } from '../../src/utils/constants'
 
 const solverAccount = privateKeyToAccount(
@@ -14,7 +19,7 @@ describe('samechain', () => {
   it.concurrent(
     'should make a single transaction for pure samechain',
     async () => {
-      const threadId = 5
+      const threadId = getThreadId(10)
 
       await setupChain({
         rpcUrl: `http://localhost:8545/${threadId}`,
@@ -45,7 +50,7 @@ describe('samechain', () => {
   it.concurrent(
     'should make a single transaction for mixed samechain',
     async () => {
-      const threadId = 6
+      const threadId = getThreadId(10)
 
       await setupChain({
         rpcUrl: `http://localhost:8545/${threadId}`,
