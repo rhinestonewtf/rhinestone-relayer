@@ -17,7 +17,7 @@ export const chains = loadChainConfig(
   process.env.CHAINS_CONFIG ?? 'chains.json',
 )
 
-export function getRPCUrl(chainId: number): string {
+export function defaultGetRPCUrl(chainId: number): string {
   if (!chains[chainId]) {
     throw new Error(`No RPC URL found for chainId: ${chainId}`)
   }

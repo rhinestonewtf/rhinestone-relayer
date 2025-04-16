@@ -2,12 +2,11 @@ import { Address } from 'viem'
 import { getPublicClient } from './utils/getClients'
 import { addSpanAttributes, CreateSpan } from './opentelemetry/api'
 
-
 class AggregatedNonceManager {
   private static instance: AggregatedNonceManager
   chainAccountNonces: Map<number, Map<Address, NonceManager>> = new Map()
 
-  constructor() { }
+  constructor() {}
 
   public static getInstance(): AggregatedNonceManager {
     if (!AggregatedNonceManager.instance) {
@@ -26,51 +25,71 @@ class AggregatedNonceManager {
     return res
   }
 
-  getNonceManager(chainId: number, account: Address): NonceManager {
+  getNonceManager(
+    chainId: number,
+    account: Address,
+    getRPCUrl: (chainId: number) => string,
+  ): NonceManager {
     let addressNonces = this.getAccountNonces(chainId)
     let nonceManager = addressNonces.get(account)
     if (!nonceManager) {
-      nonceManager = new NonceManager(chainId, account)
+      nonceManager = new NonceManager(chainId, account, getRPCUrl)
       addressNonces.set(account, nonceManager)
     }
     return nonceManager
   }
 
   @CreateSpan('getNonce')
-  async getNonce({ chainId, account }: { chainId: number, account: Address }): Promise<number> {
+  async getNonce({
+    chainId,
+    account,
+    getRPCUrl,
+  }: {
+    chainId: number
+    account: Address
+    getRPCUrl: (chainId: number) => string
+  }): Promise<number> {
     addSpanAttributes({
-      'chainId': chainId.toString(),
-      'account': account.toString(),
+      chainId: chainId.toString(),
+      account: account.toString(),
     })
-    let nonceManager = this.getNonceManager(chainId, account)
+    let nonceManager = this.getNonceManager(chainId, account, getRPCUrl)
     return await nonceManager.getNonce()
   }
 }
 
 // this nonce manager IS NOT thread-safe
 class NonceManager {
-  private chainId: number;
-  private account: Address;
-  private nonce?: number;
-  private initializing?: Promise<void>;
+  private chainId: number
+  private account: Address
+  private getRPCUrl: (chainId: number) => string
+  private nonce?: number
+  private initializing?: Promise<void>
 
-  constructor(chainId: number, account: Address) {
+  constructor(
+    chainId: number,
+    account: Address,
+    getRPCUrl: (chainId: number) => string,
+  ) {
     this.chainId = chainId
     this.account = account
+    this.getRPCUrl = getRPCUrl
   }
 
   async getNonce() {
     if (this.nonce === undefined) {
       if (!this.initializing) {
         this.initializing = (async () => {
-          let client = getPublicClient(this.chainId)
-          this.nonce = await client.getTransactionCount({ address: this.account });
-          this.initializing = undefined; // set to undefined to cleanup some memory, but not strictly neeeded
-        })();
+          let client = getPublicClient(this.chainId, this.getRPCUrl)
+          this.nonce = await client.getTransactionCount({
+            address: this.account,
+          })
+          this.initializing = undefined // set to undefined to cleanup some memory, but not strictly neeeded
+        })()
       }
-      await this.initializing;
+      await this.initializing
     }
-    return this.nonce!++; // we are sure nonce is here at this point
+    return this.nonce!++ // we are sure nonce is here at this point
   }
 }
 

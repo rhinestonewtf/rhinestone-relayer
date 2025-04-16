@@ -3,24 +3,27 @@ import {
   createWalletClient,
   Hex,
   http,
-  nonceManager,
   publicActions,
-  extractChain,
 } from 'viem'
 
 import { privateKeyToAccount } from 'viem/accounts'
-import { loadConfig } from './config'
-import { getRPCUrl } from './chains'
 
-export const getPublicClient = (chainId: number) => {
+export const getPublicClient = (
+  chainId: number,
+  getRPCUrl: (chainId: number) => string,
+) => {
   return createPublicClient({
     transport: http(getRPCUrl(chainId)),
   })
 }
 
-export const getWalletClient = (chainId: number, privateKey: Hex) => {
+export const getWalletClient = (
+  chainId: number,
+  privateKey: Hex,
+  getRPCUrl: (chainId: number) => string,
+) => {
   return createWalletClient({
-    account: privateKeyToAccount(privateKey, { nonceManager }),
+    account: privateKeyToAccount(privateKey),
     transport: http(getRPCUrl(chainId)),
   }).extend(publicActions)
 }

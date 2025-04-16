@@ -16,7 +16,10 @@ import {
 import { recordBundleClaim } from './metrics'
 import { getTenderlySimulation } from './utils/tenderly'
 
-export const claimBundle = async (bundle: any) =>
+export const claimBundle = async (
+  bundle: any,
+  getRPCUrl: (chainId: number) => string,
+) =>
   withSpan('claim bundle', async () => {
     // TODO: Optimize this with promise all stuff
     // TODO: this currently will make 1 claim tx per token on any chain, but anything but the first claim on a chain will fail
@@ -31,7 +34,7 @@ export const claimBundle = async (bundle: any) =>
           )
           continue
         }
-        await claimBundleEvent(depositEvent)
+        await claimBundleEvent(depositEvent, getRPCUrl)
         claimedChainIds.push(depositEvent.originClaimPayload.chainId)
       }
       addClaimStatus(BundleActionStatus.SUCCESS)
@@ -47,7 +50,10 @@ export const claimBundle = async (bundle: any) =>
     }
   })
 
-const claimBundleEvent = async (depositEvent: any) =>
+const claimBundleEvent = async (
+  depositEvent: any,
+  getRPCUrl: (chainId: number) => string,
+) =>
   withSpan('claim bundle event', async () => {
     addChainId(depositEvent.originClaimPayload.chainId)
 
@@ -65,6 +71,7 @@ const claimBundleEvent = async (depositEvent: any) =>
     const walletClient = getWalletClient(
       depositEvent.originClaimPayload.chainId,
       process.env.SOLVER_PRIVATE_KEY! as Hex,
+      getRPCUrl,
     )
 
     // const nonce = await nonceManager.getNonce({
@@ -86,6 +93,7 @@ const claimBundleEvent = async (depositEvent: any) =>
     let nonce = await nonceManager.getNonce({
       chainId: depositEvent.originClaimPayload.chainId,
       account: account.address,
+      getRPCUrl,
     })
 
     // Adding try/catch for the sendTransaction
@@ -141,6 +149,7 @@ const claimBundleEvent = async (depositEvent: any) =>
         blockNumber: Number(
           await getPublicClient(
             depositEvent.originClaimPayload.chainId,
+            getRPCUrl,
           ).getBlockNumber(),
         ),
       })

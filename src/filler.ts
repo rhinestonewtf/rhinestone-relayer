@@ -2,7 +2,7 @@ import { Address, ContractFunctionExecutionError, Hex } from 'viem'
 
 import { logError, logMessage } from './utils/logger'
 import { claimBundle } from './claimer'
-import { getPublicClient, getRPCUrl, getWalletClient } from './utils/getClients'
+import { getPublicClient, getWalletClient } from './utils/getClients'
 import { nonceManager } from './nonceManager'
 import { privateKeyToAccount } from 'viem/accounts'
 // import { getOrchestrator } from '@rhinestone/orchestrator-sdk'
@@ -17,6 +17,7 @@ import {
 import { addChain } from 'viem/_types/actions/wallet/addChain'
 import { recordBundleFill } from './metrics'
 import { getTenderlySimulation } from './utils/tenderly'
+import { defaultGetRPCUrl } from './utils/chains'
 
 function isWhitelistedAddress(address: Address) {
   // Replace with clave provided address here
@@ -49,7 +50,10 @@ function isWhitelistedAddress(address: Address) {
   return false
 }
 
-export const fillBundle = async (bundle: any) =>
+export const fillBundle = async (
+  bundle: any,
+  getRPCUrl: (chainId: number) => string = defaultGetRPCUrl,
+) =>
   withSpan('fillBundle', async () => {
     // const validatedBundle: BundleEvent = await validateBundle(bundle)
     // NOTE: This should not be added for production fillers.
@@ -113,7 +117,7 @@ export const fillBundle = async (bundle: any) =>
       // }
     }
 
-    const { success } = await claimBundle(bundle)
+    const { success } = await claimBundle(bundle, getRPCUrl)
 
     if (!success) {
       console.log('Claim bundle failed, skipping fill')
@@ -133,6 +137,7 @@ export const fillBundle = async (bundle: any) =>
       const walletClient = getWalletClient(
         bundle.targetFillPayload.chainId,
         process.env.SOLVER_PRIVATE_KEY! as Hex,
+        getRPCUrl,
       )
 
       // if (
@@ -190,6 +195,7 @@ export const fillBundle = async (bundle: any) =>
       nonce = await nonceManager.getNonce({
         chainId: bundle.targetFillPayload.chainId,
         account: account.address,
+        getRPCUrl,
       })
 
       // console.log('Filling bundle with payload:', updatedPayload)
@@ -260,7 +266,10 @@ export const fillBundle = async (bundle: any) =>
         to: updatedPayload.to,
         calldata: updatedPayload.data,
         blockNumber: Number(
-          await getPublicClient(updatedPayload.chainId).getBlockNumber(),
+          await getPublicClient(
+            updatedPayload.chainId,
+            getRPCUrl,
+          ).getBlockNumber(),
         ),
       })
       if (tenderlyUrl) {
