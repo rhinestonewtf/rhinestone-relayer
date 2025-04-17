@@ -14,7 +14,13 @@ export const processBundle = async (
   addBundleId(String(bundle.bundleId))
 
   // validate the bundle
-  await validateBundle(bundle)
+  const isValid = await validateBundle(bundle)
+
+  if (!isValid) {
+    // if the bundle is not valid, we should not process it
+    // this should be handled by the monitoring system
+    return
+  }
 
   // add a time delay
   // note: this is used to give other fillers time to fill the order
