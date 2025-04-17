@@ -1,31 +1,30 @@
 import { Hex } from 'viem'
-import { getWalletClient } from './getClients'
-import { privateKeyToAccount } from 'viem/accounts'
-import { nonceManager } from '../nonceManager'
+import { Transaction } from '../types'
+import { getWalletClient } from '../helpers/getClients'
+import { nonceManager } from './nonceManager'
 
 export const handleTransactions = async (
-  transactions: any[],
+  transactions: Transaction[],
   getRPCUrl: (chainId: number) => string,
 ) => {
-  // todo: do this in parallel
-  for (const transaction of transactions) {
+  const processPromises = transactions.map(async (transaction) => {
     const walletClient = getWalletClient(
       transaction.chainId,
       process.env.SOLVER_PRIVATE_KEY! as Hex,
       getRPCUrl,
     )
 
-    const account = privateKeyToAccount(process.env.SOLVER_PRIVATE_KEY! as Hex)
     let gas
     try {
       gas = await walletClient.estimateGas({
-        account,
+        account: walletClient.account,
         to: transaction.to,
         value: transaction.value,
         data: transaction.data,
       })
     } catch (error) {
-      return false
+      // todo: log error
+      return { success: false }
     }
 
     const { maxFeePerGas, maxPriorityFeePerGas } =
@@ -33,14 +32,14 @@ export const handleTransactions = async (
 
     const nonce = await nonceManager.getNonce({
       chainId: transaction.chainId,
-      account: account.address,
+      account: walletClient.account.address,
       getRPCUrl,
     })
 
     let fillTx
     try {
       fillTx = await walletClient.sendRawTransaction({
-        serializedTransaction: await account.signTransaction({
+        serializedTransaction: await walletClient.account.signTransaction({
           to: transaction.to,
           value: transaction.value,
           data: transaction.data,
@@ -52,6 +51,10 @@ export const handleTransactions = async (
           nonce,
         }),
       })
+
+      // todo: do we need to wait for transaction receipt?
+      // await walletClient.waitForTransactionReceipt({ hash: fillTx })
+      return { success: true }
     } catch (txError) {
       // addFillStatus(BundleActionStatus.FAILED)
       // recordError(txError)
@@ -60,12 +63,14 @@ export const handleTransactions = async (
       //   walletClient.account.address,
       //   BundleActionStatus.FAILED,
       // )
-      // console.log('txError', txError)
-      // // TODO: Synchronize nonce at this point, either by decrementing the nonce or by getting the latest nonce from the chain
-      return false
+      return { success: false }
     }
+  })
 
-    walletClient.waitForTransactionReceipt({ hash: fillTx })
-  }
-  return true
+  // Execute all transaction processes in parallel
+  const results = await Promise.all(processPromises)
+
+  // Check if any transaction failed
+  const allSuccessful = results.every((result) => result.success)
+  return allSuccessful
 }

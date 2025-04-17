@@ -1,5 +1,5 @@
-import { setupSDK } from './opentelemetry/setup'
 import WebSocket from 'ws'
+import { setupSDK } from './opentelemetry/setup'
 import { withSpan } from './opentelemetry/api'
 import { config } from 'dotenv'
 import { processBundle } from './processor'

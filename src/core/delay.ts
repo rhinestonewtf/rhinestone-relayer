@@ -1,4 +1,6 @@
-export const addDelay = async (bundle: any) => {
+import { BundleEvent } from '../types'
+
+export const addDelay = async (bundle: BundleEvent) => {
   let delay = 0
   let hasEth
   let hasL2s

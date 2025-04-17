@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/app.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --noEmit",
     "start": "ts-node src/app.ts",
     "dev": "nodemon --exec ts-node src/app.ts",
     "test": "pnpm test:unit && pnpm test:integration",

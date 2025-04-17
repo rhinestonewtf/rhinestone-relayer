@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { Hex, Address } from 'viem'
 
+// todo: remove axios
 export const getTenderlySimulation = async ({
   chainId,
   from,
@@ -14,8 +15,10 @@ export const getTenderlySimulation = async ({
   calldata: Hex
   blockNumber: number
 }) => {
-  const TENDERLY_ACCOUNT_SLUG = process.env.TENDERLY_ACCOUNT_SLUG ?? 'rhinestone'
-  const TENDERLY_PROJECT_SLUG = process.env.TENDERLY_PROJECT_SLUG ?? 'chain-abstraction'
+  const TENDERLY_ACCOUNT_SLUG =
+    process.env.TENDERLY_ACCOUNT_SLUG ?? 'rhinestone'
+  const TENDERLY_PROJECT_SLUG =
+    process.env.TENDERLY_PROJECT_SLUG ?? 'chain-abstraction'
   const TENDERLY_ACCESS_KEY = process.env.TENDERLY_ACCESS_KEY
 
   if (!TENDERLY_ACCESS_KEY) {

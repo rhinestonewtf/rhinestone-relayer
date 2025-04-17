@@ -1,6 +1,6 @@
 import { Address } from 'viem'
-import { getPublicClient } from './utils/getClients'
-import { addSpanAttributes, CreateSpan } from './opentelemetry/api'
+import { addSpanAttributes, CreateSpan } from '../opentelemetry/api'
+import { getPublicClient } from '../helpers/getClients'
 
 class AggregatedNonceManager {
   private static instance: AggregatedNonceManager

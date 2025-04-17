@@ -7,7 +7,7 @@ import {
   parseEther,
 } from 'viem'
 import { foundry } from 'viem/chains'
-import { RHINESTONE_SPOKEPOOL_ADDRESS } from '../../../src/utils/constants'
+import { RHINESTONE_SPOKEPOOL_ADDRESS } from '../../../src/constants'
 
 export const setupChain = async ({
   rpcUrl,

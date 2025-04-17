@@ -1,16 +1,17 @@
-import { addBundleId } from './tracing'
-import { defaultGetRPCUrl } from './utils/chains'
-import { addDelay } from './utils/delay'
-import { getTransactions } from './utils/fillOrder'
-import { handleTransactions } from './utils/transactionHandler'
-import { validateBundle } from './utils/validator'
+import { defaultGetRPCUrl } from './config/chains'
+import { addDelay } from './core/delay'
+import { getTransactions } from './core/fillOrder'
+import { handleTransactions } from './core/transactionHandler'
+import { validateBundle } from './core/validator'
+import { addBundleId } from './monitoring/tracing'
+import { BundleEvent } from './types'
 
 export const processBundle = async (
-  bundle: any,
+  bundle: BundleEvent,
   getRPCUrl: (chainId: number) => string = defaultGetRPCUrl,
 ) => {
   // add bundle id for tracing
-  addBundleId(bundle.bundleId)
+  addBundleId(String(bundle.bundleId))
 
   // validate the bundle
   await validateBundle(bundle)
@@ -22,8 +23,10 @@ export const processBundle = async (
   // determine order of filling
   const { claims, fill } = await getTransactions(bundle)
 
+  // handle the claims
   const success = await handleTransactions(claims, getRPCUrl)
 
+  // if claims were successful and we havent filled yet, then fill now
   if (success && fill) {
     await handleTransactions([fill], getRPCUrl)
   }

@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
 import { Hex } from 'viem'
-import { fillBundle } from '../../src/filler'
 import { getEmptyBundleEvent } from '../common/utils'
 import { privateKeyToAccount } from 'viem/accounts'
 import {
@@ -9,7 +8,7 @@ import {
   mockGetRPRUrl,
   setupChain,
 } from './common/utils'
-import { RHINESTONE_SPOKEPOOL_ADDRESS } from '../../src/utils/constants'
+import { RHINESTONE_SPOKEPOOL_ADDRESS } from '../../src/constants'
 import { processBundle } from '../../src/processor'
 
 const solverAccount = privateKeyToAccount(

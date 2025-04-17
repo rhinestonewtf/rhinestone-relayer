@@ -1,4 +1,4 @@
-import { loadConfig } from './config'
+import { loadConfig } from './utils'
 
 const loadChainConfig = (path: string) => {
   const config = loadConfig(path)

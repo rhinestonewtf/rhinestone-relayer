@@ -1,7 +1,8 @@
 // import type { BundleEvent } from '@rhinestone/orchestrator-sdk'
 import { zeroAddress } from 'viem'
+import { BundleEvent } from '../../src/types'
 
-export const getEmptyBundleEvent = () => {
+export const getEmptyBundleEvent = (): BundleEvent => {
   return {
     bundleId: 0n,
     type: 'Bundle',
