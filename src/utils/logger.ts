@@ -20,7 +20,10 @@ export async function logToSlack(message: string) {
   // }
 }
 
+// todo: add log levels
 export async function logMessage(message: string) {
+  const logLevel = process.env.LOG_LEVEL || 'info'
+  if (logLevel == 'none') return
   console.log(message)
   logToSlack(message)
 }

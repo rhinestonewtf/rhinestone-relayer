@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { Hex } from 'viem'
-import { fillBundle } from '../../src/filler'
+import { processBundle } from '../../src/filler'
 import { getEmptyBundleEvent } from '../common/utils'
 import { privateKeyToAccount } from 'viem/accounts'
 import {
@@ -10,6 +10,7 @@ import {
   setupChain,
 } from './common/utils'
 import { RHINESTONE_SPOKEPOOL_ADDRESS } from '../../src/utils/constants'
+import { processBundle } from '../../src/processor'
 
 const solverAccount = privateKeyToAccount(
   process.env.SOLVER_PRIVATE_KEY! as Hex,
@@ -40,7 +41,7 @@ describe('multi chain', () => {
     bundle.targetFillPayload.to = RHINESTONE_SPOKEPOOL_ADDRESS
     bundle.targetFillPayload.data = '0xd09de08a'
 
-    await fillBundle(bundle, mockGetRPRUrl(threadId))
+    await processBundle(bundle, mockGetRPRUrl(threadId))
 
     const sourceCount = await getCount({
       rpcUrl: `http://localhost:8545/${threadId}`,
@@ -93,7 +94,7 @@ describe('multi chain', () => {
     bundle.targetFillPayload.to = RHINESTONE_SPOKEPOOL_ADDRESS
     bundle.targetFillPayload.data = '0xd09de08a'
 
-    await fillBundle(bundle, mockGetRPRUrl(threadId))
+    await processBundle(bundle, mockGetRPRUrl(threadId))
 
     const firstSourceCount = await getCount({
       rpcUrl: `http://localhost:8545/${threadId}`,
@@ -138,7 +139,7 @@ describe('multi chain', () => {
     bundle.targetFillPayload.to = RHINESTONE_SPOKEPOOL_ADDRESS
     bundle.targetFillPayload.data = '0xd09de08a'
 
-    await fillBundle(bundle, mockGetRPRUrl(threadId))
+    await processBundle(bundle, mockGetRPRUrl(threadId))
 
     const sourceCount = await getCount({
       rpcUrl: `http://localhost:8545/${threadId}`,
@@ -192,7 +193,7 @@ describe('multi chain', () => {
     bundle.targetFillPayload.to = RHINESTONE_SPOKEPOOL_ADDRESS
     bundle.targetFillPayload.data = '0xd09de08a'
 
-    await fillBundle(bundle, mockGetRPRUrl(threadId))
+    await processBundle(bundle, mockGetRPRUrl(threadId))
 
     const firstSourceCount = await getCount({
       rpcUrl: `http://localhost:8545/${threadId}`,

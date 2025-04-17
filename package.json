@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "ts-node src/app.ts",
     "dev": "nodemon --exec ts-node src/app.ts",
-    "test": "test:unit && test:integration",
+    "test": "pnpm test:unit && pnpm test:integration",
     "test:unit": "vitest run --config ./test/unit/vitest.config.ts",
     "test:integration": "vitest run --config ./test/integration/vitest.config.ts"
   },
