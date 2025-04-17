@@ -1,7 +1,5 @@
-import axios from 'axios'
 import { Hex, Address } from 'viem'
 
-// todo: remove axios
 export const getTenderlySimulation = async ({
   chainId,
   from,
@@ -26,35 +24,41 @@ export const getTenderlySimulation = async ({
   }
 
   try {
-    const { data } = await axios.post(
+    const response = await fetch(
       `https://api.tenderly.co/api/v1/account/${TENDERLY_ACCOUNT_SLUG}/project/${TENDERLY_PROJECT_SLUG}/simulate`,
       {
-        network_id: chainId,
-        from,
-        to,
-        input: calldata,
-        block_number: blockNumber,
-        save: true,
-        save_if_fails: true,
-        simulation_type: 'quick',
-      },
-      {
+        method: 'POST',
         headers: {
           'X-Access-Key': `${TENDERLY_ACCESS_KEY}`,
-          'content-type': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          network_id: chainId,
+          from,
+          to,
+          input: calldata,
+          block_number: blockNumber,
+          save: true,
+          save_if_fails: true,
+          simulation_type: 'quick',
+        }),
+      },
+    )
+
+    const data = await response.json()
+
+    await fetch(
+      `https://api.tenderly.co/api/v1/account/${TENDERLY_ACCOUNT_SLUG}/project/${TENDERLY_PROJECT_SLUG}/simulations/${data.simulation.id}/share`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'X-Access-Key': `${TENDERLY_ACCESS_KEY}`,
         },
       },
     )
 
-    await axios.request({
-      method: 'POST',
-      url: `https://api.tenderly.co/api/v1/account/${TENDERLY_ACCOUNT_SLUG}/project/${TENDERLY_PROJECT_SLUG}/simulations/${data.simulation.id}/share`,
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'X-Access-Key': `${TENDERLY_ACCESS_KEY}`,
-      },
-    })
     return `https://www.tdly.co/shared/simulation/${data.simulation.id}`
   } catch (error) {
     console.error(error)

@@ -1,19 +1,23 @@
 {
   "name": "rhinestone-relayer",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "A reference implementation relayer for the Omni Account system",
+  "author": {
+    "name": "Rhinestone",
+    "url": "https://rhinestone.wtf"
+  },
+  "license": "AGPL-3.0",
   "main": "src/app.ts",
   "scripts": {
-    "build": "tsc --noEmit",
+    "build": "tsc",
     "start": "ts-node src/app.ts",
     "dev": "nodemon --exec ts-node src/app.ts",
     "test": "pnpm test:unit && pnpm test:integration",
     "test:unit": "vitest run --config ./test/unit/vitest.config.ts",
-    "test:integration": "vitest run --config ./test/integration/vitest.config.ts"
+    "test:integration": "vitest run --config ./test/integration/vitest.config.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/exporter-metrics-otlp-grpc": "^0.200.0",
@@ -25,13 +29,10 @@
     "@opentelemetry/sdk-node": "^0.200.0",
     "@opentelemetry/semantic-conventions": "^1.30.0",
     "@pimlico/opentelemetry-instrumentation-viem": "^0.0.4",
-    "@rhinestone/orchestrator-sdk": "0.2.0-rc.8",
     "@types/node": "^22.10.1",
     "@types/ws": "^8.5.13",
     "amqplib": "^0.10.5",
-    "axios": "^1.7.9",
     "dotenv": "^16.4.5",
-    "permissionless": "^0.2.20",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "viem": "^2.23.5",
@@ -39,11 +40,11 @@
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.5",
+    "eslint": "^9.24.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "nodemon": "^3.1.7",
     "prettier": "^3.4.1",
-    "prisma": "^5.22.0",
     "prool": "^0.0.24",
     "vitest": "^3.1.1"
   }
