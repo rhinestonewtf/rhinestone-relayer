@@ -1,35 +1,37 @@
 import { withSpan } from '../opentelemetry/api'
 
 export async function logToSlack(message: string) {
-  // const webhookUrl = process.env.SLACK_WEBHOOK_URL
-  //
-  // if (!webhookUrl) {
-  //   return
-  // }
-  //
-  // const response = await fetch(webhookUrl, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: JSON.stringify({ text: message }),
-  // })
-  //
-  // if (!response.ok) {
-  //   console.error('Failed to send slack message:', response.statusText)
-  // }
-}
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL
 
-// todo: add log levels
-export async function logMessage(message: string) {
-  const logLevel = process.env.LOG_LEVEL || 'info'
-  if (logLevel == 'none') return
-  console.log(message)
-  logToSlack(message)
-}
+  if (!webhookUrl) {
+    return
+  }
 
-export const logError = async (message: string) =>
-  withSpan('log error to slack', async () => {
-    console.error(message)
-    logToSlack(message)
+  const response = await fetch(webhookUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ text: message }),
   })
+
+  if (!response.ok) {
+    console.error('Failed to send slack message:', response.statusText)
+  }
+}
+
+// LOG_LEVEL can be set to NONE, LOCAL, or FULL
+// NONE: No logs
+// LOCAL: Only local logs
+// FULL: Local logs and send to slack
+export async function logMessage(message: string) {
+  const logLevel = process.env.LOG_LEVEL || 'LOCAL'
+
+  if (logLevel == 'NONE') return
+  if (logLevel == 'LOCAL' || logLevel == 'FULL') {
+    console.log(message)
+  }
+  if (logLevel == 'FULL') {
+    await logToSlack(message)
+  }
+}

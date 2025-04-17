@@ -5,12 +5,12 @@ export const addDelay = async (bundle: BundleEvent) => {
   let hasEth
   let hasL2s
 
-  // check if pure same chain flow first
   if (
     bundle.acrossDepositEvents.every(
       (depositEvent: any) => depositEvent.originClaimPayload.chainId === 0,
     )
   ) {
+    // in pure samechain case, only do a 4s delay
     delay = 4000
   } else {
     for (const depositEvent of bundle.acrossDepositEvents) {
@@ -41,16 +41,6 @@ export const addDelay = async (bundle: BundleEvent) => {
   }
 
   if (delay > 0 && process.env.DEPLOYMENT_ENV == 'prod') {
-    console.log(`waiting for ${delay / 1000} seconds`)
     await new Promise((resolve) => setTimeout(resolve, delay))
-
-    // Check the bundle is still valid post delay
-    // const bundleStatus = await getOrchestrator(
-    //   process.env.ORCHESTRATOR_API_KEY!,
-    //   process.env.ORCHESTRATOR_URL,
-    // ).getBundleStatus(bundle.bundleId)
-    // if (bundleStatus.status !== 'PENDING') {
-    //   return
-    // }
   }
 }

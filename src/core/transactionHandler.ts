@@ -1,7 +1,14 @@
-import { Hex } from 'viem'
+import { Address, Hex } from 'viem'
 import { Transaction } from '../types'
-import { getWalletClient } from '../helpers/getClients'
+import { getPublicClient, getWalletClient } from '../helpers/getClients'
 import { nonceManager } from './nonceManager'
+import {
+  addFillStatus,
+  BundleActionStatus,
+  recordError,
+} from '../monitoring/tracing'
+import { recordBundleFill } from '../monitoring/metrics'
+import { getTenderlySimulation } from '../helpers/tenderly'
 
 export const handleTransactions = async (
   transactions: Transaction[],
@@ -23,7 +30,12 @@ export const handleTransactions = async (
         data: transaction.data,
       })
     } catch (error) {
-      // todo: log error
+      await processTransactionFailure({
+        txError: error,
+        transaction,
+        relayerAddress: walletClient.account.address,
+        blockNumber: await walletClient.getBlockNumber(),
+      })
       return { success: false }
     }
 
@@ -52,17 +64,16 @@ export const handleTransactions = async (
         }),
       })
 
-      // todo: do we need to wait for transaction receipt?
+      // do we need to wait for transaction receipt?
       // await walletClient.waitForTransactionReceipt({ hash: fillTx })
       return { success: true }
     } catch (txError) {
-      // addFillStatus(BundleActionStatus.FAILED)
-      // recordError(txError)
-      // recordBundleFill(
-      //   bundle.targetFillPayload.chainId,
-      //   walletClient.account.address,
-      //   BundleActionStatus.FAILED,
-      // )
+      await processTransactionFailure({
+        txError,
+        transaction,
+        relayerAddress: walletClient.account.address,
+        blockNumber: await walletClient.getBlockNumber(),
+      })
       return { success: false }
     }
   })
@@ -73,4 +84,34 @@ export const handleTransactions = async (
   // Check if any transaction failed
   const allSuccessful = results.every((result) => result.success)
   return allSuccessful
+}
+
+const processTransactionFailure = async ({
+  txError,
+  transaction,
+  relayerAddress,
+  blockNumber,
+}: {
+  txError: unknown
+  transaction: Transaction
+  relayerAddress: Address
+  blockNumber: bigint
+}) => {
+  // add metrics
+  addFillStatus(BundleActionStatus.FAILED)
+  recordError(txError)
+  recordBundleFill(
+    String(transaction.chainId),
+    relayerAddress,
+    BundleActionStatus.FAILED,
+  )
+
+  // simulate on tenderly
+  await getTenderlySimulation({
+    chainId: transaction.chainId,
+    from: relayerAddress,
+    to: transaction.to,
+    calldata: transaction.data,
+    blockNumber: Number(blockNumber),
+  })
 }
