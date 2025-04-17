@@ -10,6 +10,9 @@ export default defineConfig({
     pool: 'threads',
     watch: false,
     globalSetup: './test/integration/setup.ts',
-    setupFiles: ['./test/integration/mocks.ts'],
+    setupFiles: [
+      './test/integration/servers.ts',
+      './test/integration/mocks.ts',
+    ],
   },
 })

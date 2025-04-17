@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { Hex } from 'viem'
 import { getEmptyBundleEvent } from '../common/utils'
 import { privateKeyToAccount } from 'viem/accounts'
@@ -10,19 +10,12 @@ import {
 } from './common/utils'
 import { RHINESTONE_SPOKEPOOL_ADDRESS } from '../../src/constants'
 import { processBundle } from '../../src/processor'
-import { waitForServer } from './common/server'
 
 const solverAccount = privateKeyToAccount(
   process.env.SOLVER_PRIVATE_KEY! as Hex,
 )
 
 describe('samechain', () => {
-  beforeAll(async () => {
-    await waitForServer('http://localhost:8545/healthcheck')
-    await waitForServer('http://localhost:8546/healthcheck')
-    await waitForServer('http://localhost:8547/healthcheck')
-  })
-
   it.concurrent(
     'should make a single transaction for pure samechain',
     async () => {
