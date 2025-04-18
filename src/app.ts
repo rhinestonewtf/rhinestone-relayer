@@ -4,6 +4,7 @@ import WebSocket from 'ws'
 import { setupSDK } from './opentelemetry/setup'
 import { withSpan } from './opentelemetry/api'
 import { processBundle } from './processor'
+import { debugLog } from './helpers/logger'
 
 setupSDK({
   version: process.env.VERSION,
@@ -24,7 +25,10 @@ ws.on('message', async (data) =>
   withSpan('Handle WS event', async () => {
     const bundle = JSON.parse(data.toString())
     if (bundle.type !== 'Ping') {
+      debugLog(`Received bundle: ${bundle.bundleId}`)
       await processBundle(bundle)
+    } else {
+      debugLog('Received ping')
     }
   }),
 )

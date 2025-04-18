@@ -1,3 +1,4 @@
+import { debugLog } from '../helpers/logger'
 import { BundleEvent } from '../types'
 
 export const addDelay = async (bundle: BundleEvent) => {
@@ -41,6 +42,7 @@ export const addDelay = async (bundle: BundleEvent) => {
   }
 
   if (delay > 0 && process.env.DEPLOYMENT_ENV == 'prod') {
+    debugLog(`Waiting for ${delay / 1000} seconds before filling...`)
     await new Promise((resolve) => setTimeout(resolve, delay))
   }
 }

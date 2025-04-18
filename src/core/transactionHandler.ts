@@ -9,6 +9,7 @@ import {
 } from '../monitoring/tracing'
 import { recordBundleFill } from '../monitoring/metrics'
 import { getTenderlySimulation } from '../helpers/tenderly'
+import { debugLog } from '../helpers/logger'
 
 export const handleTransactions = async (
   transactions: Transaction[],
@@ -63,6 +64,8 @@ export const handleTransactions = async (
           nonce,
         }),
       })
+
+      debugLog(`Transaction sent: ${fillTx}`)
 
       // do we need to wait for transaction receipt?
       // await walletClient.waitForTransactionReceipt({ hash: fillTx })

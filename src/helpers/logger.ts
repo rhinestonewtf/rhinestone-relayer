@@ -24,14 +24,21 @@ export async function logToSlack(message: string) {
 // NONE: No logs
 // LOCAL: Only local logs
 // FULL: Local logs and send to slack
-export async function logMessage(message: string) {
+// DEBUG: Debug logs
+export const logMessage = async (message: string) => {
   const logLevel = process.env.LOG_LEVEL || 'LOCAL'
 
   if (logLevel == 'NONE') return
-  if (logLevel == 'LOCAL' || logLevel == 'FULL') {
+  if (logLevel == 'LOCAL' || logLevel == 'FULL' || logLevel == 'DEBUG') {
     console.log(message)
   }
   if (logLevel == 'FULL') {
     await logToSlack(message)
+  }
+}
+
+export const debugLog = (message: string) => {
+  if (process.env.LOG_LEVEL == 'DEBUG') {
+    console.log(message)
   }
 }

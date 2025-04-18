@@ -3,6 +3,7 @@ import { addDelay } from './core/delay'
 import { getTransactions } from './core/fillOrder'
 import { handleTransactions } from './core/transactionHandler'
 import { validateBundle } from './core/validator'
+import { debugLog } from './helpers/logger'
 import { addBundleId } from './monitoring/tracing'
 import { BundleEvent } from './types'
 
@@ -15,6 +16,7 @@ export const processBundle = async (
 
   // validate the bundle
   const isValid = await validateBundle(bundle)
+  debugLog(`Bundle ${bundle.bundleId} is valid: ${isValid}`)
 
   if (!isValid) {
     // if the bundle is not valid, we should not process it
@@ -31,9 +33,11 @@ export const processBundle = async (
 
   // handle the claims
   const success = await handleTransactions(claims, getRPCUrl)
+  debugLog(`Claims for bundle ${bundle.bundleId} were successful: ${success}`)
 
   // if claims were successful and we havent filled yet, then fill now
   if (success && fill) {
+    debugLog(`Filling bundle ${bundle.bundleId}`)
     await handleTransactions([fill], getRPCUrl)
   }
 }
