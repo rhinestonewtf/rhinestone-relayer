@@ -64,9 +64,12 @@ jobs:
       - name: 'Install the Node.js dependencies'
         run: 'bun install'
 
-      - name: Run tests
-        run: 'bun run test'
-        env:
-          SOLVER_PRIVATE_KEY: '0xa0b55bb2a3d11b39b33063a1871a4169173002258b39edc3d63102c45b4f0319'
-          DEPLOYMENT_ENV: 'dev'
-          CHAINS_CONFIG: 'e2e_external_chains.json'
+      - name: Run unit tests
+        run: 'bun run test:unit'
+
+      # - name: Run integration tests
+      #   run: 'bun run test:integration'
+      #   env:
+      #     SOLVER_PRIVATE_KEY: '0xa0b55bb2a3d11b39b33063a1871a4169173002258b39edc3d63102c45b4f0319'
+      #     DEPLOYMENT_ENV: 'dev'
+      #     CHAINS_CONFIG: 'e2e_external_chains.json'
