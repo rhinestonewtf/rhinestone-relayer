@@ -31,12 +31,7 @@ export const handleTransactions = async (
         data: transaction.data,
       })
     } catch (error) {
-      await processTransactionFailure({
-        txError: error,
-        transaction,
-        relayerAddress: walletClient.account.address,
-        blockNumber: await walletClient.getBlockNumber(),
-      })
+      debugLog(`Error estimating gas: ${error} for transaction: ${transaction}`)
       return { success: false }
     }
 
