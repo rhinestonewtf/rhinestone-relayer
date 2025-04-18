@@ -7,9 +7,7 @@
 ### Quick Guide
 
 - `src/app.ts`: Listens for bundles sent from the orchestrator.
-- `src/filler.ts`: Fills the received bundles on the destination chain.
-- `src/claimer.ts`: Claims filled bundles on the origin chains.
-- `src/bundleGenerator.ts`: The `generateBundle` function enables relayers to create mock bundles for testing. Our default relayer skips bundles with `outputAmount = 1` to ensure fair testing for other relayers.
+- `src/processor.ts`: Processes bundles and fills them
 
 ### Requirements
 
@@ -18,6 +16,8 @@ To interact with most Orchestrator functions, you'll need an API key. If you're 
 ### Contributing
 
 We welcome contributions! To request features, propose changes, or discuss improvements:
+
 - Open a Pull Request (PR)
 - Start a discussion in the repo
 - Reach out directly via Discord
+
