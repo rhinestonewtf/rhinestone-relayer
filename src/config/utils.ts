@@ -27,7 +27,7 @@ const interpolateWithEnvVars = (input: string): string => {
 export function loadConfig(filePath: string): any {
   // Read the JSON file
   const rawData = fs.readFileSync(path.resolve(filePath), 'utf-8')
-  let config = JSON.parse(rawData)
+  const config = JSON.parse(rawData)
 
   // Interpolate all values in the config object
   function traverseAndInterpolate(obj: any): any {

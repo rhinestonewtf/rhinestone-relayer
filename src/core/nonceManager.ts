@@ -30,7 +30,7 @@ class AggregatedNonceManager {
     account: Address,
     getRPCUrl: (chainId: number) => string,
   ): NonceManager {
-    let addressNonces = this.getAccountNonces(chainId)
+    const addressNonces = this.getAccountNonces(chainId)
     let nonceManager = addressNonces.get(account)
     if (!nonceManager) {
       nonceManager = new NonceManager(chainId, account, getRPCUrl)
@@ -53,7 +53,7 @@ class AggregatedNonceManager {
       chainId: chainId.toString(),
       account: account.toString(),
     })
-    let nonceManager = this.getNonceManager(chainId, account, getRPCUrl)
+    const nonceManager = this.getNonceManager(chainId, account, getRPCUrl)
     return await nonceManager.getNonce()
   }
 }
@@ -80,7 +80,7 @@ class NonceManager {
     if (this.nonce === undefined) {
       if (!this.initializing) {
         this.initializing = (async () => {
-          let client = getPublicClient(this.chainId, this.getRPCUrl)
+          const client = getPublicClient(this.chainId, this.getRPCUrl)
           this.nonce = await client.getTransactionCount({
             address: this.account,
           })
