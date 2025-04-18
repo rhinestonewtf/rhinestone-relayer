@@ -1,10 +1,10 @@
+require('dotenv').config()
+
 import WebSocket from 'ws'
 import { setupSDK } from './opentelemetry/setup'
 import { withSpan } from './opentelemetry/api'
-import { config } from 'dotenv'
 import { processBundle } from './processor'
 
-config()
 setupSDK({
   version: process.env.VERSION,
   env: process.env.DEPLOYMENT_ENV,
