@@ -1,17 +1,18 @@
 import { BundleEvent, Transaction } from '../types'
 
-const determineFillOrder = async (bundle: BundleEvent) => {
+export const isClaimFirst = async (bundle: BundleEvent) => {
   // todo
   return true
 }
 
 export const getTransactions = async (
   bundle: BundleEvent,
+  isClaimFirstFn = isClaimFirst,
 ): Promise<{
   claims: Transaction[]
   fill: Transaction | undefined
 }> => {
-  const claimFirst = await determineFillOrder(bundle)
+  const claimFirst = await isClaimFirstFn(bundle)
 
   const claims = bundle.acrossDepositEvents
     .map((depositEvent: any) => {
