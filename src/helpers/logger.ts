@@ -38,7 +38,8 @@ export const logMessage = async (message: string) => {
 }
 
 export const debugLog = (message: string) => {
-  if (process.env.LOG_LEVEL == 'DEBUG') {
+  const logLevel = process.env.LOG_LEVEL || 'LOCAL'
+  if (logLevel == 'DEBUG' || logLevel == 'FULL') {
     console.log(message)
   }
 }
