@@ -9,10 +9,11 @@
   "license": "AGPL-3.0",
   "main": "src/app.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "bun run clean && tsc",
+    "clean": "rimraf out",
     "start": "ts-node src/app.ts",
     "dev": "nodemon --exec ts-node src/app.ts",
-    "test": "pnpm test:unit && pnpm test:integration",
+    "test": "bun run test:unit && bun run test:integration",
     "test:unit": "vitest run --config ./test/unit/vitest.config.ts",
     "test:integration": "vitest run --config ./test/integration/vitest.config.ts",
     "typecheck": "tsc --noEmit",
