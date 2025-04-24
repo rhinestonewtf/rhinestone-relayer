@@ -12,7 +12,7 @@ export const addDelay = async (bundle: BundleEvent) => {
     )
   ) {
     // in pure samechain case, only do a 4s delay
-    delay = 4000
+    delay = 2500
   } else {
     for (const depositEvent of bundle.acrossDepositEvents) {
       const chainId = depositEvent.originClaimPayload.chainId
