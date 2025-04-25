@@ -1,3 +1,4 @@
+import { Address } from 'viem'
 import { defaultGetRPCUrl } from './config/chains'
 import { addDelay } from './core/delay'
 import { getTransactions } from './core/fillOrder'
@@ -10,6 +11,7 @@ import { BundleEvent } from './types'
 export const processBundle = async (
   bundle: BundleEvent,
   getRPCUrl: (chainId: number) => string = defaultGetRPCUrl,
+  relayerAddress: Address | undefined = undefined,
 ) => {
   // add bundle id for tracing
   addBundleId(String(bundle.bundleId))
@@ -28,8 +30,12 @@ export const processBundle = async (
   // note: this is used to give other fillers time to fill the order
   await addDelay(bundle)
 
-  // determine order of filling
-  const { claims, fill } = await getTransactions(bundle)
+  // determine order of filling, potentially applying inventory rebalancing
+  const { claims, fill } = await getTransactions(
+    bundle,
+    undefined,
+    relayerAddress,
+  )
 
   // handle the claims
   const success = await handleTransactions(claims, getRPCUrl)
