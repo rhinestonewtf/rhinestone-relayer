@@ -1,7 +1,7 @@
 import { Address } from 'viem'
 import { BundleEvent, Transaction } from '../types'
 import { debugLog } from '../helpers/logger'
-import { getOptimalDestinationChain, shouldReroute } from './inventory'
+import { getOptimalDestinationChain } from './inventory'
 
 export const isClaimFirst = async (bundle: BundleEvent) => {
   // todo: This could be enhanced with inventory-based decision making
@@ -18,6 +18,7 @@ export const getTransactions = async (
 }> => {
   const claimFirst = await isClaimFirstFn(bundle)
 
+  // Process claim transactions
   const claims = bundle.acrossDepositEvents
     .map((depositEvent: any) => {
       if (depositEvent.originClaimPayload.chainId === 0) {
@@ -43,64 +44,81 @@ export const getTransactions = async (
     value: 0n, // we never need to send value
   }
 
-  // Apply inventory-based rebalancing if relayer address is provided
-  // Note: In a production system, we'd need more sophisticated routing logic
+  // Apply inventory-based rebalancing (if relayer address is provided)
   if (relayerAddress && bundle.acrossDepositEvents.length > 0) {
-    try {
-      // We'll use the first deposit event for simplicity
-      // In a production system, more complex logic would be needed for multiple deposits
-      const depositEvent = bundle.acrossDepositEvents[0]
+    // Process each deposit event individually
+    let optimalChainId: number | null = null
 
-      // Check if we should consider rerouting this transaction
-      if (shouldReroute(depositEvent, relayerAddress)) {
-        // Find the optimal destination chain based on our inventory distribution
-        const optimalChainId = await getOptimalDestinationChain(
+    // Loop through each deposit event to find the optimal destination
+    for (const depositEvent of bundle.acrossDepositEvents) {
+      try {
+        // Skip if there's no origin claim payload (already filtered in claims)
+        if (depositEvent.originClaimPayload.chainId === 0) continue
+
+        // Determine optimal destination chain for this deposit event
+        const eventOptimalChainId = await getOptimalDestinationChain(
           depositEvent,
           relayerAddress,
         )
 
-        // If we found an alternate destination, and it's different from the original
-        if (
-          optimalChainId &&
-          optimalChainId !== bundle.targetFillPayload.chainId
-        ) {
-          debugLog(
-            `Rebalancing: Redirecting fill from chain ${bundle.targetFillPayload.chainId} to chain ${optimalChainId}`,
-          )
-
-          // In a real implementation, we would modify the fill transaction here
-          // to target the new chain. This would involve:
-          // 1. Generate a new transaction for the optimal chain
-          // 2. Update the fill payload with the new transaction
-
-          // For our stub implementation, we're just changing the chainId
-          // In production, this would require additional on-chain operations
-          const rebalancedFillPayload = {
-            ...originalFillPayload,
-            chainId: optimalChainId,
-            // In a real implementation, we would also need to update
-            // the 'to' address and 'data' for the new chain
+        // If we found a valid optimal chain, consider it
+        if (eventOptimalChainId) {
+          // If we haven't found an optimal chain yet, use this one
+          if (!optimalChainId) {
+            optimalChainId = eventOptimalChainId
+            debugLog(
+              `Considering chain ${optimalChainId} as optimal destination`,
+            )
           }
-
-          // Use the rebalanced fill payload
-          if (claimFirst) {
-            fill = rebalancedFillPayload
-          } else {
-            claims.unshift(rebalancedFillPayload)
-          }
-
-          // Skip default assignment below
-          return {
-            claims,
-            fill,
+          // If this deposit's optimal chain differs from a previous one,
+          // we have conflicting needs. In this simple implementation,
+          // we'll use the first valid one, but a more sophisticated approach
+          // might prioritize based on deficit size, value, etc.
+          else if (optimalChainId !== eventOptimalChainId) {
+            debugLog(
+              `Note: Deposit events have different optimal destinations (${optimalChainId} vs ${eventOptimalChainId})`,
+            )
           }
         }
+      } catch (error) {
+        // If processing one deposit fails, log and continue with others
+        debugLog(`Error processing deposit event: ${error}`)
+        // We continue the loop to process other deposit events
       }
-    } catch (error) {
-      // If rebalancing logic fails, fall back to original destination
+    }
+
+    // If we found an optimal chain different from the original destination
+    if (optimalChainId && optimalChainId !== bundle.targetFillPayload.chainId) {
       debugLog(
-        `Error in rebalancing logic, using original destination: ${error}`,
+        `Rebalancing: Redirecting fill from chain ${bundle.targetFillPayload.chainId} to chain ${optimalChainId}`,
       )
+
+      // TODO: In a real implementation, we would modify the fill transaction here
+      // to target the new chain. This would involve:
+      // 1. Generate a new transaction for the optimal chain
+      // 2. Update the fill payload with the new transaction
+
+      // For our stub implementation, we're just changing the chainId
+      // In production, this would require additional on-chain operations
+      const rebalancedFillPayload = {
+        ...originalFillPayload,
+        chainId: optimalChainId,
+        // In a real implementation, we would also need to update
+        // the 'to' address and 'data' for the new chain
+      }
+
+      // Use the rebalanced fill payload
+      if (claimFirst) {
+        fill = rebalancedFillPayload
+      } else {
+        claims.unshift(rebalancedFillPayload)
+      }
+
+      // Skip default assignment
+      return {
+        claims,
+        fill,
+      }
     }
   }
 

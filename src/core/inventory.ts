@@ -41,6 +41,7 @@ interface PortfolioBalance {
 //       In a real implementation, this would query on-chain balances
 export async function getBalances(
   relayerAddress: Address,
+  assetSymbol?: string,
 ): Promise<PortfolioBalance> {
   // This would be replaced with actual on-chain balance queries
   const portfolio: PortfolioBalance = {
@@ -62,7 +63,9 @@ export async function getBalances(
 
     // Calculate balances for each asset on this chain
     for (const [symbol, assetConfig] of Object.entries(chainConfig.assets)) {
-      // In a real implementation, we would query the blockchain here
+      if (assetSymbol && symbol !== assetSymbol) continue
+
+      // TODO: In a real implementation, we would query the blockchain here
       // For stub, we'll generate a random balance
       const rawBalance = BigInt(
         Math.floor(Math.random() * 100) * 10 ** assetDecimals[symbol],
@@ -152,31 +155,33 @@ export function findUnderfundedChain(
   const actualDistribution: Record<number, Record<string, number>> = {}
   const assetTotalValue: Record<string, number> = {}
 
-  // First, calculate total value per asset
+  // Since we're now passing in balances for just this asset,
+  // we can simplify and optimize the calculation
+
+  // Calculate total value for this specific asset
+  let totalValue = 0
   for (const chain of currentBalances.chains) {
     if (!actualDistribution[chain.chainId]) {
       actualDistribution[chain.chainId] = {}
     }
 
-    for (const assetBalance of chain.assets) {
-      if (assetBalance.symbol === asset) {
-        if (!assetTotalValue[asset]) {
-          assetTotalValue[asset] = 0
-        }
-        assetTotalValue[asset] += assetBalance.valueUSD
-      }
+    // Find the asset in this chain's assets (should be at most one entry now)
+    const assetBalance = chain.assets.find((a) => a.symbol === asset)
+    if (assetBalance) {
+      totalValue += assetBalance.valueUSD
     }
   }
 
-  // Then calculate actual distribution percentages
+  // No need to calculate for multiple assets anymore
+  // Calculate actual distribution percentages for this asset
   for (const chain of currentBalances.chains) {
-    for (const assetBalance of chain.assets) {
-      if (assetBalance.symbol === asset && assetTotalValue[asset] > 0) {
-        actualDistribution[chain.chainId][asset] =
-          assetBalance.valueUSD / assetTotalValue[asset]
-      } else {
-        actualDistribution[chain.chainId][asset] = 0
-      }
+    const assetBalance = chain.assets.find((a) => a.symbol === asset)
+
+    if (assetBalance && totalValue > 0) {
+      actualDistribution[chain.chainId][asset] =
+        assetBalance.valueUSD / totalValue
+    } else {
+      actualDistribution[chain.chainId][asset] = 0
     }
   }
 
@@ -207,31 +212,26 @@ export function findUnderfundedChain(
   return optimalChainId
 }
 
-// Determine if we should route a specific deposit to a different chain
-export function shouldReroute(
-  depositEvent: any,
-  relayerAddress: Address,
-): boolean {
-  // TODO: Implement based on current inventory, may require that as input...
-  return true
-}
-
 // Get optimal destination chain based on inventory distribution
+// This function uses the depositEvent to determine which asset we're handling
+// and finds the most underfunded chain for that specific asset
 export async function getOptimalDestinationChain(
   depositEvent: any,
   relayerAddress: Address,
 ): Promise<number | null> {
   try {
-    // Get current balances
-    const balances = await getBalances(relayerAddress)
-
-    // Find the most underfunded chain for this asset
+    // Find the asset symbol from the output token
     const assetSymbol = getAssetSymbolFromAddress(
       depositEvent.outputToken,
       depositEvent.destinationChainId,
     )
 
+    // If we can't identify the asset, we can't reroute it
+    // TODO: This means the asset is not supported, we should at least log this, but potentially hard error
     if (!assetSymbol) return null
+
+    // Get current balances for just this specific asset
+    const balances = await getBalances(relayerAddress, assetSymbol)
 
     return findUnderfundedChain(
       assetSymbol,
