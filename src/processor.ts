@@ -35,6 +35,7 @@ export const processBundle = async (
     bundle,
     undefined,
     relayerAddress,
+    getRPCUrl,
   )
 
   // handle the claims

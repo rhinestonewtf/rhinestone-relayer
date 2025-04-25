@@ -12,6 +12,7 @@ export const getTransactions = async (
   bundle: BundleEvent,
   isClaimFirstFn = isClaimFirst,
   relayerAddress: Address | undefined = undefined,
+  getRPCUrl: (chainId: number) => string,
 ): Promise<{
   claims: Transaction[]
   fill: Transaction | undefined
@@ -59,6 +60,7 @@ export const getTransactions = async (
         const eventOptimalChainId = await getOptimalDestinationChain(
           depositEvent,
           relayerAddress,
+          getRPCUrl,
         )
 
         // If we found a valid optimal chain, consider it

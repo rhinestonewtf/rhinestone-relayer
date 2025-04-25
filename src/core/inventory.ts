@@ -1,5 +1,25 @@
 import { Address } from 'viem'
 import { chains, getAssetWeight } from '../config/chains'
+import { getPublicClient } from '../helpers/getClients'
+
+// TODO: Maybe move to an artifacts directory?
+// Minimal ERC20 ABI - only what we need for balance checking (and decimals)
+const erc20ABI = [
+  {
+    constant: true,
+    inputs: [{ name: '_owner', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: 'balance', type: 'uint256' }],
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', type: 'uint8' }],
+    type: 'function',
+  },
+] as const
 
 // Stub prices for assets (in USD)
 const assetPrices: Record<string, number> = {
@@ -37,19 +57,96 @@ interface PortfolioBalance {
   totalValueUSD: number
 }
 
-// NOTE: For stub implementation, we'll hardcode some balances
-//       In a real implementation, this would query on-chain balances
+/**
+ * Get token balance for an account on a specific chain
+ * Handles both native tokens and ERC20 tokens
+ */
+async function getTokenBalance(
+  chainId: number,
+  tokenAddress: Address,
+  account: Address,
+  getRPCUrl: (chainId: number) => string,
+): Promise<{ balance: bigint; decimals: number }> {
+  const publicClient = getPublicClient(chainId, getRPCUrl)
+  let balance: bigint
+  let decimals: number
+
+  // TODO: Not every chain's native token is 0 address...
+  // Handle native token (ETH, MATIC, etc.)
+  if (tokenAddress === '0x0000000000000000000000000000000000000000') {
+    try {
+      balance = await publicClient.getBalance({ address: account })
+      // Native tokens typically have 18 decimals
+      decimals = 18
+    } catch (error) {
+      console.error(
+        `Error getting native token balance on chain ${chainId}:`,
+        error,
+      )
+      balance = 0n
+      decimals = 18
+    }
+  } else {
+    // For ERC-20 tokens
+    try {
+      // Get balance
+      const balanceResult = await publicClient.readContract({
+        address: tokenAddress,
+        abi: erc20ABI,
+        functionName: 'balanceOf',
+        args: [account],
+      })
+
+      balance = balanceResult as bigint
+
+      // Try to get decimals from the contract
+      try {
+        const decimalsResult = await publicClient.readContract({
+          address: tokenAddress,
+          abi: erc20ABI,
+          functionName: 'decimals',
+          args: [],
+        })
+
+        decimals = Number(decimalsResult)
+      } catch (error) {
+        // If decimals function fails, try to find in our mapping first, then fall back to default
+        console.warn(
+          `Failed to get decimals for token ${tokenAddress} on chain ${chainId}, using configured value or default`,
+        )
+
+        // Find by token address (in case it's mapped) or use symbol mapping through assetConfig
+        // If all else fails, default to 18 decimals
+        decimals = assetDecimals[tokenAddress] || 18
+      }
+    } catch (error) {
+      console.error(
+        `Error getting balance for token ${tokenAddress} on chain ${chainId}:`,
+        error,
+      )
+      balance = 0n
+      decimals = 18
+    }
+  }
+
+  return { balance, decimals }
+}
+
+/**
+ * Get balances for the relayer across all configured chains
+ * Can optionally filter to a specific asset symbol
+ */
 export async function getBalances(
+  getRPCUrl: (chainId: number) => string,
   relayerAddress: Address,
   assetSymbol?: string,
 ): Promise<PortfolioBalance> {
-  // This would be replaced with actual on-chain balance queries
   const portfolio: PortfolioBalance = {
     chains: [],
     totalValueUSD: 0,
   }
 
-  // Calculate balances for each chain
+  // Process each chain from our configuration
   for (const [chainIdStr, chainConfig] of Object.entries(chains)) {
     const chainId = parseInt(chainIdStr)
 
@@ -61,34 +158,47 @@ export async function getBalances(
       totalValueUSD: 0,
     }
 
-    // Calculate balances for each asset on this chain
+    // Process each asset on this chain
     for (const [symbol, assetConfig] of Object.entries(chainConfig.assets)) {
+      // Skip if we're filtering by asset and this isn't the one we want
       if (assetSymbol && symbol !== assetSymbol) continue
 
-      // TODO: In a real implementation, we would query the blockchain here
-      // For stub, we'll generate a random balance
-      const rawBalance = BigInt(
-        Math.floor(Math.random() * 100) * 10 ** assetDecimals[symbol],
-      )
+      try {
+        // Query the on-chain balance
+        const { balance, decimals } = await getTokenBalance(
+          chainId,
+          assetConfig.address as Address,
+          relayerAddress,
+          getRPCUrl,
+        )
 
-      // Calculate USD value
-      const decimals = assetDecimals[symbol] || 18
-      const normalizedBalance = Number(rawBalance) / 10 ** decimals
-      const valueUSD = normalizedBalance * (assetPrices[symbol] || 0)
+        // Calculate USD value
+        const normalizedBalance = Number(balance) / 10 ** decimals
+        const valueUSD = normalizedBalance * (assetPrices[symbol] || 0)
 
-      const assetBalance: AssetBalance = {
-        symbol,
-        address: assetConfig.address,
-        balance: rawBalance,
-        valueUSD,
+        const assetBalance: AssetBalance = {
+          symbol,
+          address: assetConfig.address,
+          balance,
+          valueUSD,
+        }
+
+        chainBalance.assets.push(assetBalance)
+        chainBalance.totalValueUSD += valueUSD
+      } catch (error) {
+        console.error(
+          `Error getting balance for ${symbol} on chain ${chainId}:`,
+          error,
+        )
+        // Continue with other assets even if one fails
       }
-
-      chainBalance.assets.push(assetBalance)
-      chainBalance.totalValueUSD += valueUSD
     }
 
-    portfolio.chains.push(chainBalance)
-    portfolio.totalValueUSD += chainBalance.totalValueUSD
+    // Only add chains that have at least one valid asset balance
+    if (chainBalance.assets.length > 0) {
+      portfolio.chains.push(chainBalance)
+      portfolio.totalValueUSD += chainBalance.totalValueUSD
+    }
   }
 
   return portfolio
@@ -153,10 +263,6 @@ export function findUnderfundedChain(
 
   // Calculate actual distribution percentages
   const actualDistribution: Record<number, Record<string, number>> = {}
-  const assetTotalValue: Record<string, number> = {}
-
-  // Since we're now passing in balances for just this asset,
-  // we can simplify and optimize the calculation
 
   // Calculate total value for this specific asset
   let totalValue = 0
@@ -218,6 +324,7 @@ export function findUnderfundedChain(
 export async function getOptimalDestinationChain(
   depositEvent: any,
   relayerAddress: Address,
+  getRPCUrl: (chainId: number) => string,
 ): Promise<number | null> {
   try {
     // Find the asset symbol from the output token
@@ -231,7 +338,7 @@ export async function getOptimalDestinationChain(
     if (!assetSymbol) return null
 
     // Get current balances for just this specific asset
-    const balances = await getBalances(relayerAddress, assetSymbol)
+    const balances = await getBalances(getRPCUrl, relayerAddress, assetSymbol)
 
     return findUnderfundedChain(
       assetSymbol,
