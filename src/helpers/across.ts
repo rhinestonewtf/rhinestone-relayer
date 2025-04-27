@@ -134,51 +134,68 @@ export function encodeAcrossFillData(decodedData: DecodedAcrossFillData): Hex {
 /**
  * Updates the repayment chain ID in decoded fill data
  *
- * This is a convenience function that takes decoded fill data, updates the
- * repaymentChainId parameter, and returns the updated decoded data ready for encoding.
+ * When changing the repayment chain ID, we need to use the fillRelayWithUpdatedDeposit function
+ * rather than fillRelay, as this is the proper way to modify the deposit parameters according
+ * to the SpokePool contract.
  *
  * @param decodedData - The original decoded fill data
  * @param newRepaymentChainId - The new repayment chain ID to set
- * @returns The updated decoded fill data
+ * @returns The updated decoded fill data with the appropriate function for changing repayment chain
  */
 export function updateRepaymentChainId(
   decodedData: DecodedAcrossFillData,
   newRepaymentChainId: bigint,
 ): DecodedAcrossFillData {
-  if (decodedData.functionName === 'fillRelay') {
-    // Create a new array to avoid mutating the original
-    const newArgs: [RelayData, bigint, `0x${string}`] = [
-      decodedData.args[0],
-      newRepaymentChainId,
-      decodedData.args[2],
-    ]
-    return { ...decodedData, args: newArgs }
-  } else if (decodedData.functionName === 'fillRelayWithUpdatedDeposit') {
-    // Create a new array to avoid mutating the original
-    const newArgs: [
-      RelayData,
-      bigint,
-      `0x${string}`,
-      bigint,
-      `0x${string}`,
-      `0x${string}`,
-      `0x${string}`,
-    ] = [
-      decodedData.args[0],
-      newRepaymentChainId,
-      decodedData.args[2],
-      decodedData.args[3],
-      decodedData.args[4],
-      decodedData.args[5],
-      decodedData.args[6],
-    ]
-    return { ...decodedData, args: newArgs }
+  // For fillV3Relay, we need to handle a different type of relay data
+  if (decodedData.functionName === 'fillV3Relay') {
+    // Convert RelayDataV3 to RelayData format
+    const v3RelayData = decodedData.args[0]
+    const relayData: RelayData = {
+      depositor: `0x${v3RelayData.depositor.slice(2)}` as `0x${string}`,
+      recipient: `0x${v3RelayData.recipient.slice(2)}` as `0x${string}`,
+      exclusiveRelayer:
+        `0x${v3RelayData.exclusiveRelayer.slice(2)}` as `0x${string}`,
+      inputToken: `0x${v3RelayData.inputToken.slice(2)}` as `0x${string}`,
+      outputToken: `0x${v3RelayData.outputToken.slice(2)}` as `0x${string}`,
+      inputAmount: v3RelayData.inputAmount,
+      outputAmount: v3RelayData.outputAmount,
+      originChainId: v3RelayData.originChainId,
+      depositId: BigInt(v3RelayData.depositId),
+      fillDeadline: v3RelayData.fillDeadline,
+      exclusivityDeadline: v3RelayData.exclusivityDeadline,
+      message: v3RelayData.message,
+    }
+
+    // Create a fillRelayWithUpdatedDeposit call
+    return {
+      functionName: 'fillRelayWithUpdatedDeposit',
+      args: [
+        relayData,
+        newRepaymentChainId,
+        `0x${v3RelayData.depositor.slice(2)}` as `0x${string}`, // Use depositor as relayer
+        relayData.outputAmount,
+        relayData.recipient,
+        relayData.message,
+        '0x' as `0x${string}`, // Empty signature
+      ],
+    }
   } else {
-    // fillV3Relay
-    const newArgs: [RelayDataV3, bigint] = [
-      decodedData.args[0],
-      newRepaymentChainId,
-    ]
-    return { ...decodedData, args: newArgs }
+    // For fillRelay or fillRelayWithUpdatedDeposit
+    const relayData = decodedData.args[0]
+    const relayer = decodedData.args[2]
+
+    // Create a fillRelayWithUpdatedDeposit call
+    return {
+      functionName: 'fillRelayWithUpdatedDeposit',
+      args: [
+        relayData,
+        newRepaymentChainId,
+        relayer,
+        relayData.outputAmount,
+        relayData.recipient,
+        relayData.message,
+        '0x' as `0x${string}`, // Empty signature
+      ],
+    }
   }
 }

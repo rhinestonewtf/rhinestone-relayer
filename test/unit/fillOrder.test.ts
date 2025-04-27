@@ -3,7 +3,8 @@ import { isClaimFirst, getTransactions } from '../../src/core/fillOrder'
 import { getEmptyBundleEvent } from '../common/utils'
 
 describe('fillOrder', () => {
-  const relayerAddress = '0x0000000000000000000000000000000000000000'
+  const relayerAddress = '0x0000000000000000000000000000000000000123'
+  // todo: will this actually call this fake address? how do we inject mock RPC?
   const getRPCUrl = vi.fn(() => 'https://rpc.example.com')
 
   it('should determine fill order', async () => {
