@@ -104,7 +104,7 @@ export const getTransactions = async (
       // 1) Decode the original fill data
       const decodedData = decodeAcrossFillData(bundle.targetFillPayload.data)
 
-      // 2) Update the repaymentChainId parameter using the helper function
+      // 2) Update the repaymentChainId parameter
       const updatedData = updateRepaymentChainId(
         decodedData,
         BigInt(optimalChainId),

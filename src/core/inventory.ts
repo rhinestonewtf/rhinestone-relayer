@@ -57,6 +57,8 @@ interface PortfolioBalance {
   totalValueUSD: number
 }
 
+// TODO: We may want to make tokenAddress an optional parameter, and default to gathering balance
+//       for all supported assets on every chain, in which case we should have multicall support.
 /**
  * Get token balance for an account on a specific chain
  * Handles both native tokens and ERC20 tokens

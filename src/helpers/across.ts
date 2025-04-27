@@ -4,7 +4,6 @@ import {
   Hex,
   decodeFunctionData,
   encodeFunctionData,
-  parseAbi,
 } from 'viem'
 import spokePoolAbi from '../../artifacts/SpokePool.sol/SpokePool.json'
 
