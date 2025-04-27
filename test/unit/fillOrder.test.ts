@@ -3,9 +3,12 @@ import { isClaimFirst, getTransactions } from '../../src/core/fillOrder'
 import { getEmptyBundleEvent } from '../common/utils'
 
 describe('fillOrder', () => {
+  const relayerAddress = '0x0000000000000000000000000000000000000000'
+  const getRPCUrl = vi.fn(() => 'https://rpc.example.com')
+
   it('should determine fill order', async () => {
-    const bunlde = getEmptyBundleEvent()
-    const claimFirst = await isClaimFirst(bunlde)
+    const bundle = getEmptyBundleEvent()
+    const claimFirst = await isClaimFirst(bundle)
 
     expect(claimFirst).toBe(true)
   })
@@ -14,7 +17,12 @@ describe('fillOrder', () => {
     const bundle = getEmptyBundleEvent()
     bundle.acrossDepositEvents[0].originClaimPayload.chainId = 1
 
-    const { claims, fill } = await getTransactions(bundle)
+    const { claims, fill } = await getTransactions(
+      bundle,
+      async () => true, // isClaimFirstFn here just returns true
+      relayerAddress,
+      getRPCUrl,
+    )
 
     expect(claims.length).toBe(1)
     expect(claims[0].to).toBe(
@@ -39,7 +47,12 @@ describe('fillOrder', () => {
     const bundle = getEmptyBundleEvent()
 
     // we don't need to manipulate bundle because chainId is 0 by default
-    const { claims } = await getTransactions(bundle)
+    const { claims } = await getTransactions(
+      bundle,
+      async () => true,
+      relayerAddress,
+      getRPCUrl,
+    )
 
     expect(claims.length).toBe(0)
   })
@@ -48,7 +61,12 @@ describe('fillOrder', () => {
     const bundle = getEmptyBundleEvent()
     bundle.acrossDepositEvents[0].originClaimPayload.chainId = 1
 
-    const { claims, fill } = await getTransactions(bundle, async () => false)
+    const { claims, fill } = await getTransactions(
+      bundle,
+      async () => false,
+      relayerAddress,
+      getRPCUrl,
+    )
 
     expect(claims.length).toBe(2)
     expect(claims[0].to).toBe(bundle.targetFillPayload.to)

@@ -60,6 +60,12 @@ interface PortfolioBalance {
 /**
  * Get token balance for an account on a specific chain
  * Handles both native tokens and ERC20 tokens
+ *
+ * @param chainId - The ID of the blockchain to query
+ * @param tokenAddress - The address of the token contract (0x0 for native token)
+ * @param account - The address of the account to check balance for
+ * @param getRPCUrl - Function that returns the RPC URL for a given chain ID
+ * @returns Object containing the token balance as BigInt and the token decimals
  */
 async function getTokenBalance(
   chainId: number,
@@ -68,8 +74,8 @@ async function getTokenBalance(
   getRPCUrl: (chainId: number) => string,
 ): Promise<{ balance: bigint; decimals: number }> {
   const publicClient = getPublicClient(chainId, getRPCUrl)
-  let balance: bigint
-  let decimals: number
+  let balance: bigint = 0n
+  let decimals: number = 18
 
   // TODO: Not every chain's native token is 0 address...
   // Handle native token (ETH, MATIC, etc.)
@@ -90,25 +96,27 @@ async function getTokenBalance(
     // For ERC-20 tokens
     try {
       // Get balance
-      const balanceResult = await publicClient.readContract({
+      const balanceResult = (await publicClient.readContract({
         address: tokenAddress,
         abi: erc20ABI,
         functionName: 'balanceOf',
         args: [account],
-      })
+      })) as unknown
 
-      balance = balanceResult as bigint
+      // Safely handle the result type
+      balance = BigInt(balanceResult?.toString() || '0')
 
       // Try to get decimals from the contract
       try {
-        const decimalsResult = await publicClient.readContract({
+        const decimalsResult = (await publicClient.readContract({
           address: tokenAddress,
           abi: erc20ABI,
           functionName: 'decimals',
           args: [],
-        })
+        })) as unknown
 
-        decimals = Number(decimalsResult)
+        // Safely convert to number
+        decimals = Number(decimalsResult?.toString() || '18')
       } catch (error) {
         // If decimals function fails, try to find in our mapping first, then fall back to default
         console.warn(
@@ -134,7 +142,12 @@ async function getTokenBalance(
 
 /**
  * Get balances for the relayer across all configured chains
- * Can optionally filter to a specific asset symbol
+ * Creates a comprehensive portfolio overview showing balances and USD values
+ *
+ * @param getRPCUrl - Function that returns the RPC URL for a given chain ID
+ * @param relayerAddress - The address of the relayer to check balances for
+ * @param assetSymbol - Optional filter to only return balances for a specific asset
+ * @returns A structured portfolio containing chain balances, asset balances, and USD values
  */
 export async function getBalances(
   getRPCUrl: (chainId: number) => string,
@@ -204,8 +217,13 @@ export async function getBalances(
   return portfolio
 }
 
-// Calculate target distribution based on weights
 // TODO: Add caching if this becomes a performance bottleneck, as its input is likely to be static
+/**
+ * Calculate target distribution based on configured asset weights
+ * Used to determine optimal distribution of assets across chains
+ *
+ * @returns A nested object mapping chainIds to assets with their target percentage distribution
+ */
 export function calculateTargetDistribution(): Record<
   number,
   Record<string, number>
@@ -252,7 +270,15 @@ export function calculateTargetDistribution(): Record<
   return targetDistribution
 }
 
-// Determine the optimal destination chain for an asset
+/**
+ * Determine the optimal destination chain for an asset based on current balances
+ * Identifies which chain has the biggest deficit compared to target distribution
+ *
+ * @param asset - Symbol of the asset to evaluate
+ * @param sourceChainId - The origin chain ID to exclude from consideration
+ * @param currentBalances - Current portfolio balances to evaluate against targets
+ * @returns The chain ID with the biggest deficit, or null if no suitable chain found
+ */
 export function findUnderfundedChain(
   asset: string,
   sourceChainId: number,
@@ -318,9 +344,17 @@ export function findUnderfundedChain(
   return optimalChainId
 }
 
-// Get optimal destination chain based on inventory distribution
-// This function uses the depositEvent to determine which asset we're handling
-// and finds the most underfunded chain for that specific asset
+// TODO: Since this may add significant latency, we should consider caching inventory,
+//       possibly using a cache manager that stays up to date with outgoing transactions.
+/**
+ * Get optimal destination chain based on inventory distribution
+ * Analyzes a deposit event to determine where funds should be directed based on inventory needs
+ *
+ * @param depositEvent - The deposit event containing transaction details
+ * @param relayerAddress - The address of the relayer managing the funds
+ * @param getRPCUrl - Function that returns the RPC URL for a given chain ID
+ * @returns The optimal destination chain ID, or null if no suitable chain found
+ */
 export async function getOptimalDestinationChain(
   depositEvent: any,
   relayerAddress: Address,
@@ -351,7 +385,14 @@ export async function getOptimalDestinationChain(
   }
 }
 
-// Helper to get asset symbol from address (stub implementation)
+/**
+ * Helper to get asset symbol from address
+ * Maps token addresses to their symbolic representation using the chain configuration
+ *
+ * @param address - The token contract address to look up
+ * @param chainId - The chain ID where the token exists
+ * @returns The symbol of the asset, or null if not found in configuration
+ */
 function getAssetSymbolFromAddress(
   address: string,
   chainId: number,

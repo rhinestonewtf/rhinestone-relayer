@@ -2,9 +2,13 @@ import { Address } from 'viem'
 import { BundleEvent, Transaction } from '../types'
 import { debugLog } from '../helpers/logger'
 import { getOptimalDestinationChain } from './inventory'
+import {
+  decodeAcrossFillData,
+  encodeAcrossFillData,
+  updateRepaymentChainId,
+} from '../helpers/across'
 
 export const isClaimFirst = async (bundle: BundleEvent) => {
-  // todo: This could be enhanced with inventory-based decision making
   return true
 }
 
@@ -92,31 +96,36 @@ export const getTransactions = async (
     // If we found an optimal chain different from the original destination
     if (optimalChainId && optimalChainId !== bundle.targetFillPayload.chainId) {
       debugLog(
-        `Rebalancing: Redirecting fill from chain ${bundle.targetFillPayload.chainId} to chain ${optimalChainId}`,
+        `Rebalancing: Setting repayment from chain ${bundle.targetFillPayload.chainId} to chain ${optimalChainId}`,
       )
 
-      // TODO: In a real implementation, we would modify the fill transaction here
-      // to target the new chain. This would involve:
-      // 1. Generate a new transaction for the optimal chain
-      // 2. Update the fill payload with the new transaction
+      // In order to change the repayment chain, we need to decode the original fill data,
+      // update the repaymentChainId parameter, and re-encode the data.
+      // 1) Decode the original fill data
+      const decodedData = decodeAcrossFillData(bundle.targetFillPayload.data)
 
-      // For our stub implementation, we're just changing the chainId
-      // In production, this would require additional on-chain operations
+      // 2) Update the repaymentChainId parameter using the helper function
+      const updatedData = updateRepaymentChainId(
+        decodedData,
+        BigInt(optimalChainId),
+      )
+
+      // 3) Re-encode the data with the updated parameter
+      const reEncodedData = encodeAcrossFillData(updatedData)
+
+      // 4) Create the modified payload
       const rebalancedFillPayload = {
         ...originalFillPayload,
-        chainId: optimalChainId,
-        // In a real implementation, we would also need to update
-        // the 'to' address and 'data' for the new chain
+        data: reEncodedData,
       }
 
-      // Use the rebalanced fill payload
+      // 5) Use the rebalanced fill payload
       if (claimFirst) {
         fill = rebalancedFillPayload
       } else {
         claims.unshift(rebalancedFillPayload)
       }
 
-      // Skip default assignment
       return {
         claims,
         fill,
