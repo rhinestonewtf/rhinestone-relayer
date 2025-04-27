@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 import WebSocket from 'ws'
+import { privateKeyToAccount } from 'viem/accounts'
 import { setupSDK } from './opentelemetry/setup'
 import { withSpan } from './opentelemetry/api'
 import { processBundle } from './processor'
@@ -11,6 +12,19 @@ setupSDK({
   env: process.env.DEPLOYMENT_ENV,
   serviceName: 'rhinestone-relayer',
 })
+
+// Get the relayer address from private key
+const relayerAccount = process.env.SOLVER_PRIVATE_KEY
+  ? privateKeyToAccount(process.env.SOLVER_PRIVATE_KEY as `0x${string}`)
+  : undefined
+
+if (relayerAccount) {
+  debugLog(`Relayer address: ${relayerAccount.address}`)
+} else {
+  console.warn(
+    'No relayer private key provided, inventory rebalancing will be disabled',
+  )
+}
 
 // Create a WebSocket client
 const ws = new WebSocket(process.env.ORCHESTRATOR_EVENTS_URL!)
@@ -26,7 +40,7 @@ ws.on('message', async (data) =>
     const bundle = JSON.parse(data.toString())
     if (bundle.type !== 'Ping') {
       debugLog(`Received bundle: ${bundle.bundleId}`)
-      await processBundle(bundle)
+      await processBundle(bundle, undefined, relayerAccount?.address)
     } else {
       debugLog('Received ping')
     }
