@@ -36,11 +36,7 @@ export function defaultGetRPCUrl(chainId: number): string {
 
 // Helper function to get asset weight (defaults to 1 if not specified)
 export function getAssetWeight(chainId: number, symbol: string): number {
-  if (
-    !chains[chainId] ||
-    !chains[chainId].assets ||
-    !chains[chainId].assets[symbol]
-  ) {
+  if (!chains[chainId]?.assets?.[symbol]) {
     return 0 // Asset not supported on this chain
   }
 
