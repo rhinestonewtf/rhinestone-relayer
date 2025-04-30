@@ -44,9 +44,9 @@ export const handleTransactions = async (
       getRPCUrl,
     })
 
-    let fillTx
+    let tx
     try {
-      fillTx = await walletClient.sendRawTransaction({
+      tx = await walletClient.sendRawTransaction({
         serializedTransaction: await walletClient.account.signTransaction({
           to: transaction.to,
           value: transaction.value,
@@ -60,7 +60,11 @@ export const handleTransactions = async (
         }),
       })
 
-      debugLog(`Transaction sent: ${fillTx}`)
+      if (transaction.isFill) {
+        // make preconfirmation
+      }
+
+      debugLog(`Transaction sent: ${tx}`)
 
       // do we need to wait for transaction receipt?
       // await walletClient.waitForTransactionReceipt({ hash: fillTx })

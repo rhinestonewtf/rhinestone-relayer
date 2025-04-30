@@ -37,7 +37,7 @@ export const processBundle = async (
 
   // if claims were successful and we havent filled yet, then fill now
   if (success && fill) {
-    debugLog(`Filling bundle ${bundle.bundleId}`)
+    debugLog(`Filling bundle ${bundle.bundleId} on chain ${fill.chainId}`)
     await handleTransactions([fill], getRPCUrl)
   }
 }
