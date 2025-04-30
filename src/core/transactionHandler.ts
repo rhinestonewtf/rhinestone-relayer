@@ -12,6 +12,7 @@ import { getTenderlySimulation } from '../helpers/tenderly'
 import { debugLog } from '../helpers/logger'
 
 export const handleTransactions = async (
+  bundleId: string,
   transactions: Transaction[],
   getRPCUrl: (chainId: number) => string,
 ) => {
@@ -62,6 +63,18 @@ export const handleTransactions = async (
 
       if (transaction.isFill) {
         // make preconfirmation
+        fetch(`${process.env.ORCHESTRATOR_URL}/bundles/${bundleId}/events`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': process.env.ORCHESTRATOR_API_KEY!,
+          },
+          body: JSON.stringify({
+            type: 'FillPreconfirmation',
+            chainId: transaction.chainId,
+            txHash: tx,
+          }),
+        })
       }
 
       debugLog(`Transaction sent: ${tx}`)
