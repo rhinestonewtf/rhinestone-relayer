@@ -12,6 +12,7 @@ import { getTenderlySimulation } from '../helpers/tenderly'
 import { debugLog } from '../helpers/logger'
 
 export const handleTransactions = async (
+  bundleId: string,
   transactions: Transaction[],
   getRPCUrl: (chainId: number) => string,
 ) => {
@@ -44,9 +45,9 @@ export const handleTransactions = async (
       getRPCUrl,
     })
 
-    let fillTx
+    let tx
     try {
-      fillTx = await walletClient.sendRawTransaction({
+      tx = await walletClient.sendRawTransaction({
         serializedTransaction: await walletClient.account.signTransaction({
           to: transaction.to,
           value: transaction.value,
@@ -60,7 +61,24 @@ export const handleTransactions = async (
         }),
       })
 
-      debugLog(`Transaction sent: ${fillTx}`)
+      if (transaction.isFill) {
+        // make preconfirmation
+        fetch(`${process.env.ORCHESTRATOR_URL}/bundles/${bundleId}/events`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': process.env.ORCHESTRATOR_API_KEY!,
+          },
+          body: JSON.stringify({
+            type: 'FillPreconfirmation',
+            chainId: transaction.chainId,
+            txHash: tx,
+          }),
+        })
+        debugLog(`Fill preconfirmation sent for transaction: ${tx}`)
+      }
+
+      debugLog(`Transaction sent: ${tx}`)
 
       // do we need to wait for transaction receipt?
       // await walletClient.waitForTransactionReceipt({ hash: fillTx })

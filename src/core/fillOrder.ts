@@ -25,6 +25,7 @@ export const getTransactions = async (
         data: depositEvent.originClaimPayload.data,
         chainId: depositEvent.originClaimPayload.chainId,
         value: 0n, // we never need to send value
+        isFill: false,
       }
     })
     .filter(Boolean) as Transaction[]
@@ -36,6 +37,7 @@ export const getTransactions = async (
     data: bundle.targetFillPayload.data,
     chainId: bundle.targetFillPayload.chainId,
     value: 0n, // we never need to send value
+    isFill: true,
   }
 
   if (!claimFirst) {

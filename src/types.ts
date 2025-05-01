@@ -12,6 +12,7 @@ export type Transaction = {
   to: Address
   value: bigint
   data: Hex
+  isFill: boolean
 }
 
 export type BundleEvent = {
