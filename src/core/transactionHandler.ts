@@ -75,6 +75,7 @@ export const handleTransactions = async (
             txHash: tx,
           }),
         })
+        debugLog(`Fill preconfirmation sent for transaction: ${tx}`)
       }
 
       debugLog(`Transaction sent: ${tx}`)
