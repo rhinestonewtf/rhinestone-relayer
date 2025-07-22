@@ -13,7 +13,13 @@ export type Transaction = {
   value: bigint
   data: Hex
   isFill: boolean
-  authorisationList?: SignedAuthorizationList
+  authorizationList?: SignedAuthorizationList
+}
+
+export type FeeEstimation = {
+  gas: bigint
+  maxFeePerGas: bigint,
+  maxPriorityFeePerGas: bigint,
 }
 
 export type BundleEvent = {

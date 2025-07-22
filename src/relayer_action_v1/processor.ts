@@ -18,14 +18,18 @@ export const processRelayerActionV1 = async (action: RelayerActionV1) =>
 
     const prefillActions = action.claims
       .filter((claim) => claim.beforeFill)
-    await withSpan('prefill claim actions', () => handleTransactions(bundleId, toTransactions(prefillActions, false), defaultGetRPCUrl))
+    const prefillClaimSuccess = await withSpan('prefill claim actions', () => handleTransactions(bundleId, toTransactions(prefillActions, false), defaultGetRPCUrl))
+    if (!prefillClaimSuccess) { return }
 
-    await withSpan('fill action', () => handleTransactions(bundleId, toTransactions([action.fill], true), defaultGetRPCUrl))
+
+    const fillSuccess = await withSpan('fill action', () => handleTransactions(bundleId, toTransactions([action.fill], true), defaultGetRPCUrl))
+    if (!fillSuccess) { return }
 
     const postFillActions = action.claims
       .filter((claim) => !claim.beforeFill)
 
-    await withSpan('postfill claim actions', () => handleTransactions(bundleId, toTransactions(postFillActions, false), defaultGetRPCUrl))
+    const postFillClaimSuccess = await withSpan('postfill claim actions', () => handleTransactions(bundleId, toTransactions(postFillActions, false), defaultGetRPCUrl))
+    if (!postFillClaimSuccess) { return }
     debugLog('relayer action v1 completed')
   })
 

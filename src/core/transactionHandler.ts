@@ -1,5 +1,5 @@
-import { Address, Hex } from 'viem'
-import { Transaction } from '../types'
+import { Address, Hex, SignedAuthorizationList, TransactionSerializable } from 'viem'
+import { FeeEstimation, Transaction } from '../types'
 import { getWalletClient } from '../helpers/getClients'
 import { nonceManager } from './nonceManager'
 import {
@@ -31,6 +31,7 @@ export const handleTransactions = async (
         to: transaction.to,
         value: transaction.value,
         data: transaction.data,
+        authorizationList: transaction.authorizationList,
       })
     } catch (error) {
       debugLog(`Error estimating gas: ${error} for transaction: ${transaction}`)
@@ -46,20 +47,16 @@ export const handleTransactions = async (
       getRPCUrl,
     })
 
+    const feeEstimation = {
+      gas,
+      maxFeePerGas,
+      maxPriorityFeePerGas
+    }
+
     let tx
     try {
       tx = await walletClient.sendRawTransaction({
-        serializedTransaction: await walletClient.account.signTransaction({
-          to: transaction.to,
-          value: transaction.value,
-          data: transaction.data,
-          chainId: transaction.chainId,
-          type: 'eip1559',
-          maxFeePerGas,
-          maxPriorityFeePerGas,
-          gas,
-          nonce,
-        }),
+        serializedTransaction: await walletClient.account.signTransaction(makeTransactionRequest(transaction, nonce, feeEstimation)),
       })
 
       if (transaction.isFill) {
@@ -131,4 +128,29 @@ const processTransactionFailure = async ({
     calldata: transaction.data,
     blockNumber: Number(blockNumber),
   })
+}
+
+function makeTransactionRequest(transaction: Transaction, nonce: number, feeEstimation: FeeEstimation): TransactionSerializable {
+  if (transaction.authorizationList) {
+    return {
+      to: transaction.to,
+      value: BigInt(transaction.value),
+      data: transaction.data,
+      chainId: transaction.chainId,
+      ...feeEstimation,
+      nonce,
+      type: 'eip7702',
+      authorizationList: transaction.authorizationList
+    }
+  } else {
+    return {
+      to: transaction.to,
+      value: BigInt(transaction.value),
+      data: transaction.data,
+      chainId: transaction.chainId,
+      ...feeEstimation,
+      nonce,
+      type: 'eip1559'
+    }
+  }
 }
