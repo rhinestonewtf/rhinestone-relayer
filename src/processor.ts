@@ -32,12 +32,16 @@ export const processBundle = async (
   const { claims, fill } = await getTransactions(bundle)
 
   // handle the claims
-  const success = await handleTransactions(claims, getRPCUrl)
+  const success = await handleTransactions(
+    bundle.bundleId.toString(),
+    claims,
+    getRPCUrl,
+  )
   debugLog(`Claims for bundle ${bundle.bundleId} were successful: ${success}`)
 
   // if claims were successful and we havent filled yet, then fill now
   if (success && fill) {
-    debugLog(`Filling bundle ${bundle.bundleId}`)
-    await handleTransactions([fill], getRPCUrl)
+    debugLog(`Filling bundle ${bundle.bundleId} on chain ${fill.chainId}`)
+    await handleTransactions(bundle.bundleId.toString(), [fill], getRPCUrl)
   }
 }
