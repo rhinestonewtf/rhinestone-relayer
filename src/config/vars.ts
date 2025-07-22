@@ -1,0 +1,1 @@
+export const SOLVER_PRIVATE_KEY = process.env.SOLVER_PRIVATE_KEY ?? (() => { throw Error('solver private key is missing') })

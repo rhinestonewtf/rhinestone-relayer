@@ -1,6 +1,6 @@
 import { Address, Hex } from 'viem'
 import { Transaction } from '../types'
-import { getPublicClient, getWalletClient } from '../helpers/getClients'
+import { getWalletClient } from '../helpers/getClients'
 import { nonceManager } from './nonceManager'
 import {
   addFillStatus,
@@ -10,6 +10,7 @@ import {
 import { recordBundleFill } from '../monitoring/metrics'
 import { getTenderlySimulation } from '../helpers/tenderly'
 import { debugLog } from '../helpers/logger'
+import { SOLVER_PRIVATE_KEY } from '../config/vars'
 
 export const handleTransactions = async (
   bundleId: string,
@@ -19,7 +20,7 @@ export const handleTransactions = async (
   const processPromises = transactions.map(async (transaction) => {
     const walletClient = getWalletClient(
       transaction.chainId,
-      process.env.SOLVER_PRIVATE_KEY! as Hex,
+      SOLVER_PRIVATE_KEY as Hex,
       getRPCUrl,
     )
 
