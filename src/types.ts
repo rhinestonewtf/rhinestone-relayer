@@ -1,4 +1,4 @@
-import { Address, Chain, Hex } from 'viem'
+import { Address, Chain, Hex, SignedAuthorizationList } from 'viem'
 
 export type RelayerChainConfig = {
   rpcUrl: string
@@ -13,6 +13,13 @@ export type Transaction = {
   value: bigint
   data: Hex
   isFill: boolean
+  authorizationList?: SignedAuthorizationList
+}
+
+export type FeeEstimation = {
+  gas: bigint
+  maxFeePerGas: bigint,
+  maxPriorityFeePerGas: bigint,
 }
 
 export type BundleEvent = {

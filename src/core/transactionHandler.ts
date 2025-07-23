@@ -1,6 +1,6 @@
-import { Address, Hex } from 'viem'
-import { Transaction } from '../types'
-import { getPublicClient, getWalletClient } from '../helpers/getClients'
+import { Address, Hex, TransactionSerializable } from 'viem'
+import { FeeEstimation, Transaction } from '../types'
+import { getWalletClient } from '../helpers/getClients'
 import { nonceManager } from './nonceManager'
 import {
   addFillStatus,
@@ -10,6 +10,7 @@ import {
 import { recordBundleFill } from '../monitoring/metrics'
 import { getTenderlySimulation } from '../helpers/tenderly'
 import { debugLog } from '../helpers/logger'
+import { SOLVER_PRIVATE_KEY } from '../config/vars'
 
 export const handleTransactions = async (
   bundleId: string,
@@ -19,7 +20,7 @@ export const handleTransactions = async (
   const processPromises = transactions.map(async (transaction) => {
     const walletClient = getWalletClient(
       transaction.chainId,
-      process.env.SOLVER_PRIVATE_KEY! as Hex,
+      SOLVER_PRIVATE_KEY as Hex,
       getRPCUrl,
     )
 
@@ -30,6 +31,7 @@ export const handleTransactions = async (
         to: transaction.to,
         value: transaction.value,
         data: transaction.data,
+        authorizationList: transaction.authorizationList,
       })
     } catch (error) {
       debugLog(`Error estimating gas: ${error} for transaction: ${transaction}`)
@@ -45,20 +47,16 @@ export const handleTransactions = async (
       getRPCUrl,
     })
 
+    const feeEstimation = {
+      gas,
+      maxFeePerGas,
+      maxPriorityFeePerGas
+    }
+
     let tx
     try {
       tx = await walletClient.sendRawTransaction({
-        serializedTransaction: await walletClient.account.signTransaction({
-          to: transaction.to,
-          value: transaction.value,
-          data: transaction.data,
-          chainId: transaction.chainId,
-          type: 'eip1559',
-          maxFeePerGas,
-          maxPriorityFeePerGas,
-          gas,
-          nonce,
-        }),
+        serializedTransaction: await walletClient.account.signTransaction(makeTransactionRequest(transaction, nonce, feeEstimation)),
       })
 
       if (transaction.isFill) {
@@ -130,4 +128,29 @@ const processTransactionFailure = async ({
     calldata: transaction.data,
     blockNumber: Number(blockNumber),
   })
+}
+
+function makeTransactionRequest(transaction: Transaction, nonce: number, feeEstimation: FeeEstimation): TransactionSerializable {
+  if (transaction.authorizationList) {
+    return {
+      to: transaction.to,
+      value: BigInt(transaction.value),
+      data: transaction.data,
+      chainId: transaction.chainId,
+      ...feeEstimation,
+      nonce,
+      type: 'eip7702',
+      authorizationList: transaction.authorizationList
+    }
+  } else {
+    return {
+      to: transaction.to,
+      value: BigInt(transaction.value),
+      data: transaction.data,
+      chainId: transaction.chainId,
+      ...feeEstimation,
+      nonce,
+      type: 'eip1559'
+    }
+  }
 }

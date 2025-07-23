@@ -31,6 +31,18 @@ export const addChainId = (chainId: number) => {
   })
 }
 
+export const addSettlementLayer = (settlementLayer: string) => {
+  addSpanAttributes({
+    'relayer.settlement.layer': settlementLayer,
+  })
+}
+
+export const addActionId = (id: number) => {
+  addSpanAttributes({
+    'relayer.action.id': id.toString(),
+  })
+}
+
 export const recordError = (e: any) => {
   currentSpan()
     ?.setStatus({

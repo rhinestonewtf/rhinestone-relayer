@@ -5,6 +5,7 @@ import { setupSDK } from './opentelemetry/setup'
 import { withSpan } from './opentelemetry/api'
 import { processBundle } from './processor'
 import { debugLog } from './helpers/logger'
+import { processRelayerActionV1 } from './relayer_action_v1/processor'
 
 setupSDK({
   version: process.env.VERSION,
@@ -23,12 +24,22 @@ ws.on('open', async () => {
 // Handle incoming messages
 ws.on('message', async (data) =>
   withSpan('Handle WS event', async () => {
-    const bundle = JSON.parse(data.toString())
-    if (bundle.type !== 'Ping') {
-      debugLog(`Received bundle: ${bundle.bundleId}`)
-      await processBundle(bundle)
-    } else {
-      debugLog('Received ping')
+    const message = JSON.parse(data.toString())
+    switch (message.type) {
+      case 'Ping':
+        debugLog('Received ping')
+        break
+      case 'RhinestoneBundle':
+        debugLog(`Received bundle: ${message.bundleId}`)
+        await processBundle(message)
+        break
+
+      case 'RelayerActionV1':
+        await processRelayerActionV1(message)
+        break
+      default:
+        debugLog('Unknown message type')
+        debugLog(JSON.stringify(message, undefined, 2))
     }
   }),
 )

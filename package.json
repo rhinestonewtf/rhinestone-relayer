@@ -41,6 +41,7 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "bun": "^1.2.19",
     "@types/amqplib": "^0.10.5",
     "eslint": "^9.24.0",
     "eslint-config-prettier": "^9.1.0",
