@@ -1,4 +1,4 @@
-import { Address, Hex, SignedAuthorizationList, TransactionSerializable } from 'viem'
+import { Address, Hex, TransactionSerializable } from 'viem'
 import { FeeEstimation, Transaction } from '../types'
 import { getWalletClient } from '../helpers/getClients'
 import { nonceManager } from './nonceManager'

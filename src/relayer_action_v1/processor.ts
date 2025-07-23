@@ -41,7 +41,7 @@ function toTransactions(actions: ChainAction[], isFill: boolean): Transaction[] 
       value: action.call.value,
       data: action.call.data,
       isFill,
-      authorisationList: toAuthorizationList(action.eip7702Delegation)
+      authorizationList: toAuthorizationList(action.eip7702Delegation)
     }
   })
 }
