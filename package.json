@@ -37,12 +37,12 @@
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
-    "viem": "^2.23.5",
+    "viem": "^2.33.2",
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "bun": "^1.2.19",
     "@types/amqplib": "^0.10.5",
+    "bun": "^1.2.19",
     "eslint": "^9.24.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
