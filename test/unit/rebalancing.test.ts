@@ -7,6 +7,6 @@ const claimRouteCall = `0x0fbb12dc0000000000000000000000000000000000000000000000
 describe('Rebalancing', () => {
     it('should replace repayment address and chain with given info', () => {
 
-        const updated = replaceRepaymentDestinations(fillRouteCall, { address: {}, chain: 123 })
+        const updated = replaceRepaymentDestinations(fillRouteCall, { address: '0x', chain: 123 })
     })
 })
