@@ -11,6 +11,7 @@ import { recordBundleFill } from '../monitoring/metrics'
 import { getTenderlySimulation } from '../helpers/tenderly'
 import { debugLog } from '../helpers/logger'
 import { SOLVER_PRIVATE_KEY } from '../config/vars'
+import { replaceRepaymentDestinations } from '../helpers/rebalancing'
 
 export const handleTransactions = async (
   bundleId: string,
@@ -24,13 +25,15 @@ export const handleTransactions = async (
       getRPCUrl,
     )
 
+    const txData = replaceRepaymentDestinations(transaction.data, { address: walletClient.account.address })
+
     let gas
     try {
       gas = await walletClient.estimateGas({
         account: walletClient.account,
         to: transaction.to,
         value: transaction.value,
-        data: transaction.data,
+        data: txData,
         authorizationList: transaction.authorizationList,
       })
     } catch (error) {
