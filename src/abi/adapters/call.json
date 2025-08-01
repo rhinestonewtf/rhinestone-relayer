@@ -1,0 +1,29 @@
+[
+    {
+        "type": "fallback",
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "singleCall",
+        "inputs": [
+            {
+                "name": "target",
+                "type": "address",
+                "internalType": "address"
+            },
+            {
+                "name": "callData",
+                "type": "bytes",
+                "internalType": "bytes"
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "error",
+        "name": "Unauthorized",
+        "inputs": []
+    }
+]
