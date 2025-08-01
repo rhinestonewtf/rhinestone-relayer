@@ -1,0 +1,1587 @@
+export const acrossAdapterMulticallAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: 'router',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'compact',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'orchestrator',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'intentExecutor',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'acrossMessageHandler',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'arbiterOverride',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'ACROSS_MESSAGE_HANDLER',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'ARBITER',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'TYPEHASH_COMPACT',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'TYPEHASH_ELEMENT',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'TYPEHASH_LOCK',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'TYPEHASH_MANDATE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: '_ROUTER',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: '__QUALIFIER_EIP712Hash',
+    inputs: [
+      {
+        name: 'data',
+        type: 'bytes',
+        internalType: 'bytes',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: '__encodeRelayerData',
+    inputs: [
+      {
+        name: 'repayments',
+        type: 'tuple[]',
+        internalType: 'struct IAcrossAdapter.AcrossRepayment[]',
+        components: [
+          {
+            name: 'repaymentChain',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'repaymentAddress',
+            type: 'address',
+            internalType: 'address',
+          },
+        ],
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes',
+        internalType: 'bytes',
+      },
+    ],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    name: '_hashElement',
+    inputs: [
+      {
+        name: 'order',
+        type: 'tuple',
+        internalType: 'struct Types.Order',
+        components: [
+          {
+            name: 'sponsor',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'recipient',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'nonce',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'expires',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'fillDeadline',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'notarizedChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'targetChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'tokenIn',
+            type: 'uint256[2][]',
+            internalType: 'uint256[2][]',
+          },
+          {
+            name: 'tokenOut',
+            type: 'uint256[2][]',
+            internalType: 'uint256[2][]',
+          },
+          {
+            name: 'preClaimOps',
+            type: 'tuple',
+            internalType: 'struct Types.Operation',
+            components: [
+              {
+                name: 'data',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+          {
+            name: 'targetOps',
+            type: 'tuple',
+            internalType: 'struct Types.Operation',
+            components: [
+              {
+                name: 'data',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+          {
+            name: 'qualifier',
+            type: 'bytes',
+            internalType: 'bytes',
+          },
+        ],
+      },
+      {
+        name: 'arbiter',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'originChainId',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'claimProofSender',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: 'hash',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: '_hashMandate',
+    inputs: [
+      {
+        name: 'order',
+        type: 'tuple',
+        internalType: 'struct Types.Order',
+        components: [
+          {
+            name: 'sponsor',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'recipient',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'nonce',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'expires',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'fillDeadline',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'notarizedChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'targetChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'tokenIn',
+            type: 'uint256[2][]',
+            internalType: 'uint256[2][]',
+          },
+          {
+            name: 'tokenOut',
+            type: 'uint256[2][]',
+            internalType: 'uint256[2][]',
+          },
+          {
+            name: 'preClaimOps',
+            type: 'tuple',
+            internalType: 'struct Types.Operation',
+            components: [
+              {
+                name: 'data',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+          {
+            name: 'targetOps',
+            type: 'tuple',
+            internalType: 'struct Types.Operation',
+            components: [
+              {
+                name: 'data',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+          {
+            name: 'qualifier',
+            type: 'bytes',
+            internalType: 'bytes',
+          },
+        ],
+      },
+      {
+        name: 'claimProofSender',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: 'hash',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'across_multicall_handleClaim',
+    inputs: [
+      {
+        name: 'claimData',
+        type: 'tuple',
+        internalType: 'struct IAcrossAdapter.ClaimData',
+        components: [
+          {
+            name: 'order',
+            type: 'tuple',
+            internalType: 'struct Types.Order',
+            components: [
+              {
+                name: 'sponsor',
+                type: 'address',
+                internalType: 'address',
+              },
+              {
+                name: 'recipient',
+                type: 'address',
+                internalType: 'address',
+              },
+              {
+                name: 'nonce',
+                type: 'uint256',
+                internalType: 'uint256',
+              },
+              {
+                name: 'expires',
+                type: 'uint256',
+                internalType: 'uint256',
+              },
+              {
+                name: 'fillDeadline',
+                type: 'uint256',
+                internalType: 'uint256',
+              },
+              {
+                name: 'notarizedChainId',
+                type: 'uint256',
+                internalType: 'uint256',
+              },
+              {
+                name: 'targetChainId',
+                type: 'uint256',
+                internalType: 'uint256',
+              },
+              {
+                name: 'tokenIn',
+                type: 'uint256[2][]',
+                internalType: 'uint256[2][]',
+              },
+              {
+                name: 'tokenOut',
+                type: 'uint256[2][]',
+                internalType: 'uint256[2][]',
+              },
+              {
+                name: 'preClaimOps',
+                type: 'tuple',
+                internalType: 'struct Types.Operation',
+                components: [
+                  {
+                    name: 'data',
+                    type: 'bytes',
+                    internalType: 'bytes',
+                  },
+                ],
+              },
+              {
+                name: 'targetOps',
+                type: 'tuple',
+                internalType: 'struct Types.Operation',
+                components: [
+                  {
+                    name: 'data',
+                    type: 'bytes',
+                    internalType: 'bytes',
+                  },
+                ],
+              },
+              {
+                name: 'qualifier',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+          {
+            name: 'userSigs',
+            type: 'tuple',
+            internalType: 'struct Types.Signatures',
+            components: [
+              {
+                name: 'notarizedClaimSig',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+              {
+                name: 'preClaimSig',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+          {
+            name: 'elementIndex',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'otherElements',
+            type: 'bytes32[]',
+            internalType: 'bytes32[]',
+          },
+          {
+            name: 'allocatorData',
+            type: 'bytes',
+            internalType: 'bytes',
+          },
+          {
+            name: 'preClaimGasStipend',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+        ],
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes4',
+        internalType: 'bytes4',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'across_multicall_handleFill',
+    inputs: [
+      {
+        name: 'fillData',
+        type: 'tuple',
+        internalType: 'struct IAcrossAdapter.FillData',
+        components: [
+          {
+            name: 'claimHash',
+            type: 'bytes32',
+            internalType: 'bytes32',
+          },
+          {
+            name: 'originChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'sponsor',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'recipient',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'tokenIn',
+            type: 'uint256[2][]',
+            internalType: 'uint256[2][]',
+          },
+          {
+            name: 'tokenOut',
+            type: 'uint256[2][]',
+            internalType: 'uint256[2][]',
+          },
+          {
+            name: 'nonce',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'originChainWETH',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'fillDeadline',
+            type: 'uint32',
+            internalType: 'uint32',
+          },
+          {
+            name: 'targetOps',
+            type: 'tuple',
+            internalType: 'struct Types.Operation',
+            components: [
+              {
+                name: 'data',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes4',
+        internalType: 'bytes4',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'getUnsafeDepositId',
+    inputs: [
+      {
+        name: 'msgSender',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'depositor',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+      {
+        name: 'depositNonce',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    name: 'isAdapter',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes4',
+        internalType: 'bytes4',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'supportsInterface',
+    inputs: [
+      {
+        name: 'selector',
+        type: 'bytes4',
+        internalType: 'bytes4',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+        internalType: 'bool',
+      },
+    ],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'event',
+    name: 'Claimed',
+    inputs: [
+      {
+        name: 'nonce',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'Filled',
+    inputs: [
+      {
+        name: 'nonce',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'SpokePoolInitialized',
+    inputs: [
+      {
+        name: 'spokePool',
+        type: 'address',
+        indexed: false,
+        internalType: 'address',
+      },
+      {
+        name: 'weth',
+        type: 'address',
+        indexed: false,
+        internalType: 'address',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'AssertTokenTransfer',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'IncorrectMessageValue',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'IncorrectType',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidArbiterAddress',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidClaimData',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidFillDeadline',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidMode',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidNotarizedChain',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidRepaymentAddress',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidRepaymentChainId',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidRepaymentChainIdDuringCollapse',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidToken',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'OnlyDelegateCall',
+    inputs: [],
+  },
+]
+
+export const acrossAdapter7579IntentExecutorAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: 'router',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'compact',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'orchestrator',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'intentExecutor',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'acrossMessageHandler',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'arbiterOverride',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'ACROSS_MESSAGE_HANDLER',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'ARBITER',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'TYPEHASH_COMPACT',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'TYPEHASH_ELEMENT',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'TYPEHASH_LOCK',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'TYPEHASH_MANDATE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: '_ROUTER',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: '__QUALIFIER_EIP712Hash',
+    inputs: [
+      {
+        name: 'data',
+        type: 'bytes',
+        internalType: 'bytes',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: '__encodeRelayerData',
+    inputs: [
+      {
+        name: 'repayments',
+        type: 'tuple[]',
+        internalType: 'struct IAcrossAdapter.AcrossRepayment[]',
+        components: [
+          {
+            name: 'repaymentChain',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'repaymentAddress',
+            type: 'address',
+            internalType: 'address',
+          },
+        ],
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes',
+        internalType: 'bytes',
+      },
+    ],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    name: '_hashElement',
+    inputs: [
+      {
+        name: 'order',
+        type: 'tuple',
+        internalType: 'struct Types.Order',
+        components: [
+          {
+            name: 'sponsor',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'recipient',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'nonce',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'expires',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'fillDeadline',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'notarizedChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'targetChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'tokenIn',
+            type: 'uint256[2][]',
+            internalType: 'uint256[2][]',
+          },
+          {
+            name: 'tokenOut',
+            type: 'uint256[2][]',
+            internalType: 'uint256[2][]',
+          },
+          {
+            name: 'preClaimOps',
+            type: 'tuple',
+            internalType: 'struct Types.Operation',
+            components: [
+              {
+                name: 'data',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+          {
+            name: 'targetOps',
+            type: 'tuple',
+            internalType: 'struct Types.Operation',
+            components: [
+              {
+                name: 'data',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+          {
+            name: 'qualifier',
+            type: 'bytes',
+            internalType: 'bytes',
+          },
+        ],
+      },
+      {
+        name: 'arbiter',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'originChainId',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+      {
+        name: 'claimProofSender',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: 'hash',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: '_hashMandate',
+    inputs: [
+      {
+        name: 'order',
+        type: 'tuple',
+        internalType: 'struct Types.Order',
+        components: [
+          {
+            name: 'sponsor',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'recipient',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'nonce',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'expires',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'fillDeadline',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'notarizedChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'targetChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'tokenIn',
+            type: 'uint256[2][]',
+            internalType: 'uint256[2][]',
+          },
+          {
+            name: 'tokenOut',
+            type: 'uint256[2][]',
+            internalType: 'uint256[2][]',
+          },
+          {
+            name: 'preClaimOps',
+            type: 'tuple',
+            internalType: 'struct Types.Operation',
+            components: [
+              {
+                name: 'data',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+          {
+            name: 'targetOps',
+            type: 'tuple',
+            internalType: 'struct Types.Operation',
+            components: [
+              {
+                name: 'data',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+          {
+            name: 'qualifier',
+            type: 'bytes',
+            internalType: 'bytes',
+          },
+        ],
+      },
+      {
+        name: 'claimProofSender',
+        type: 'address',
+        internalType: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: 'hash',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'across_erc7579Intent_handleClaim',
+    inputs: [
+      {
+        name: 'claimData',
+        type: 'tuple',
+        internalType: 'struct IAcrossAdapter.ClaimData',
+        components: [
+          {
+            name: 'order',
+            type: 'tuple',
+            internalType: 'struct Types.Order',
+            components: [
+              {
+                name: 'sponsor',
+                type: 'address',
+                internalType: 'address',
+              },
+              {
+                name: 'recipient',
+                type: 'address',
+                internalType: 'address',
+              },
+              {
+                name: 'nonce',
+                type: 'uint256',
+                internalType: 'uint256',
+              },
+              {
+                name: 'expires',
+                type: 'uint256',
+                internalType: 'uint256',
+              },
+              {
+                name: 'fillDeadline',
+                type: 'uint256',
+                internalType: 'uint256',
+              },
+              {
+                name: 'notarizedChainId',
+                type: 'uint256',
+                internalType: 'uint256',
+              },
+              {
+                name: 'targetChainId',
+                type: 'uint256',
+                internalType: 'uint256',
+              },
+              {
+                name: 'tokenIn',
+                type: 'uint256[2][]',
+                internalType: 'uint256[2][]',
+              },
+              {
+                name: 'tokenOut',
+                type: 'uint256[2][]',
+                internalType: 'uint256[2][]',
+              },
+              {
+                name: 'preClaimOps',
+                type: 'tuple',
+                internalType: 'struct Types.Operation',
+                components: [
+                  {
+                    name: 'data',
+                    type: 'bytes',
+                    internalType: 'bytes',
+                  },
+                ],
+              },
+              {
+                name: 'targetOps',
+                type: 'tuple',
+                internalType: 'struct Types.Operation',
+                components: [
+                  {
+                    name: 'data',
+                    type: 'bytes',
+                    internalType: 'bytes',
+                  },
+                ],
+              },
+              {
+                name: 'qualifier',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+          {
+            name: 'userSigs',
+            type: 'tuple',
+            internalType: 'struct Types.Signatures',
+            components: [
+              {
+                name: 'notarizedClaimSig',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+              {
+                name: 'preClaimSig',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+          {
+            name: 'elementIndex',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'otherElements',
+            type: 'bytes32[]',
+            internalType: 'bytes32[]',
+          },
+          {
+            name: 'allocatorData',
+            type: 'bytes',
+            internalType: 'bytes',
+          },
+          {
+            name: 'preClaimGasStipend',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+        ],
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes4',
+        internalType: 'bytes4',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'across_erc7579Intent_handleFill',
+    inputs: [
+      {
+        name: 'fillData',
+        type: 'tuple',
+        internalType: 'struct IAcrossAdapter.FillData',
+        components: [
+          {
+            name: 'claimHash',
+            type: 'bytes32',
+            internalType: 'bytes32',
+          },
+          {
+            name: 'originChainId',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'sponsor',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'recipient',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'tokenIn',
+            type: 'uint256[2][]',
+            internalType: 'uint256[2][]',
+          },
+          {
+            name: 'tokenOut',
+            type: 'uint256[2][]',
+            internalType: 'uint256[2][]',
+          },
+          {
+            name: 'nonce',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'originChainWETH',
+            type: 'address',
+            internalType: 'address',
+          },
+          {
+            name: 'fillDeadline',
+            type: 'uint32',
+            internalType: 'uint32',
+          },
+          {
+            name: 'targetOps',
+            type: 'tuple',
+            internalType: 'struct Types.Operation',
+            components: [
+              {
+                name: 'data',
+                type: 'bytes',
+                internalType: 'bytes',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'context',
+        type: 'tuple',
+        internalType: 'struct AcrossAdapterERC7579IntentExecutor.IntentContext',
+        components: [
+          {
+            name: 'expires',
+            type: 'uint256',
+            internalType: 'uint256',
+          },
+          {
+            name: 'originPreClaimOpsHash',
+            type: 'bytes32',
+            internalType: 'bytes32',
+          },
+          {
+            name: 'otherElements',
+            type: 'bytes32[]',
+            internalType: 'bytes32[]',
+          },
+          {
+            name: 'qHash',
+            type: 'bytes32',
+            internalType: 'bytes32',
+          },
+          {
+            name: 'targetSig',
+            type: 'bytes',
+            internalType: 'bytes',
+          },
+        ],
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes4',
+        internalType: 'bytes4',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'getUnsafeDepositId',
+    inputs: [
+      {
+        name: 'msgSender',
+        type: 'address',
+        internalType: 'address',
+      },
+      {
+        name: 'depositor',
+        type: 'bytes32',
+        internalType: 'bytes32',
+      },
+      {
+        name: 'depositNonce',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+        internalType: 'uint256',
+      },
+    ],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    name: 'isAdapter',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes4',
+        internalType: 'bytes4',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'supportsInterface',
+    inputs: [
+      {
+        name: 'selector',
+        type: 'bytes4',
+        internalType: 'bytes4',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+        internalType: 'bool',
+      },
+    ],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'event',
+    name: 'Claimed',
+    inputs: [
+      {
+        name: 'nonce',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'Filled',
+    inputs: [
+      {
+        name: 'nonce',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'SpokePoolInitialized',
+    inputs: [
+      {
+        name: 'spokePool',
+        type: 'address',
+        indexed: false,
+        internalType: 'address',
+      },
+      {
+        name: 'weth',
+        type: 'address',
+        indexed: false,
+        internalType: 'address',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'AssertTokenTransfer',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'IncorrectMessageValue',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'IncorrectType',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidArbiterAddress',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidClaimData',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidFillDeadline',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidMode',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidNotarizedChain',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidRepaymentAddress',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidRepaymentChainId',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidRepaymentChainIdDuringCollapse',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidToken',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'OnlyDelegateCall',
+    inputs: [],
+  },
+] as const
