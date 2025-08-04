@@ -93,27 +93,24 @@ export const RelayRepaymentsRelayerContext = (original: Hex, repayment: Repaymen
     return original
 }
 
-const adapterRelayerContextMap = {
-    'singleCallAbi': NoRelayerContext,
-    'multiCallAbi': NoRelayerContext,
-    'sameChainAbi': SameChainRepaymentsRelayerContext,
-    'ecoAbi': EcoRepaymentsRelayerContext,
-    'across7579Abi': AccrossRepaymentsRelayerContext,
-    'acrossMultiCallAbi': AccrossRepaymentsRelayerContext,
-    'relayAbi': RelayRepaymentsRelayerContext,
+const adapterRelayerContextMap: { [K in keyof typeof adapters]: RelayerContextRewrite } = {
+    singleCallAbi: NoRelayerContext,
+    multiCallAbi: NoRelayerContext,
+    sameChainAbi: SameChainRepaymentsRelayerContext,
+    ecoAbi: EcoRepaymentsRelayerContext,
+    across7579Abi: AccrossRepaymentsRelayerContext,
+    acrossMultiCallAbi: AccrossRepaymentsRelayerContext,
+    relayAbi: RelayRepaymentsRelayerContext,
 }
 
-const functionSelectorToRelayerContextMap = buildSelectorToContextMap(adapters)
+const functionSelectorToRelayerContextMap = buildSelectorToContextMap()
 
-function buildSelectorToContextMap(adapters: { [key: string]: Abi }): { [key: Hex]: RelayerContextRewrite } {
+function buildSelectorToContextMap(): { [key: Hex]: RelayerContextRewrite } {
     let map: { [key: Hex]: RelayerContextRewrite } = {}
 
-    for (const [key, value] of Object.entries(adapters)) {
-        const rewrite = adapterRelayerContextMap[key] as RelayerContextRewrite
-        if (!rewrite) {
-            throw new Error(`unknown adapter ${key} for rewrite`)
-        }
-        const abi = value as Abi
+    for (const key of Object.keys(adapters) as (keyof typeof adapters)[]) {
+        const rewrite = adapterRelayerContextMap[key]
+        const abi = adapters[key]
 
         for (const item of abi.filter((v) => v.type == 'function')) {
             const functionSelector = toFunctionSelector(item)

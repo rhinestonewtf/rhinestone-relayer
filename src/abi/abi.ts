@@ -32,4 +32,4 @@ export const adapters = {
     acrossMultiCallAbi,
     across7579Abi,
     relayAbi,
-}
+} as const
