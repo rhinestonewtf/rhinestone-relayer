@@ -1,4 +1,4 @@
-import { Abi, Address, decodeAbiParameters, decodeFunctionData, encodeAbiParameters, encodeFunctionData, getFunctionSelector, Hex, parseAbiParameters, sliceHex, toFunctionSelector } from "viem"
+import { Abi, Address, decodeAbiParameters, decodeFunctionData, encodeAbiParameters, encodeFunctionData, encodePacked, Hex, sliceHex, toFunctionSelector } from "viem"
 import { adapters, routerAbi } from "../abi/abi"
 
 
@@ -22,8 +22,6 @@ export function replaceRepaymentDestinations(data: Hex, destination: RepaymentDe
         throw new Error(`Unsupported route function call: ${routerCall.functionName}`)
     }
 
-    console.log(routerCall)
-
     let relayerContextData = routerCall.args![0] as Hex[]
     const adaptersCallData = routerCall.args![1] as Hex[]
 
@@ -31,7 +29,6 @@ export function replaceRepaymentDestinations(data: Hex, destination: RepaymentDe
         let relayerContext = relayerContextData[i]
         const adapterCall = adaptersCallData[i]
 
-        console.log('Context: ', relayerContext, ' adapter: ', adapterCall)
         const selector = sliceHex(adapterCall, 0, 4)
         const rewriteF = functionSelectorToRelayerContextMap[selector]
         if (!rewriteF) {
@@ -49,6 +46,16 @@ export const NoRelayerContext = (original: Hex, _repayment: RepaymentDestination
     return original
 }
 
+const accrossRelayerContext = [
+    {
+        type: 'tuple[]',
+        components: [
+            { name: 'repaymentChain', type: 'uint256' },
+            { name: 'repaymentAddress', type: 'address' },
+        ],
+    },
+];
+
 export const AccrossRepaymentsRelayerContext = (original: Hex, repayment: RepaymentDestination): Hex => {
     let decoded = decodeAbiParameters(accrossRelayerContext, original)
     let contexts = decoded[0] as { repaymentChain: bigint, repaymentAddress: Address }[]
@@ -64,27 +71,25 @@ export const AccrossRepaymentsRelayerContext = (original: Hex, repayment: Repaym
     return encodeAbiParameters(accrossRelayerContext, [contexts])
 }
 
-export const SameChainRepaymentsRelayerContext = (original: Hex, repayment: RepaymentDestination): Hex => {
-    console.log('Same chain repayments')
-    return original
+// 1. tokenIn recipient
+// 2. refund recipient
+const sameChainRelayerContext = ['address', 'address']
+
+export const SameChainRepaymentsRelayerContext = (_original: Hex, repayment: RepaymentDestination): Hex => {
+    // can be adapted to support different address for token in and refund
+    // if optional address is added in repayment context
+    // also we can decode original data and reuse parts of it if needed
+    return encodePacked(sameChainRelayerContext, [repayment.address, repayment.address])
 }
 
-export const EcoRepaymentsRelayerContext = (original: Hex, repayment: RepaymentDestination): Hex => {
-    console.log('Eco repayments')
-    return original
+// a single claimant address
+const ecoRelayerContext = ['address']
+export const EcoRepaymentsRelayerContext = (_original: Hex, repayment: RepaymentDestination): Hex => {
+    return encodePacked(ecoRelayerContext, [repayment.address])
 }
-
-const accrossRelayerContext = [
-    {
-        type: 'tuple[]',
-        components: [
-            { name: 'repaymentChain', type: 'uint256' },
-            { name: 'repaymentAddress', type: 'address' },
-        ],
-    },
-];
 
 export const RelayRepaymentsRelayerContext = (original: Hex, repayment: RepaymentDestination): Hex => {
+    // relay settlement uses only relay relayer (pun intended) themselves - nothing to override
     return original
 }
 
