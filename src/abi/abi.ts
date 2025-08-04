@@ -21,11 +21,15 @@ export const acrossMultiCallAbi: Abi = acrossMultiCallAbiJson as Abi
 import across7579AbiJson from "./adapters/across_7579.json"
 export const across7579Abi: Abi = across7579AbiJson as Abi
 
+import relayAbiJson from "./adapters/relay.json"
+export const relayAbi: Abi = relayAbiJson as Abi
+
 export const adapters = {
     singleCallAbi,
     multiCallAbi,
     ecoAbi,
     sameChainAbi,
     acrossMultiCallAbi,
-    across7579Abi
+    across7579Abi,
+    relayAbi,
 }

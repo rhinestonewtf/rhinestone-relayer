@@ -1,0 +1,810 @@
+[
+    {
+        "type": "constructor",
+        "inputs": [
+            {
+                "name": "router",
+                "type": "address",
+                "internalType": "address"
+            },
+            {
+                "name": "relayArbiter",
+                "type": "address",
+                "internalType": "address"
+            },
+            {
+                "name": "intentExecutor",
+                "type": "address",
+                "internalType": "address"
+            },
+            {
+                "name": "relaySolver",
+                "type": "address",
+                "internalType": "address"
+            },
+            {
+                "name": "relayRouter",
+                "type": "address",
+                "internalType": "address"
+            }
+        ],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "ARBITER",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "address",
+                "internalType": "address"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "TYPEHASH_COMPACT",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32",
+                "internalType": "bytes32"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "TYPEHASH_ELEMENT",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32",
+                "internalType": "bytes32"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "TYPEHASH_LOCK",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32",
+                "internalType": "bytes32"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "TYPEHASH_MANDATE",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32",
+                "internalType": "bytes32"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "_ROUTER",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "address",
+                "internalType": "address"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "__QUALIFIER_EIP712Hash",
+        "inputs": [
+            {
+                "name": "data",
+                "type": "bytes",
+                "internalType": "bytes"
+            }
+        ],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32",
+                "internalType": "bytes32"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "_hashElement",
+        "inputs": [
+            {
+                "name": "order",
+                "type": "tuple",
+                "internalType": "struct Types.Order",
+                "components": [
+                    {
+                        "name": "sponsor",
+                        "type": "address",
+                        "internalType": "address"
+                    },
+                    {
+                        "name": "recipient",
+                        "type": "address",
+                        "internalType": "address"
+                    },
+                    {
+                        "name": "nonce",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "expires",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "fillDeadline",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "notarizedChainId",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "targetChainId",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "tokenIn",
+                        "type": "uint256[2][]",
+                        "internalType": "uint256[2][]"
+                    },
+                    {
+                        "name": "tokenOut",
+                        "type": "uint256[2][]",
+                        "internalType": "uint256[2][]"
+                    },
+                    {
+                        "name": "preClaimOps",
+                        "type": "tuple",
+                        "internalType": "struct Types.Operation",
+                        "components": [
+                            {
+                                "name": "data",
+                                "type": "bytes",
+                                "internalType": "bytes"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "targetOps",
+                        "type": "tuple",
+                        "internalType": "struct Types.Operation",
+                        "components": [
+                            {
+                                "name": "data",
+                                "type": "bytes",
+                                "internalType": "bytes"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "qualifier",
+                        "type": "bytes",
+                        "internalType": "bytes"
+                    }
+                ]
+            },
+            {
+                "name": "arbiter",
+                "type": "address",
+                "internalType": "address"
+            },
+            {
+                "name": "originChainId",
+                "type": "uint256",
+                "internalType": "uint256"
+            }
+        ],
+        "outputs": [
+            {
+                "name": "hash",
+                "type": "bytes32",
+                "internalType": "bytes32"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "_hashMandate",
+        "inputs": [
+            {
+                "name": "order",
+                "type": "tuple",
+                "internalType": "struct Types.Order",
+                "components": [
+                    {
+                        "name": "sponsor",
+                        "type": "address",
+                        "internalType": "address"
+                    },
+                    {
+                        "name": "recipient",
+                        "type": "address",
+                        "internalType": "address"
+                    },
+                    {
+                        "name": "nonce",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "expires",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "fillDeadline",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "notarizedChainId",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "targetChainId",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "tokenIn",
+                        "type": "uint256[2][]",
+                        "internalType": "uint256[2][]"
+                    },
+                    {
+                        "name": "tokenOut",
+                        "type": "uint256[2][]",
+                        "internalType": "uint256[2][]"
+                    },
+                    {
+                        "name": "preClaimOps",
+                        "type": "tuple",
+                        "internalType": "struct Types.Operation",
+                        "components": [
+                            {
+                                "name": "data",
+                                "type": "bytes",
+                                "internalType": "bytes"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "targetOps",
+                        "type": "tuple",
+                        "internalType": "struct Types.Operation",
+                        "components": [
+                            {
+                                "name": "data",
+                                "type": "bytes",
+                                "internalType": "bytes"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "qualifier",
+                        "type": "bytes",
+                        "internalType": "bytes"
+                    }
+                ]
+            }
+        ],
+        "outputs": [
+            {
+                "name": "hash",
+                "type": "bytes32",
+                "internalType": "bytes32"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "isAdapter",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes4",
+                "internalType": "bytes4"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "relay_handleClaim",
+        "inputs": [
+            {
+                "name": "claimData",
+                "type": "tuple",
+                "internalType": "struct ClaimData",
+                "components": [
+                    {
+                        "name": "order",
+                        "type": "tuple",
+                        "internalType": "struct Types.Order",
+                        "components": [
+                            {
+                                "name": "sponsor",
+                                "type": "address",
+                                "internalType": "address"
+                            },
+                            {
+                                "name": "recipient",
+                                "type": "address",
+                                "internalType": "address"
+                            },
+                            {
+                                "name": "nonce",
+                                "type": "uint256",
+                                "internalType": "uint256"
+                            },
+                            {
+                                "name": "expires",
+                                "type": "uint256",
+                                "internalType": "uint256"
+                            },
+                            {
+                                "name": "fillDeadline",
+                                "type": "uint256",
+                                "internalType": "uint256"
+                            },
+                            {
+                                "name": "notarizedChainId",
+                                "type": "uint256",
+                                "internalType": "uint256"
+                            },
+                            {
+                                "name": "targetChainId",
+                                "type": "uint256",
+                                "internalType": "uint256"
+                            },
+                            {
+                                "name": "tokenIn",
+                                "type": "uint256[2][]",
+                                "internalType": "uint256[2][]"
+                            },
+                            {
+                                "name": "tokenOut",
+                                "type": "uint256[2][]",
+                                "internalType": "uint256[2][]"
+                            },
+                            {
+                                "name": "preClaimOps",
+                                "type": "tuple",
+                                "internalType": "struct Types.Operation",
+                                "components": [
+                                    {
+                                        "name": "data",
+                                        "type": "bytes",
+                                        "internalType": "bytes"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "targetOps",
+                                "type": "tuple",
+                                "internalType": "struct Types.Operation",
+                                "components": [
+                                    {
+                                        "name": "data",
+                                        "type": "bytes",
+                                        "internalType": "bytes"
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "qualifier",
+                                "type": "bytes",
+                                "internalType": "bytes"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "userSigs",
+                        "type": "tuple",
+                        "internalType": "struct Types.Signatures",
+                        "components": [
+                            {
+                                "name": "notarizedClaimSig",
+                                "type": "bytes",
+                                "internalType": "bytes"
+                            },
+                            {
+                                "name": "preClaimSig",
+                                "type": "bytes",
+                                "internalType": "bytes"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "elementIndex",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "otherElements",
+                        "type": "bytes32[]",
+                        "internalType": "bytes32[]"
+                    },
+                    {
+                        "name": "allocatorData",
+                        "type": "bytes",
+                        "internalType": "bytes"
+                    },
+                    {
+                        "name": "preClaimGasStipend",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "depositId",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    }
+                ]
+            }
+        ],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes4",
+                "internalType": "bytes4"
+            }
+        ],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "relay_handleFill",
+        "inputs": [
+            {
+                "name": "fillData",
+                "type": "tuple",
+                "internalType": "struct FillData",
+                "components": [
+                    {
+                        "name": "sponsor",
+                        "type": "address",
+                        "internalType": "address"
+                    },
+                    {
+                        "name": "recipient",
+                        "type": "address",
+                        "internalType": "address"
+                    },
+                    {
+                        "name": "tokenOut",
+                        "type": "uint256[2][]",
+                        "internalType": "uint256[2][]"
+                    },
+                    {
+                        "name": "tokenIn",
+                        "type": "uint256[2][]",
+                        "internalType": "uint256[2][]"
+                    },
+                    {
+                        "name": "fillDeadline",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "nonce",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "originChainId",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "targetOps",
+                        "type": "tuple",
+                        "internalType": "struct Types.Operation",
+                        "components": [
+                            {
+                                "name": "data",
+                                "type": "bytes",
+                                "internalType": "bytes"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "calls",
+                        "type": "tuple[]",
+                        "internalType": "struct Call3Value[]",
+                        "components": [
+                            {
+                                "name": "target",
+                                "type": "address",
+                                "internalType": "address"
+                            },
+                            {
+                                "name": "allowFailure",
+                                "type": "bool",
+                                "internalType": "bool"
+                            },
+                            {
+                                "name": "value",
+                                "type": "uint256",
+                                "internalType": "uint256"
+                            },
+                            {
+                                "name": "callData",
+                                "type": "bytes",
+                                "internalType": "bytes"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes4",
+                "internalType": "bytes4"
+            }
+        ],
+        "stateMutability": "payable"
+    },
+    {
+        "type": "function",
+        "name": "relay_handleFill_ERC7579",
+        "inputs": [
+            {
+                "name": "fillData",
+                "type": "tuple",
+                "internalType": "struct FillData",
+                "components": [
+                    {
+                        "name": "sponsor",
+                        "type": "address",
+                        "internalType": "address"
+                    },
+                    {
+                        "name": "recipient",
+                        "type": "address",
+                        "internalType": "address"
+                    },
+                    {
+                        "name": "tokenOut",
+                        "type": "uint256[2][]",
+                        "internalType": "uint256[2][]"
+                    },
+                    {
+                        "name": "tokenIn",
+                        "type": "uint256[2][]",
+                        "internalType": "uint256[2][]"
+                    },
+                    {
+                        "name": "fillDeadline",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "nonce",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "originChainId",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "targetOps",
+                        "type": "tuple",
+                        "internalType": "struct Types.Operation",
+                        "components": [
+                            {
+                                "name": "data",
+                                "type": "bytes",
+                                "internalType": "bytes"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "calls",
+                        "type": "tuple[]",
+                        "internalType": "struct Call3Value[]",
+                        "components": [
+                            {
+                                "name": "target",
+                                "type": "address",
+                                "internalType": "address"
+                            },
+                            {
+                                "name": "allowFailure",
+                                "type": "bool",
+                                "internalType": "bool"
+                            },
+                            {
+                                "name": "value",
+                                "type": "uint256",
+                                "internalType": "uint256"
+                            },
+                            {
+                                "name": "callData",
+                                "type": "bytes",
+                                "internalType": "bytes"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "context",
+                "type": "tuple",
+                "internalType": "struct IntentContext",
+                "components": [
+                    {
+                        "name": "expires",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "originPreClaimOpsHash",
+                        "type": "bytes32",
+                        "internalType": "bytes32"
+                    },
+                    {
+                        "name": "otherElements",
+                        "type": "bytes32[]",
+                        "internalType": "bytes32[]"
+                    },
+                    {
+                        "name": "qHash",
+                        "type": "bytes32",
+                        "internalType": "bytes32"
+                    },
+                    {
+                        "name": "targetSig",
+                        "type": "bytes",
+                        "internalType": "bytes"
+                    }
+                ]
+            }
+        ],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes4",
+                "internalType": "bytes4"
+            }
+        ],
+        "stateMutability": "payable"
+    },
+    {
+        "type": "function",
+        "name": "supportsInterface",
+        "inputs": [
+            {
+                "name": "selector",
+                "type": "bytes4",
+                "internalType": "bytes4"
+            }
+        ],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool",
+                "internalType": "bool"
+            }
+        ],
+        "stateMutability": "pure"
+    },
+    {
+        "type": "event",
+        "name": "Claimed",
+        "inputs": [
+            {
+                "name": "nonce",
+                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256"
+            }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
+        "name": "Filled",
+        "inputs": [
+            {
+                "name": "nonce",
+                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256"
+            }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "error",
+        "name": "AssertTokenTransfer",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "CallFailed",
+        "inputs": [
+            {
+                "name": "returnData",
+                "type": "bytes",
+                "internalType": "bytes"
+            }
+        ]
+    },
+    {
+        "type": "error",
+        "name": "IncorrectMessageValue",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "IncorrectType",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidArbiterAddress",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidClaimData",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidRecipientAddress",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidSolver",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NoCallsToExecute",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "OnlyDelegateCall",
+        "inputs": []
+    }
+]
