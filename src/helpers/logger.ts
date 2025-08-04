@@ -1,4 +1,3 @@
-import { withSpan } from '../opentelemetry/api'
 
 export async function logToSlack(message: string) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL

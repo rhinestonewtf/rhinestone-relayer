@@ -1,0 +1,104 @@
+[
+    {
+        "type": "receive",
+        "stateMutability": "payable"
+    },
+    {
+        "type": "function",
+        "name": "isArbiter",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes4",
+                "internalType": "bytes4"
+            }
+        ],
+        "stateMutability": "pure"
+    },
+    {
+        "type": "function",
+        "name": "multiCall",
+        "inputs": [
+            {
+                "name": "executions",
+                "type": "tuple[]",
+                "internalType": "struct Execution[]",
+                "components": [
+                    {
+                        "name": "target",
+                        "type": "address",
+                        "internalType": "address"
+                    },
+                    {
+                        "name": "value",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "callData",
+                        "type": "bytes",
+                        "internalType": "bytes"
+                    }
+                ]
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "payable"
+    },
+    {
+        "type": "function",
+        "name": "multiCallWithDrainToken",
+        "inputs": [
+            {
+                "name": "executions",
+                "type": "tuple[]",
+                "internalType": "struct Execution[]",
+                "components": [
+                    {
+                        "name": "target",
+                        "type": "address",
+                        "internalType": "address"
+                    },
+                    {
+                        "name": "value",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "callData",
+                        "type": "bytes",
+                        "internalType": "bytes"
+                    }
+                ]
+            },
+            {
+                "name": "tokenAndAmounts",
+                "type": "uint256[2][]",
+                "internalType": "uint256[2][]"
+            },
+            {
+                "name": "recipient",
+                "type": "address",
+                "internalType": "address"
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "payable"
+    },
+    {
+        "type": "error",
+        "name": "ExecutionFailed",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "Unauthorized",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "WithdrawFailed",
+        "inputs": []
+    }
+]
