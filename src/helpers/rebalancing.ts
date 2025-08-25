@@ -7,10 +7,9 @@ export type RepaymentDestination = {
     chain?: number,
 }
 
-const supportedRouteCalls = ['routeClaim', 'routeFill']
+const supportedRouteCalls = ['routeClaim', 'routeFill', 'optimized_routeFill921336808']
 
 export function replaceRepaymentDestinations(data: Hex, destination: RepaymentDestination): Hex {
-
     let routerCall = decodeFunctionData(
         {
             abi: routerAbi,
@@ -22,19 +21,40 @@ export function replaceRepaymentDestinations(data: Hex, destination: RepaymentDe
         throw new Error(`Unsupported route function call: ${routerCall.functionName}`)
     }
 
+    let contextIndex = 0
     let relayerContextData = routerCall.args![0] as Hex[]
-    const adaptersCallData = routerCall.args![1] as Hex[]
+    const isOptimizedRouteCall = routerCall.functionName.includes('optimized')
+    const adaptersCallData = !isOptimizedRouteCall
+      ? routerCall.args![1] as Hex[]
+      : decodeAbiParameters(
+          [{ type: 'bytes[]', name: 'adapterContexts' }],
+          routerCall.args![1] as Hex
+        )[0]
 
     for (let i = 0; i < adaptersCallData.length; i++) {
-        let relayerContext = relayerContextData[i]
         const adapterCall = adaptersCallData[i]
-
         const selector = sliceHex(adapterCall, 0, 4)
         const rewriteF = functionSelectorToRelayerContextMap[selector]
         if (!rewriteF) {
             throw new Error(`Unkonwn adapter call at ${i}, selector: ${selector}`)
         }
-        relayerContextData[i] = rewriteF(relayerContext, destination)
+
+        if (
+          (isOptimizedRouteCall && rewriteF !== NoRelayerContext)
+          || !isOptimizedRouteCall
+        ) {
+          if (contextIndex >= relayerContextData.length) {
+              throw new Error(`Mismatch: Adapter call at index ${i} requires a relayer context, but none are available`)
+          }
+
+          const currentContext = relayerContextData[contextIndex]
+          relayerContextData[contextIndex] = rewriteF(currentContext, destination)
+          contextIndex++
+        }
+    }
+
+    if (contextIndex !== relayerContextData.length) {
+        throw new Error('Data mismatch: More contexts were provided than were consumed by the adapter calls')
     }
 
     return encodeFunctionData({ ...routerCall, abi: routerAbi })
