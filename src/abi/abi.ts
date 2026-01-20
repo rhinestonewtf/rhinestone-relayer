@@ -24,6 +24,9 @@ export const across7579Abi: Abi = across7579AbiJson as Abi
 import relayAbiJson from "./adapters/relay.json"
 export const relayAbi: Abi = relayAbiJson as Abi
 
+import directRoutesAbiJson from "./adapters/directRoutes.json"
+export const directRoutesAbi: Abi = directRoutesAbiJson as Abi
+
 export const adapters = {
     singleCallAbi,
     multiCallAbi,
@@ -32,4 +35,5 @@ export const adapters = {
     acrossMultiCallAbi,
     across7579Abi,
     relayAbi,
+    directRoutesAbi,
 } as const

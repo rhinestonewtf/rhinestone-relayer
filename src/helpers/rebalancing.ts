@@ -34,6 +34,7 @@ export function replaceRepaymentDestinations(data: Hex, destination: RepaymentDe
     for (let i = 0; i < adaptersCallData.length; i++) {
         const adapterCall = adaptersCallData[i]
         const selector = sliceHex(adapterCall, 0, 4)
+        console.dir({adapterCall, selector})
         const rewriteF = functionSelectorToRelayerContextMap[selector]
         if (!rewriteF) {
             throw new Error(`Unkonwn adapter call at ${i}, selector: ${selector}`)
@@ -116,6 +117,7 @@ export const RelayRepaymentsRelayerContext = (original: Hex, repayment: Repaymen
 const adapterRelayerContextMap: { [K in keyof typeof adapters]: RelayerContextRewrite } = {
     singleCallAbi: NoRelayerContext,
     multiCallAbi: NoRelayerContext,
+    directRoutesAbi: NoRelayerContext,
     sameChainAbi: SameChainRepaymentsRelayerContext,
     ecoAbi: EcoRepaymentsRelayerContext,
     across7579Abi: AccrossRepaymentsRelayerContext,
@@ -133,6 +135,7 @@ function buildSelectorToContextMap(): { [key: Hex]: RelayerContextRewrite } {
         const abi = adapters[key]
 
         for (const item of abi.filter((v) => v.type == 'function')) {
+            console.dir({item},{depth:null})
             const functionSelector = toFunctionSelector(item)
             map[functionSelector] = rewrite
         }

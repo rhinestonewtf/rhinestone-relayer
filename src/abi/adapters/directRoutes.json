@@ -1,0 +1,41 @@
+[
+	{
+		"type": "function",
+		"name": "onFill_inRouter_setApproval",
+		"inputs":[
+			{
+				"name": "token",
+				"type": "address",
+				"internalType": "address"
+			},
+			{
+				"name": "spender",
+				"type": "address",
+				"internalType": "address"
+			},
+			{
+				"name": "amount",
+				"type": "uint256",
+				"internalType": "uint256"
+			},
+			{
+				"name": "chainId",
+				"type": "uint64",
+				"internalType": "uint64"
+			},
+			{
+				"name": "expires",
+				"type": "uint32",
+				"internalType": "uint32"
+			}
+		],
+		"outputs":[
+			{ 
+				"name": "",
+				"type": "bytes4",
+				"internalType": "bytes4"
+			}
+		],
+		"stateMutability": "nonpayable"
+	}
+]
