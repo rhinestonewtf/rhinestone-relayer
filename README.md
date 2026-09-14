@@ -1,5 +1,7 @@
 # Rhinestone Relayer
 
+> **No longer maintained.** This repository is kept for reference. For new projects, use the [Rhinestone SDK](https://docs.rhinestone.dev).
+
 **A Minimal Example Repo to Demonstrate How to Fill OmniAccount Bundles on Across**
 
 > **Important:** This is a demo script. Please reach out on Discord before filling any bundles. [Join Discord Channel](https://discord.com/channels/887426921892315137/1333280423920402464).
