@@ -4,7 +4,7 @@
   "description": "A reference implementation relayer for the Omni Account system",
   "author": {
     "name": "Rhinestone",
-    "url": "https://rhinestone.wtf"
+    "url": "https://www.rhinestone.dev"
   },
   "license": "AGPL-3.0",
   "main": "src/app.ts",
